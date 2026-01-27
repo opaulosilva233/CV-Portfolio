@@ -1,0 +1,16 @@
+{
+	"name": "CV Portfolio",
+	"dockerComposeFile": [
+		"../docker-compose.yml"
+	],
+	"service": "app",
+	"workspaceFolder": "/var/www/html",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"bmewburn.vscode-intelephense-client",
+				"eamodio.gitlens"
+			]
+		}
+	}
+}
