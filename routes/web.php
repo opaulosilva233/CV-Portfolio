@@ -14,11 +14,17 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
 
-Route::middleware('auth')->group(function () {
+    // Admin Routes
+    Route::resource('admin/experiences', \App\Http\Controllers\Admin\ExperienceController::class);
+    Route::resource('admin/skills', \App\Http\Controllers\Admin\SkillController::class);
+    Route::resource('admin/projects', \App\Http\Controllers\Admin\ProjectController::class);
+    Route::resource('admin/sections', \App\Http\Controllers\Admin\PageSectionController::class);
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
