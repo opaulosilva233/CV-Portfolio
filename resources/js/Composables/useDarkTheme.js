@@ -3,15 +3,24 @@ import { onMounted, ref } from 'vue';
 export function useDarkTheme() {
     const isDark = ref(false);
 
-    const toggleTheme = () => {
-        isDark.value = !isDark.value;
-        if (isDark.value) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
+    const toggleTheme = (event) => {
+        const toggle = () => {
+            isDark.value = !isDark.value;
+            if (isDark.value) {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+        };
+
+        if (!document.startViewTransition) {
+            toggle();
+            return;
         }
+
+        document.startViewTransition(toggle);
     };
 
     onMounted(() => {

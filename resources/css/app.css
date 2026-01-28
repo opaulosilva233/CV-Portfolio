@@ -3,7 +3,59 @@
 @tailwind utilities;
 
 @layer base {
+    :root {
+        /* Default animation (used when switching to Light Mode, i.e., removing .dark class) */
+        /* Since .dark is removed, the :root value applies. We want the reverse wipe. */
+        --wipe-animation: diagonal-wipe-reverse;
+    }
+
+    :root.dark {
+        /* Animation used when switching to Dark Mode (adding .dark class) */
+        --wipe-animation: diagonal-wipe;
+    }
+
     body {
         @apply transition-colors duration-500 ease-in-out;
+    }
+}
+
+/* Base View Transition Setup */
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+/* The "New" view (incoming theme) sits on top and animates its clip-path */
+::view-transition-new(root) {
+    z-index: 9999;
+    animation: 1.5s ease-in-out var(--wipe-animation) forwards;
+}
+
+/* The "Old" view stays underneath */
+::view-transition-old(root) {
+    z-index: 1;
+}
+
+/* Top-Left to Bottom-Right Wipe */
+@keyframes diagonal-wipe {
+    0% {
+        clip-path: polygon(0 0, 0 0, 0 0);
+    }
+
+    100% {
+        clip-path: polygon(-100% 0, 200% 0, 0 200%);
+    }
+}
+
+/* Bottom-Right to Top-Left Wipe (Reverse) */
+@keyframes diagonal-wipe-reverse {
+    0% {
+        clip-path: polygon(100% 100%, 100% 100%, 100% 100%);
+    }
+
+    100% {
+        /* Expands deeply negative to ensure it covers the top-left corner (0,0) */
+        clip-path: polygon(100% 100%, 200% -200%, -200% 200%);
     }
 }
