@@ -23,5 +23,38 @@ export default defineConfig({
             host: 'localhost',
             clientPort: 5173,
         },
+        watch: {
+            // Ignora node_modules e vendor para reduzir overhead de file watching
+            ignored: ['**/node_modules/**', '**/vendor/**', '**/.git/**'],
+        },
+        warmup: {
+            // Pré-aquece os arquivos principais
+            clientFiles: ['./resources/js/app.js', './resources/css/app.css'],
+        },
+    },
+    // Otimização de dependências - pré-bundling
+    optimizeDeps: {
+        include: [
+            'vue',
+            '@inertiajs/vue3',
+            'axios',
+        ],
+        exclude: [],
+    },
+    // Configurações de CSS para melhor performance
+    css: {
+        devSourcemap: false, // Desativa sourcemaps em dev para mais velocidade
+    },
+    // Cache explícito para acelerar rebuilds
+    cacheDir: 'node_modules/.vite',
+    // Configurações de build mais eficientes
+    build: {
+        target: 'esnext',
+        minify: 'esbuild',
+        sourcemap: false,
+    },
+    // Evita processamento desnecessário
+    esbuild: {
+        target: 'esnext',
     },
 });
