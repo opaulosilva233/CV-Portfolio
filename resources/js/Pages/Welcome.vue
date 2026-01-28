@@ -1,6 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
-import ThemeToggle from '@/Components/ThemeToggle.vue';
+import CyberLayout from '@/Layouts/CyberLayout.vue';
 
 defineProps({
     hero: Object,
@@ -20,26 +20,25 @@ const scrollTo = (id) => {
 </script>
 
 <template>
-    <Head title="Portfolio" />
-    
-    <div class="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 font-sans transition-colors duration-300">
+    <CyberLayout>
+        <Head title="Portfolio" />
         
-        <!-- Navigation -->
-        <nav class="fixed top-0 w-full z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800">
+        <!-- Navigation (Adjusted for Cyber Layout) -->
+        <nav class="fixed top-0 w-full z-40 bg-white/5 dark:bg-black/20 backdrop-blur-md border-b border-white/10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
-                    <div class="font-bold text-xl tracking-tight">
-                        {{ hero.name || 'Portfolio' }}
+                    <div class="font-bold text-xl tracking-tight text-gray-900 dark:text-white">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500">{{ hero.name || 'Portfolio' }}</span>
                     </div>
                     <div class="hidden md:flex space-x-8">
-                        <button @click="scrollTo('about')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">About</button>
-                        <button @click="scrollTo('skills')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Skills</button>
-                        <button @click="scrollTo('experience')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Experience</button>
-                        <button @click="scrollTo('projects')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Projects</button>
+                        <button @click="scrollTo('about')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">About</button>
+                        <button @click="scrollTo('skills')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">Skills</button>
+                        <button @click="scrollTo('experience')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">Experience</button>
+                        <button @click="scrollTo('projects')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">Projects</button>
                     </div>
                     <div class="flex items-center space-x-4">
-                        <ThemeToggle />
-                         <Link v-if="canLogin" :href="route('dashboard')" class="text-sm text-gray-500 hover:text-gray-900 dark:hover:text-gray-100">
+                        <!-- ThemeToggle removed (handled by CyberLayout) -->
+                         <Link v-if="canLogin" :href="route('dashboard')" class="text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-purple-600 dark:hover:text-cyan-400 transition">
                             Admin
                         </Link>
                     </div>
@@ -48,45 +47,48 @@ const scrollTo = (id) => {
         </nav>
 
         <!-- Hero Section -->
-        <section id="about" class="pt-32 pb-20 px-4">
+        <section id="about" class="pt-32 pb-20 px-4 min-h-screen flex items-center">
             <div class="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center gap-12">
                 <div class="lg:w-1/2 space-y-6">
-                    <h2 class="text-sm font-semibold text-indigo-600 dark:text-indigo-400 tracking-wide uppercase">
+                    <h2 class="text-sm font-bold text-cyan-600 dark:text-cyan-400 tracking-[0.2em] uppercase animate-pulse">
                         {{ hero.title || 'Full Stack Developer' }}
                     </h2>
-                    <h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight">
-                        Hi, I'm <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">{{ hero.name }}</span>
+                    <h1 class="text-5xl lg:text-7xl font-black tracking-tight text-gray-900 dark:text-white">
+                        Hi, I'm <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600">{{ hero.name }}</span>
                     </h1>
-                    <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-lg">
+                    <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-lg font-medium">
                         {{ hero.bio }}
                     </p>
                     <div class="pt-4 flex gap-4">
-                        <a v-for="(link, platform) in socials" :key="platform" :href="link" target="_blank" class="px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-medium hover:opacity-90 transition">
+                        <a v-for="(link, platform) in socials" :key="platform" :href="link" target="_blank" class="px-6 py-3 bg-gray-900 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md border border-white/10 text-white dark:text-white rounded-xl font-bold uppercase tracking-wide hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-purple-500/30">
                             {{ platform }}
                         </a>
                     </div>
                 </div>
                 <div class="lg:w-1/2 flex justify-center">
-                    <div class="relative w-72 h-72 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-2xl">
-                        <img 
-                            :src="hero.image || 'https://ui-avatars.com/api/?name=' + (hero.name || 'User') + '&background=random'" 
-                            alt="Profile" 
-                            class="w-full h-full object-cover"
-                        />
+                    <div class="relative w-72 h-72 lg:w-96 lg:h-96">
+                        <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-full blur-2xl opacity-50 animate-pulse"></div>
+                        <div class="relative w-full h-full rounded-full overflow-hidden border-4 border-white/20 dark:border-white/10 shadow-2xl">
+                            <img 
+                                :src="hero.image || 'https://ui-avatars.com/api/?name=' + (hero.name || 'User') + '&background=random'" 
+                                alt="Profile" 
+                                class="w-full h-full object-cover"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Skills Section -->
-        <section id="skills" class="py-20 bg-gray-100 dark:bg-gray-800/50">
+        <section id="skills" class="py-20 px-4">
             <div class="max-w-7xl mx-auto px-4">
-                <h2 class="text-3xl font-bold mb-12 text-center">Technical Skills</h2>
+                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-purple-500">#</span> Technical Skills</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div v-for="(categorySkills, category) in skills" :key="category" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                        <h3 class="text-xl font-semibold mb-6 capitalize border-b pb-2 border-indigo-500 w-max">{{ category }}</h3>
+                    <div v-for="(categorySkills, category) in skills" :key="category" class="bg-white/50 dark:bg-black/40 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white/20 dark:border-white/5 hover:border-purple-500/50 transition-colors duration-300 group">
+                        <h3 class="text-xl font-bold mb-6 capitalize border-b-2 border-purple-500/30 pb-2 w-max group-hover:border-purple-500 transition-colors text-gray-800 dark:text-gray-100">{{ category }}</h3>
                         <div class="flex flex-wrap gap-2">
-                            <span v-for="skill in categorySkills" :key="skill.id" class="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm font-medium">
+                            <span v-for="skill in categorySkills" :key="skill.id" class="px-3 py-1 bg-white/60 dark:bg-white/10 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-200 border border-transparent hover:border-cyan-500/50 transition-all">
                                 {{ skill.name }}
                             </span>
                         </div>
@@ -98,45 +100,46 @@ const scrollTo = (id) => {
         <!-- Experience Section -->
         <section id="experience" class="py-20 px-4">
             <div class="max-w-4xl mx-auto">
-                <h2 class="text-3xl font-bold mb-12 text-center">Experience</h2>
+                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-cyan-500">#</span> Experience</h2>
                 <div class="space-y-12">
-                    <div v-for="exp in experiences" :key="exp.id" class="relative pl-8 border-l-2 border-indigo-200 dark:border-indigo-900">
-                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-indigo-600 ring-4 ring-white dark:ring-gray-900"></div>
-                        <div class="mb-1 text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
+                    <div v-for="exp in experiences" :key="exp.id" class="relative pl-8 border-l-2 border-purple-200 dark:border-purple-900/50">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-600 ring-4 ring-white dark:ring-black shadow-[0_0_10px_rgba(147,51,234,0.5)]"></div>
+                        <div class="mb-1 text-sm text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wide">
                             {{ exp.start_date }} - {{ exp.is_current ? 'Present' : exp.end_date }}
                         </div>
-                        <h3 class="text-xl font-bold">{{ exp.role }}</h3>
-                        <div class="text-lg font-medium text-gray-500 mb-2">{{ exp.company }}</div>
-                        <p class="text-gray-600 dark:text-gray-400 whitespace-pre-line">{{ exp.description }}</p>
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ exp.role }}</h3>
+                        <div class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">{{ exp.company }}</div>
+                        <p class="text-gray-600 dark:text-gray-300 whitespace-pre-line leading-relaxed">{{ exp.description }}</p>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- Projects Section -->
-        <section id="projects" class="py-20 bg-gray-100 dark:bg-gray-800/50 px-4">
+        <section id="projects" class="py-20 px-4">
             <div class="max-w-7xl mx-auto">
-                <h2 class="text-3xl font-bold mb-12 text-center">Featured Projects</h2>
+                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-pink-500">#</span> Featured Projects</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div v-for="project in projects" :key="project.id" class="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition hover:-translate-y-1">
-                        <div class="h-48 overflow-hidden bg-gray-200">
+                    <div v-for="project in projects" :key="project.id" class="group bg-white/50 dark:bg-black/40 backdrop-blur-xl rounded-2xl overflow-hidden shadow-lg border border-white/20 dark:border-white/5 hover:border-pink-500/50 hover:shadow-pink-500/20 transition-all duration-300 hover:-translate-y-2">
+                        <div class="h-48 overflow-hidden bg-gray-200 dark:bg-gray-800 relative">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10 opacity-60"></div>
                             <img 
                                 :src="project.image_url || 'https://via.placeholder.com/400x300?text=' + project.title" 
                                 :alt="project.title"
                                 class="w-full h-full object-cover transition duration-500 group-hover:scale-110"
                             />
                         </div>
-                        <div class="p-6">
-                            <h3 class="text-xl font-bold mb-2">{{ project.title }}</h3>
+                        <div class="p-6 relative z-20">
+                            <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-pink-500 transition-colors">{{ project.title }}</h3>
                             <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{{ project.description }}</p>
                             <div class="flex flex-wrap gap-2 mb-4">
-                                <span v-for="tag in project.tech_stack" :key="tag" class="text-xs px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded">
+                                <span v-for="tag in project.tech_stack" :key="tag" class="text-[10px] uppercase font-bold px-2 py-1 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 rounded border border-transparent group-hover:border-pink-500/30 transition-colors">
                                     {{ tag }}
                                 </span>
                             </div>
                             <div class="flex gap-4 mt-auto">
-                                <a v-if="project.project_url" :href="project.project_url" target="_blank" class="text-indigo-600 font-medium hover:underline">View Live</a>
-                                <a v-if="project.github_url" :href="project.github_url" target="_blank" class="text-gray-500 hover:text-gray-900 dark:hover:text-white">GitHub</a>
+                                <a v-if="project.project_url" :href="project.project_url" target="_blank" class="text-pink-600 font-bold hover:underline uppercase text-xs tracking-wider">View Live</a>
+                                <a v-if="project.github_url" :href="project.github_url" target="_blank" class="text-gray-500 hover:text-gray-900 dark:hover:text-white font-bold uppercase text-xs tracking-wider">GitHub</a>
                             </div>
                         </div>
                     </div>
@@ -144,8 +147,8 @@ const scrollTo = (id) => {
             </div>
         </section>
 
-        <footer class="py-10 text-center text-gray-500 text-sm">
-            &copy; {{ new Date().getFullYear() }} {{ hero.name }}. Built with Laravel & Vue.
+        <footer class="py-10 text-center text-gray-500 dark:text-gray-400 text-sm font-medium border-t border-white/10">
+            &copy; {{ new Date().getFullYear() }} {{ hero.name }}. <span class="opacity-50">System Online.</span>
         </footer>
-    </div>
+    </CyberLayout>
 </template>
