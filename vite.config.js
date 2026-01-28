@@ -21,11 +21,14 @@ export default defineConfig({
         host: '0.0.0.0',
         hmr: {
             host: 'localhost',
-            clientPort: 5173,
+            port: 5173,
         },
         watch: {
             // Ignora node_modules e vendor para reduzir overhead de file watching
             ignored: ['**/node_modules/**', '**/vendor/**', '**/.git/**'],
+            // Usa polling para melhor compatibilidade com Docker/WSL/VM
+            usePolling: true,
+            interval: 1000,
         },
         warmup: {
             // Pré-aquece os arquivos principais
