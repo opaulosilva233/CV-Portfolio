@@ -5,14 +5,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+Route::get('/', [\App\Http\Controllers\PortfolioController::class, 'index'])->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
@@ -20,10 +13,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     // Admin Routes
-    Route::resource('admin/experiences', \App\Http\Controllers\Admin\ExperienceController::class);
-    Route::resource('admin/skills', \App\Http\Controllers\Admin\SkillController::class);
-    Route::resource('admin/projects', \App\Http\Controllers\Admin\ProjectController::class);
-    Route::resource('admin/sections', \App\Http\Controllers\Admin\PageSectionController::class);
+    Route::resource('admin/experiences', \App\Http\Controllers\Admin\ExperienceController::class)->names('admin.experiences');
+    Route::resource('admin/skills', \App\Http\Controllers\Admin\SkillController::class)->names('admin.skills');
+    Route::resource('admin/projects', \App\Http\Controllers\Admin\ProjectController::class)->names('admin.projects');
+    Route::resource('admin/sections', \App\Http\Controllers\Admin\PageSectionController::class)->names('admin.sections');
+
+    Route::get('admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'edit'])->name('admin.settings.edit');
+    Route::post('admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

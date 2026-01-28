@@ -16,7 +16,7 @@ defineProps({
                 <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                     Projects
                 </h2>
-                <Link :href="route('projects.create')" class="px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 focus:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
+                <Link :href="route('admin.projects.create')" class="px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 focus:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
                     Add New
                 </Link>
             </div>
@@ -56,8 +56,8 @@ defineProps({
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <Link :href="route('projects.edit', project.id)" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4">Edit</Link>
-                                            <Link :href="route('projects.destroy', project.id)" method="delete" as="button" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Delete</Link>
+                                            <Link :href="route('admin.projects.edit', project.id)" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4">Edit</Link>
+                                            <Link :href="route('admin.projects.destroy', project.id)" method="delete" as="button" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Delete</Link>
                                         </td>
                                     </tr>
                                 </tbody>
