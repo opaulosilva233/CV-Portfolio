@@ -2,6 +2,13 @@
 import { ref } from 'vue';
 import { useDarkTheme } from '@/Composables/useDarkTheme';
 
+const props = defineProps({
+    variant: {
+        type: String,
+        default: 'default', // 'default' | 'cyber'
+    }
+});
+
 const { isDark, toggleTheme } = useDarkTheme();
 const isAnimating = ref(false);
 
@@ -15,7 +22,9 @@ const handleClick = (event) => {
 </script>
 
 <template>
+    <!-- DEFAULT VARIANT (Playful Sun/Moon) -->
     <button
+        v-if="variant === 'default'"
         @click="handleClick"
         class="toggle"
         :class="{ 
@@ -56,9 +65,36 @@ const handleClick = (event) => {
             </div>
         </div>
     </button>
+
+    <!-- CYBER VARIANT (Neon/Tech) -->
+    <button
+        v-else-if="variant === 'cyber'"
+        @click="handleClick"
+        class="cyber-toggle"
+        :class="{ 'cyber-toggle--dark': isDark }"
+        :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+    >
+        <div class="cyber-toggle__track">
+            <div class="cyber-toggle__icon cyber-toggle__icon--sun">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+            </div>
+            <div class="cyber-toggle__icon cyber-toggle__icon--moon">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </div>
+            
+            <div class="cyber-toggle__thumb"></div>
+        </div>
+    </button>
 </template>
 
 <style scoped>
+/* =========================================
+   DEFAULT STYLE (Original)
+   ========================================= */
 .toggle {
     --bg-light: linear-gradient(135deg, #74b9ff 0%, #a29bfe 100%);
     --bg-dark: linear-gradient(135deg, #0c1445 0%, #1a1a3e 100%);
@@ -209,7 +245,7 @@ const handleClick = (event) => {
     opacity: 0.9;
 }
 
-/* Rays positioning ... same as before but ensured */
+/* Rays positioning */
 .toggle__ray:nth-child(1) { transform: translateX(-50%) rotate(0deg); }
 .toggle__ray:nth-child(2) { transform: translateX(-50%) rotate(45deg); }
 .toggle__ray:nth-child(3) { transform: translateX(-50%) rotate(90deg); }
@@ -244,5 +280,80 @@ const handleClick = (event) => {
 ::view-transition-group(theme-toggle-btn) {
     animation-duration: 1.5s; /* Sync with global wipe */
     z-index: 10000; /* Ensure it stays above the wipe */
+}
+
+/* =========================================
+   CYBER STYLE (Neon/Futuristic)
+   ========================================= */
+.cyber-toggle {
+    position: relative;
+    width: 64px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 9999px;
+    cursor: pointer;
+    overflow: hidden;
+    padding: 2px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.cyber-toggle--dark {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(139, 92, 246, 0.5); /* Purple border in dark mode */
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+}
+
+.cyber-toggle:hover {
+    border-color: rgba(6, 182, 212, 0.5); /* Cyan hover */
+}
+.cyber-toggle--dark:hover {
+    border-color: rgba(139, 92, 246, 0.8);
+}
+
+.cyber-toggle__track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+}
+
+.cyber-toggle__icon {
+    z-index: 1;
+    color: #94a3b8;
+    transition: color 0.3s;
+}
+
+.cyber-toggle--dark .cyber-toggle__icon--moon {
+    color: #e2e8f0;
+    filter: drop-shadow(0 0 2px rgba(255,255,255,0.5));
+}
+
+.cyber-toggle:not(.cyber-toggle--dark) .cyber-toggle__icon--sun {
+    color: #fbbf24;
+    filter: drop-shadow(0 0 2px rgba(251, 191, 36, 0.5));
+}
+
+.cyber-toggle__thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #e0e7ff 0%, #a5b4fc 100%);
+    border-radius: 50%;
+    transition: transform 1.5s ease-in-out; /* Synced with global wipe */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.cyber-toggle--dark .cyber-toggle__thumb {
+    transform: translateX(32px);
+    background: linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%);
+    box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
 }
 </style>
