@@ -1,5 +1,6 @@
 <script setup>
 import { Head, Link } from '@inertiajs/vue3';
+import ThemeToggle from '@/Components/ThemeToggle.vue';
 
 defineProps({
     hero: Object,
@@ -36,7 +37,8 @@ const scrollTo = (id) => {
                         <button @click="scrollTo('experience')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Experience</button>
                         <button @click="scrollTo('projects')" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition">Projects</button>
                     </div>
-                    <div>
+                    <div class="flex items-center space-x-4">
+                        <ThemeToggle />
                          <Link v-if="canLogin" :href="route('dashboard')" class="text-sm text-gray-500 hover:text-gray-900 dark:hover:text-gray-100">
                             Admin
                         </Link>
