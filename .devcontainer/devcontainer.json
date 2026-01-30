@@ -5,12 +5,32 @@
 	],
 	"service": "app",
 	"workspaceFolder": "/var/www/html",
+	"forwardPorts": [
+		5173,
+		8000
+	],
+	"portsAttributes": {
+		"*": {
+			"onAutoForward": "ignore"
+		},
+		"5173": {
+			"label": "Vite Dev Server",
+			"onAutoForward": "notify"
+		},
+		"8000": {
+			"label": "Laravel",
+			"onAutoForward": "notify"
+		}
+	},
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"bmewburn.vscode-intelephense-client",
 				"eamodio.gitlens"
-			]
+			],
+			"settings": {
+				"remote.autoForwardPorts": false
+			}
 		}
 	}
 }
