@@ -1,5 +1,5 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 defineProps({
@@ -12,7 +12,7 @@ const form = useForm({
 
 const toggleVisibility = (section) => {
     form.is_visible = !section.is_visible;
-    form.put(route('sections.update', section.id), {
+    form.put(route('admin.sections.update', section.id), {
         preserveScroll: true,
     });
 };
@@ -21,47 +21,49 @@ const toggleVisibility = (section) => {
 <template>
     <Head title="Page Sections" />
 
-    <AuthenticatedLayout>
+    <CyberAdminLayout>
         <template #header>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                Page Sections
+            <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
+                Page Sections Configuration
             </h2>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
-                    <div class="p-6 text-gray-900 dark:text-gray-100">
-                        <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+        <div class="py-6">
+            <div class="mx-auto max-w-7xl">
+                <div class="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl sm:rounded-2xl overflow-hidden">
+                    <div class="p-6">
+                        <p class="mb-6 text-sm text-gray-400">
                             Manage the visibility and order of the sections on your public CV page.
                         </p>
                         
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead class="bg-gray-50 dark:bg-gray-700">
+                        <div class="overflow-x-auto rounded-xl border border-white/10">
+                            <table class="min-w-full divide-y divide-white/10">
+                                <thead class="bg-white/5">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Section Name</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title (Public)</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Order</th>
-                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Visible</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Section Name</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Title (Public)</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Order</th>
+                                        <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">Visible</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                    <tr v-for="section in sections" :key="section.id">
+                                <tbody class="divide-y divide-white/10 bg-transparent">
+                                    <tr v-for="section in sections" :key="section.id" class="hover:bg-white/5 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900 dark:text-white capitalize">{{ section.name }}</div>
+                                            <div class="text-sm font-medium text-white capitalize">{{ section.name }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900 dark:text-white">{{ section.title }}</div>
+                                            <div class="text-sm text-gray-300">{{ section.title }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-900 dark:text-white">{{ section.sort_order }}</div>
+                                            <div class="text-sm text-cyan-400 font-mono bg-white/5 inline-block px-2 py-1 rounded-md border border-white/10">{{ section.sort_order }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <button 
                                                 @click="toggleVisibility(section)" 
-                                                class="px-3 py-1 rounded-full text-xs font-bold"
-                                                :class="section.is_visible ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'"
+                                                class="px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-300 border shadow-lg"
+                                                :class="section.is_visible 
+                                                    ? 'bg-green-500/20 text-green-400 border-green-500/30 hover:bg-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]' 
+                                                    : 'bg-red-500/20 text-red-400 border-red-500/30 hover:bg-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]'"
                                             >
                                                 {{ section.is_visible ? 'Visible' : 'Hidden' }}
                                             </button>
@@ -75,5 +77,5 @@ const toggleVisibility = (section) => {
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </CyberAdminLayout>
 </template>

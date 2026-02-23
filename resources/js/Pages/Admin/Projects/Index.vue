@@ -1,5 +1,5 @@
 <script setup>
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
+import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 
 defineProps({
@@ -10,54 +10,55 @@ defineProps({
 <template>
     <Head title="Projects" />
 
-    <AuthenticatedLayout>
+    <CyberAdminLayout>
         <template #header>
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
-                    Projects
+            <div class="flex items-center justify-between w-full">
+                <h2 class="text-lg sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate mr-4">
+                    Projects Management
                 </h2>
-                <Link :href="route('admin.projects.create')" class="px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 focus:bg-blue-500 active:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150">
-                    Add New
+                <Link :href="route('admin.projects.create')" class="flex-shrink-0 px-4 py-2 sm:px-5 sm:py-2.5 bg-blue-600/80 hover:bg-blue-500 border border-blue-500/50 rounded-xl font-semibold text-xs text-white uppercase tracking-wider shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all duration-300">
+                    <span class="hidden sm:inline">Add New Project</span>
+                    <span class="sm:hidden">Add New</span>
                 </Link>
             </div>
         </template>
 
-        <div class="py-12">
-            <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
-                    <div class="p-6 text-gray-900 dark:text-gray-100">
+        <div class="py-6">
+            <div class="mx-auto max-w-7xl">
+                <div class="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl sm:rounded-2xl overflow-hidden">
+                    <div class="p-6">
                         
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead class="bg-gray-50 dark:bg-gray-700">
+                        <div class="overflow-x-auto rounded-xl border border-white/10">
+                            <table class="min-w-full divide-y divide-white/10">
+                                <thead class="bg-white/5">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Tech Stack</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Title</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Tech Stack</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Status</th>
+                                        <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                    <tr v-for="project in projects" :key="project.id">
+                                <tbody class="divide-y divide-white/10 bg-transparent">
+                                    <tr v-for="project in projects" :key="project.id" class="hover:bg-white/5 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900 dark:text-white">{{ project.title }}</div>
-                                            <div class="text-xs text-gray-500">{{ project.project_url }}</div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex flex-wrap gap-1">
-                                                <span v-for="tech in project.tech_stack" :key="tech" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-                                                    {{ tech }}
-                                                </span>
+                                            <div class="text-sm font-medium text-white">{{ project.title }}</div>
+                                            <div class="text-xs text-cyan-400 hover:text-cyan-300 mt-1">
+                                                <a :href="project.project_url" target="_blank" v-if="project.project_url">{{ project.project_url }}</a>
                                             </div>
                                         </td>
+                                        <td class="px-6 py-4 flex flex-wrap gap-2">
+                                            <span v-for="tech in project.tech_stack" :key="tech" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-white/5 text-gray-300 border border-white/10">
+                                                {{ tech }}
+                                            </span>
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800" v-if="project.is_featured">
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]" v-if="project.is_featured">
                                                 Featured
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <Link :href="route('admin.projects.edit', project.id)" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-4">Edit</Link>
-                                            <Link :href="route('admin.projects.destroy', project.id)" method="delete" as="button" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Delete</Link>
+                                            <Link :href="route('admin.projects.edit', project.id)" class="text-cyan-400 hover:text-cyan-300 mr-4 transition-colors">Edit</Link>
+                                            <Link :href="route('admin.projects.destroy', project.id)" method="delete" as="button" class="text-red-400 hover:text-red-300 transition-colors">Delete</Link>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -68,5 +69,5 @@ defineProps({
                 </div>
             </div>
         </div>
-    </AuthenticatedLayout>
+    </CyberAdminLayout>
 </template>

@@ -40,13 +40,13 @@ const showingNavigationDropdown = ref(false);
                                 >
                                     Dashboard
                                 </NavLink>
-                                <NavLink :href="route('experiences.index')" :active="route().current('experiences.*')">
+                                <NavLink :href="route('admin.experiences.index')" :active="route().current('admin.experiences.*')">
                                     Experiences
                                 </NavLink>
-                                <NavLink :href="route('skills.index')" :active="route().current('skills.*')">
+                                <NavLink :href="route('admin.skills.index')" :active="route().current('admin.skills.*')">
                                     Skills
                                 </NavLink>
-                                <NavLink :href="route('projects.index')" :active="route().current('projects.*')">
+                                <NavLink :href="route('admin.projects.index')" :active="route().current('admin.projects.*')">
                                     Projects
                                 </NavLink>
                                 <NavLink :href="route('sections.index')" :active="route().current('sections.*')">
@@ -160,13 +160,13 @@ const showingNavigationDropdown = ref(false);
                         >
                             Dashboard
                         </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('experiences.index')" :active="route().current('experiences.*')">
+                        <ResponsiveNavLink :href="route('admin.experiences.index')" :active="route().current('admin.experiences.*')">
                             Experiences
                         </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('skills.index')" :active="route().current('skills.*')">
+                        <ResponsiveNavLink :href="route('admin.skills.index')" :active="route().current('admin.skills.*')">
                             Skills
                         </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('projects.index')" :active="route().current('projects.*')">
+                        <ResponsiveNavLink :href="route('admin.projects.index')" :active="route().current('admin.projects.*')">
                             Projects
                         </ResponsiveNavLink>
                         <ResponsiveNavLink :href="route('sections.index')" :active="route().current('sections.*')">

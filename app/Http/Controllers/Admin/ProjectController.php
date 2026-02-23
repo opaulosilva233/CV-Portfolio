@@ -17,6 +17,18 @@ class ProjectController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return Inertia::render('Admin/Projects/Create');
+    }
+
+    public function edit(Project $project)
+    {
+        return Inertia::render('Admin/Projects/Edit', [
+            'project' => $project,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -34,7 +46,7 @@ class ProjectController extends Controller
 
         Project::create($validated);
 
-        return redirect()->back();
+        return redirect()->route('admin.projects.index')->with('success', 'Project created successfully.');
     }
 
     public function update(Request $request, Project $project)
@@ -51,12 +63,12 @@ class ProjectController extends Controller
         ]);
 
         if ($project->title !== $validated['title']) {
-             $validated['slug'] = Str::slug($validated['title']);
+            $validated['slug'] = Str::slug($validated['title']);
         }
 
         $project->update($validated);
 
-        return redirect()->back();
+        return redirect()->route('admin.projects.index')->with('success', 'Project updated successfully.');
     }
 
     public function destroy(Project $project)

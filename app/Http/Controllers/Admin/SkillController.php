@@ -16,6 +16,18 @@ class SkillController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return Inertia::render('Admin/Skills/Create');
+    }
+
+    public function edit(Skill $skill)
+    {
+        return Inertia::render('Admin/Skills/Edit', [
+            'skill' => $skill,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -28,7 +40,7 @@ class SkillController extends Controller
 
         Skill::create($validated);
 
-        return redirect()->back();
+        return redirect()->route('admin.skills.index')->with('success', 'Skill created successfully.');
     }
 
     public function update(Request $request, Skill $skill)
@@ -43,7 +55,7 @@ class SkillController extends Controller
 
         $skill->update($validated);
 
-        return redirect()->back();
+        return redirect()->route('admin.skills.index')->with('success', 'Skill updated successfully.');
     }
 
     public function destroy(Skill $skill)

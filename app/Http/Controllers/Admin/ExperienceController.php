@@ -16,6 +16,18 @@ class ExperienceController extends Controller
         ]);
     }
 
+    public function create()
+    {
+        return Inertia::render('Admin/Experiences/Create');
+    }
+
+    public function edit(Experience $experience)
+    {
+        return Inertia::render('Admin/Experiences/Edit', [
+            'experience' => $experience,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -31,7 +43,7 @@ class ExperienceController extends Controller
 
         Experience::create($validated);
 
-        return redirect()->back();
+        return redirect()->route('admin.experiences.index')->with('success', 'Experience created successfully.');
     }
 
     public function update(Request $request, Experience $experience)
@@ -49,7 +61,7 @@ class ExperienceController extends Controller
 
         $experience->update($validated);
 
-        return redirect()->back();
+        return redirect()->route('admin.experiences.index')->with('success', 'Experience updated successfully.');
     }
 
     public function destroy(Experience $experience)

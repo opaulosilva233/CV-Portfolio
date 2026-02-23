@@ -107,7 +107,7 @@ const handleClick = (event) => {
     width: 72px;
     height: 36px;
     border-radius: 50px;
-    border: none;
+    border: none; /* No border for the playful toggle */
     cursor: pointer;
     background: var(--bg-light);
     box-shadow: 
@@ -115,6 +115,7 @@ const handleClick = (event) => {
         0 4px 12px rgba(116, 185, 255, 0.3);
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    padding: 0; /* Remove default padding */
 }
 
 .toggle--dark {
