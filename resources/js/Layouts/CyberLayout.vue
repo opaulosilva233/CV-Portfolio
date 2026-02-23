@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref, onUnmounted } from 'vue';
 import ThemeToggle from '@/Components/ThemeToggle.vue';
+import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 
 // --- Advanced Interactive Logic (Shared) ---
 const spotlightStyle = ref({ opacity: 0, left: '0px', top: '0px' });
@@ -69,8 +70,9 @@ onUnmounted(() => {
              <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)]"></div>
         </div>
 
-        <!-- INTEGRATED Theme Toggle (Fixed Top Right) -->
-        <div class="fixed top-6 right-6 z-50 p-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-lg hover:bg-white/20 transition-all duration-300">
+        <!-- INTEGRATED Theme & Language Toggle (Fixed Top Right) -->
+        <div class="fixed top-6 right-6 z-50 flex items-center gap-4 p-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-lg transition-all duration-300">
+            <LanguageSwitcher />
             <ThemeToggle variant="cyber" />
         </div>
 

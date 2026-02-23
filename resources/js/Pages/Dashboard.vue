@@ -8,7 +8,7 @@ import { Head, Link } from '@inertiajs/vue3';
 
     <CyberAdminLayout>
         <template #header>
-            Dashboard Overview
+            {{ __('Dashboard Overview') }}
         </template>
 
         <div class="py-6">
@@ -21,10 +21,10 @@ import { Head, Link } from '@inertiajs/vue3';
                         <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                         <div class="relative z-10">
                             <h3 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 mb-2">
-                                Welcome back, {{ $page.props.auth.user.name }}!
+                                {{ __('Welcome back') }}, {{ $page.props.auth.user.name }}!
                             </h3>
                             <p class="text-gray-400 mb-6">
-                                This is your command center. Manage your portfolio content, update your skills, and showcase your latest projects.
+                                {{ __('This is your command center. Manage your portfolio content, update your skills, and showcase your latest projects.') }}
                             </p>
                             
                             <div class="flex flex-wrap gap-4 mt-auto">
@@ -48,10 +48,10 @@ import { Head, Link } from '@inertiajs/vue3';
                     <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
                          <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                          <div class="relative z-10 flex flex-col justify-between h-full">
-                            <h4 class="text-lg font-semibold text-gray-200">System Status</h4>
+                            <h4 class="text-lg font-semibold text-gray-200">{{ __('System Status') }}</h4>
                             <div class="mt-4 flex items-center gap-3">
                                 <div class="w-3 h-3 rounded-full bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.5)] animate-pulse"></div>
-                                <span class="text-green-400 font-mono text-sm">All systems operational</span>
+                                <span class="text-green-400 font-mono text-sm">{{ __('All systems operational') }}</span>
                             </div>
                          </div>
                     </div>

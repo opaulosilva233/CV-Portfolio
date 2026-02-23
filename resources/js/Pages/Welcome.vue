@@ -31,15 +31,15 @@ const scrollTo = (id) => {
                         <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500">{{ hero.name || 'Portfolio' }}</span>
                     </div>
                     <div class="hidden md:flex space-x-8">
-                        <button @click="scrollTo('about')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">About</button>
-                        <button @click="scrollTo('skills')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">Skills</button>
-                        <button @click="scrollTo('experience')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">Experience</button>
-                        <button @click="scrollTo('projects')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">Projects</button>
+                        <button @click="scrollTo('about')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('About') }}</button>
+                        <button @click="scrollTo('skills')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Skills') }}</button>
+                        <button @click="scrollTo('experience')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Experience') }}</button>
+                        <button @click="scrollTo('projects')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Projects') }}</button>
                     </div>
                     <div class="flex items-center space-x-4">
                         <!-- ThemeToggle removed (handled by CyberLayout) -->
                          <Link v-if="canLogin" :href="route('dashboard')" class="text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-purple-600 dark:hover:text-cyan-400 transition">
-                            Admin
+                            {{ __('Admin') }}
                         </Link>
                     </div>
                 </div>
@@ -83,7 +83,7 @@ const scrollTo = (id) => {
         <!-- Skills Section -->
         <section id="skills" class="py-20 px-4">
             <div class="max-w-7xl mx-auto px-4">
-                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-purple-500">#</span> Technical Skills</h2>
+                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-purple-500">#</span> {{ __('Technical Skills') }}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div v-for="(categorySkills, category) in skills" :key="category" class="bg-white/50 dark:bg-black/40 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white/20 dark:border-white/5 hover:border-purple-500/50 transition-colors duration-300 group">
                         <h3 class="text-xl font-bold mb-6 capitalize border-b-2 border-purple-500/30 pb-2 w-max group-hover:border-purple-500 transition-colors text-gray-800 dark:text-gray-100">{{ category }}</h3>
@@ -100,12 +100,12 @@ const scrollTo = (id) => {
         <!-- Experience Section -->
         <section id="experience" class="py-20 px-4">
             <div class="max-w-4xl mx-auto">
-                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-cyan-500">#</span> Experience</h2>
+                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-cyan-500">#</span> {{ __('Experience') }}</h2>
                 <div class="space-y-12">
                     <div v-for="exp in experiences" :key="exp.id" class="relative pl-8 border-l-2 border-purple-200 dark:border-purple-900/50">
                         <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-600 ring-4 ring-white dark:ring-black shadow-[0_0_10px_rgba(147,51,234,0.5)]"></div>
                         <div class="mb-1 text-sm text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wide">
-                            {{ exp.start_date }} - {{ exp.is_current ? 'Present' : exp.end_date }}
+                            {{ exp.start_date }} - {{ exp.is_current ? __('Present') : exp.end_date }}
                         </div>
                         <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ exp.role }}</h3>
                         <div class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">{{ exp.company }}</div>
@@ -118,7 +118,7 @@ const scrollTo = (id) => {
         <!-- Projects Section -->
         <section id="projects" class="py-20 px-4">
             <div class="max-w-7xl mx-auto">
-                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-pink-500">#</span> Featured Projects</h2>
+                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-pink-500">#</span> {{ __('Featured Projects') }}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div v-for="project in projects" :key="project.id" class="group bg-white/50 dark:bg-black/40 backdrop-blur-xl rounded-2xl overflow-hidden shadow-lg border border-white/20 dark:border-white/5 hover:border-pink-500/50 hover:shadow-pink-500/20 transition-all duration-300 hover:-translate-y-2">
                         <div class="h-48 overflow-hidden bg-gray-200 dark:bg-gray-800 relative">
@@ -138,7 +138,7 @@ const scrollTo = (id) => {
                                 </span>
                             </div>
                             <div class="flex gap-4 mt-auto">
-                                <a v-if="project.project_url" :href="project.project_url" target="_blank" class="text-pink-600 font-bold hover:underline uppercase text-xs tracking-wider">View Live</a>
+                                <a v-if="project.project_url" :href="project.project_url" target="_blank" class="text-pink-600 font-bold hover:underline uppercase text-xs tracking-wider">{{ __('View Live') }}</a>
                                 <a v-if="project.github_url" :href="project.github_url" target="_blank" class="text-gray-500 hover:text-gray-900 dark:hover:text-white font-bold uppercase text-xs tracking-wider">GitHub</a>
                             </div>
                         </div>
@@ -148,7 +148,7 @@ const scrollTo = (id) => {
         </section>
 
         <footer class="py-10 text-center text-gray-500 dark:text-gray-400 text-sm font-medium border-t border-white/10">
-            &copy; {{ new Date().getFullYear() }} {{ hero.name }}. <span class="opacity-50">System Online.</span>
+            &copy; {{ new Date().getFullYear() }} {{ hero.name }}. <span class="opacity-50">{{ __('System Online.') }}</span>
         </footer>
     </CyberLayout>
 </template>

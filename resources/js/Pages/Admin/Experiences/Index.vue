@@ -14,11 +14,11 @@ defineProps({
         <template #header>
             <div class="flex items-center justify-between w-full">
                 <h2 class="text-lg sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate mr-4">
-                    Experiences Management
+                    {{ __('Experiences Management') }}
                 </h2>
                 <Link :href="route('admin.experiences.create')" class="flex-shrink-0 px-4 py-2 sm:px-5 sm:py-2.5 bg-purple-600/80 hover:bg-purple-500 border border-purple-500/50 rounded-xl font-semibold text-xs text-white uppercase tracking-wider shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all duration-300">
-                    <span class="hidden sm:inline">Add New Experience</span>
-                    <span class="sm:hidden">Add New</span>
+                    <span class="hidden sm:inline">{{ __('Add New Experience') }}</span>
+                    <span class="sm:hidden">{{ __('Add New') }}</span>
                 </Link>
             </div>
         </template>
@@ -32,10 +32,10 @@ defineProps({
                             <table class="min-w-full divide-y divide-white/10">
                                 <thead class="bg-white/5">
                                     <tr>
-                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Company</th>
-                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Role</th>
-                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Dates</th>
-                                        <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">Actions</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">{{ __('Company') }}</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">{{ __('Role') }}</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">{{ __('Dates') }}</th>
+                                        <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-white/10 bg-transparent">
@@ -49,14 +49,14 @@ defineProps({
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]" v-if="experience.is_current">
-                                                Current
+                                                {{ __('Current') }}
                                             </span>
                                             <div class="text-sm text-gray-400 mt-1" v-if="!experience.is_current">{{ experience.start_date }} - {{ experience.end_date }}</div>
-                                            <div class="text-sm text-gray-400 mt-1" v-else>{{ experience.start_date }} - Present</div>
+                                            <div class="text-sm text-gray-400 mt-1" v-else>{{ experience.start_date }} - {{ __('Present') }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                            <Link :href="route('admin.experiences.edit', experience.id)" class="text-cyan-400 hover:text-cyan-300 mr-4 transition-colors">Edit</Link>
-                                            <Link :href="route('admin.experiences.destroy', experience.id)" method="delete" as="button" class="text-red-400 hover:text-red-300 transition-colors">Delete</Link>
+                                            <Link :href="route('admin.experiences.edit', experience.id)" class="text-cyan-400 hover:text-cyan-300 mr-4 transition-colors">{{ __('Edit') }}</Link>
+                                            <Link :href="route('admin.experiences.destroy', experience.id)" method="delete" as="button" class="text-red-400 hover:text-red-300 transition-colors">{{ __('Delete') }}</Link>
                                         </td>
                                     </tr>
                                 </tbody>

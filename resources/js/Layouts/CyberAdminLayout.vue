@@ -5,6 +5,7 @@ import ThemeToggle from '@/Components/ThemeToggle.vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
+import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 
 // --- Advanced Interactive Logic (Shared from CyberLayout) ---
 const spotlightStyle = ref({ opacity: 0, left: '0px', top: '0px' });
@@ -119,11 +120,11 @@ const menuItems = [
                     <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="item.icon"></path>
                     </svg>
-                    <span v-if="isSidebarOpen" class="font-medium whitespace-nowrap">{{ item.name }}</span>
+                    <span v-if="isSidebarOpen" class="font-medium whitespace-nowrap">{{ __(item.name) }}</span>
 
                     <!-- Tooltip when closed -->
                     <div v-if="!isSidebarOpen" class="absolute left-full ml-4 px-2 py-1 bg-gray-900 border border-gray-700 text-white text-sm rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-                        {{ item.name }}
+                        {{ __(item.name) }}
                     </div>
                 </Link>
             </nav>
@@ -147,6 +148,7 @@ const menuItems = [
                 </div>
 
                 <div class="flex items-center gap-4 flex-shrink-0 ml-4">
+                    <LanguageSwitcher />
                     <ThemeToggle variant="default" />
                     
                     <!-- User Dropdown -->
@@ -164,11 +166,11 @@ const menuItems = [
                             <template #content>
                                 <div class="bg-gray-900/90 border border-white/10 rounded-xl overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-xl w-48 mt-1">
                                     <DropdownLink :href="route('profile.edit')" class="hover:bg-white/10 text-gray-200 block px-4 py-2 text-sm transition-colors">
-                                        Profile
+                                        {{ __('Profile') }}
                                     </DropdownLink>
                                     <div class="border-t border-white/10"></div>
                                     <DropdownLink :href="route('logout')" method="post" as="button" class="hover:bg-red-500/20 text-red-400 hover:text-red-300 w-full text-left block px-4 py-2 text-sm transition-colors">
-                                        Log Out
+                                        {{ __('Log Out') }}
                                     </DropdownLink>
                                 </div>
                             </template>

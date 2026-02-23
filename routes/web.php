@@ -7,6 +7,8 @@ use Inertia\Inertia;
 
 Route::get('/', [\App\Http\Controllers\PortfolioController::class, 'index'])->name('home');
 
+Route::post('/language', [\App\Http\Controllers\LanguageController::class, 'update'])->name('language.switch');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
@@ -26,4 +28,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
