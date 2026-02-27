@@ -20,6 +20,8 @@ const form = useForm({
     remember: false,
 });
 
+const showPassword = ref(false);
+
 const submit = () => {
     form.post(route('login'), {
         onFinish: () => form.reset('password'),
@@ -119,13 +121,31 @@ const handleCardMouseLeave = () => {
                                 </div>
                                 <input
                                     id="password"
-                                    type="password"
-                                    class="block w-full pl-10 pr-4 py-3 bg-gray-50/50 dark:bg-black/50 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:border-purple-500 focus:ring-purple-500 transition-all outline-none backdrop-blur-sm"
+                                    :type="showPassword ? 'text' : 'password'"
+                                    class="block w-full pl-10 pr-[85px] py-3 bg-gray-50/50 dark:bg-black/50 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white rounded-xl focus:border-purple-500 focus:ring-purple-500 transition-all outline-none backdrop-blur-sm"
                                     v-model="form.password"
                                     required
                                     autocomplete="current-password"
                                     placeholder="••••••••"
                                 />
+                                <button
+                                    type="button"
+                                    @click="showPassword = !showPassword"
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1.5 rounded-lg flex items-center justify-center font-black uppercase text-[9px] sm:text-[10px] tracking-widest transition-all duration-300 border-2 overflow-hidden group outline-none focus:ring-2 focus:ring-purple-500"
+                                    :class="showPassword ? 'bg-pink-500/20 text-pink-400 border-pink-500/50 shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:bg-pink-500/30 hover:border-pink-500' : 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.2)] hover:bg-cyan-500/20 hover:border-cyan-500 hover:shadow-[0_0_15px_rgba(6,182,212,0.4)]'"
+                                >
+                                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-[150%] group-hover:translate-x-[150%] transition-transform duration-700 pointer-events-none"></div>
+                                    <span class="relative z-10 flex items-center gap-1.5 drop-shadow-md">
+                                        <template v-if="!showPassword">
+                                            <i class="fa-solid fa-user-secret text-sm"></i>
+                                            HACK
+                                        </template>
+                                        <template v-else>
+                                            <i class="fa-solid fa-eye text-sm"></i>
+                                            NUDE
+                                        </template>
+                                    </span>
+                                </button>
                             </div>
                         </div>
 
