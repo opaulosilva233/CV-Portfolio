@@ -26,4 +26,12 @@ class Experience extends Model
         'end_date' => 'date',
         'is_current' => 'boolean',
     ];
+
+    /**
+     * Prepare a date for array / JSON serialization.
+     */
+    protected function serializeDate(\DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d');
+    }
 }

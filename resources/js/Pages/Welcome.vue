@@ -17,6 +17,12 @@ const scrollTo = (id) => {
         element.scrollIntoView({ behavior: 'smooth' });
     }
 };
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' });
+};
 </script>
 
 <template>
@@ -106,7 +112,7 @@ const scrollTo = (id) => {
                     <div v-for="exp in experiences" :key="exp.id" class="relative pl-8 border-l-2 border-purple-200 dark:border-purple-900/50">
                         <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-600 ring-4 ring-white dark:ring-black shadow-[0_0_10px_rgba(147,51,234,0.5)]"></div>
                         <div class="mb-1 text-sm text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wide">
-                            {{ exp.start_date }} - {{ exp.is_current ? __('Present') : exp.end_date }}
+                            {{ formatDate(exp.start_date) }} - {{ exp.is_current ? __('Present') : formatDate(exp.end_date) }}
                         </div>
                         <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ exp.role }}</h3>
                         <div class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">{{ exp.company }}</div>

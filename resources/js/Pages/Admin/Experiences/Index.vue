@@ -5,6 +5,12 @@ import { Head, Link } from '@inertiajs/vue3';
 defineProps({
     experiences: Array,
 });
+
+const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-PT', { day: '2-digit', month: '2-digit', year: 'numeric' });
+};
 </script>
 
 <template>
@@ -51,8 +57,8 @@ defineProps({
                                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]" v-if="experience.is_current">
                                                 {{ __('Current') }}
                                             </span>
-                                            <div class="text-sm text-gray-400 mt-1" v-if="!experience.is_current">{{ experience.start_date }} - {{ experience.end_date }}</div>
-                                            <div class="text-sm text-gray-400 mt-1" v-else>{{ experience.start_date }} - {{ __('Present') }}</div>
+                                            <div class="text-sm text-gray-400 mt-1" v-if="!experience.is_current">{{ formatDate(experience.start_date) }} - {{ formatDate(experience.end_date) }}</div>
+                                            <div class="text-sm text-gray-400 mt-1" v-else>{{ formatDate(experience.start_date) }} - {{ __('Present') }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <Link :href="route('admin.experiences.edit', experience.id)" class="text-cyan-400 hover:text-cyan-300 mr-4 transition-colors">{{ __('Edit') }}</Link>
