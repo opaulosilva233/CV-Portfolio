@@ -98,7 +98,7 @@ const menuItems = [
         >
             <div class="flex h-16 items-center justify-between px-4 border-b border-white/10 bg-white/5">
                 <Link :href="route('dashboard')" class="flex items-center gap-3 overflow-hidden justify-center w-full">
-                    <ApplicationLogo class="h-8 w-auto fill-current text-white flex-shrink-0" />
+                    <ApplicationLogo class="h-10 w-auto flex-shrink-0 scale-110 transform" />
                     <span v-if="isSidebarOpen" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 whitespace-nowrap">
                         CTRL PANEL
                     </span>

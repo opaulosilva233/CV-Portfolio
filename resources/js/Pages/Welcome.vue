@@ -27,8 +27,9 @@ const scrollTo = (id) => {
         <nav class="fixed top-0 w-full z-40 bg-white/5 dark:bg-black/20 backdrop-blur-md border-b border-white/10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between h-16 items-center">
-                    <div class="font-bold text-xl tracking-tight text-gray-900 dark:text-white">
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500">{{ hero.name || 'Portfolio' }}</span>
+                    <div class="flex items-center gap-4">
+                        <img src="/images/Logotipo.png" alt="Logotipo" class="h-14 w-auto scale-125 transform hover:scale-[1.35] transition-transform duration-300" />
+                        <span class="font-bold text-xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 ml-2">{{ hero.name || 'Portfolio' }}</span>
                     </div>
                     <div class="hidden md:flex space-x-8">
                         <button @click="scrollTo('about')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('About') }}</button>
