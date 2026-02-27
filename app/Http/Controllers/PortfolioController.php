@@ -31,6 +31,10 @@ class PortfolioController extends Controller
             })->values();
         });
 
+        $educations = Cache::remember('portfolio_educations', 3600, function () {
+            return \App\Models\Education::orderBy('start_date', 'desc')->get();
+        });
+
         return Inertia::render('Welcome', [
             'hero' => [
                 'name' => SiteSetting::getValue('name', 'My Name'),
@@ -41,6 +45,7 @@ class PortfolioController extends Controller
             'projects' => $projects,
             'skills' => $skills,
             'experiences' => $experiences,
+            'educations' => $educations,
             'socials' => SiteSetting::getValue('social_links', []),
         ]);
     }

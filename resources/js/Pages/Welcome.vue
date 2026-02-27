@@ -7,6 +7,7 @@ defineProps({
     projects: Array,
     skills: Object,
     experiences: Array,
+    educations: Array,
     socials: [Object, Array],
     canLogin: Boolean,
 });
@@ -41,6 +42,7 @@ const formatDate = (dateString) => {
                         <button @click="scrollTo('about')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('About') }}</button>
                         <button @click="scrollTo('skills')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Skills') }}</button>
                         <button @click="scrollTo('experience')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Experience') }}</button>
+                        <button @click="scrollTo('education')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Education') }}</button>
                         <button @click="scrollTo('projects')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Projects') }}</button>
                     </div>
                     <div class="flex items-center space-x-4">
@@ -137,6 +139,56 @@ const formatDate = (dateString) => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education && Certificates Section -->
+        <section id="education" class="py-20 px-4">
+            <div class="max-w-4xl mx-auto">
+                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-teal-500">#</span> {{ __('Education & Certificates') }}</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div v-for="edu in educations" :key="edu.id" class="bg-white/50 dark:bg-black/40 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-white/20 dark:border-white/5 hover:border-teal-500/50 hover:shadow-teal-500/20 transition-all duration-300 group relative overflow-hidden">
+                        
+                        <!-- Glowing accent line -->
+                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r" :class="edu.type === 'certificate' ? 'from-cyan-500 to-blue-500' : 'from-teal-500 to-emerald-500'"></div>
+
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span 
+                                    class="inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full mb-3 border"
+                                    :class="edu.type === 'certificate' ? 'bg-cyan-500/10 text-cyan-500 border-cyan-500/30' : 'bg-teal-500/10 text-teal-500 border-teal-500/30'"
+                                >
+                                    {{ edu.type === 'certificate' ? __('Certificate') : __('Education') }}
+                                </span>
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-teal-400 transition-colors">{{ edu.degree || edu.institution }}</h3>
+                                <h4 class="text-md font-medium text-gray-600 dark:text-gray-300 mt-1" v-if="edu.degree">{{ edu.institution }}</h4>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 text-sm font-bold text-gray-500 dark:text-gray-400 tracking-wide uppercase mb-4" v-if="edu.start_date || edu.end_date || edu.is_current">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <span v-if="edu.start_date && edu.end_date">{{ formatDate(edu.start_date) }} - {{ formatDate(edu.end_date) }}</span>
+                            <span v-else-if="edu.start_date && edu.is_current">{{ formatDate(edu.start_date) }} - {{ __('Present') }}</span>
+                            <span v-else-if="edu.is_current">{{ __('Present') }}</span>
+                            <span v-else-if="edu.start_date">{{ formatDate(edu.start_date) }} - {{ __('Present') }}</span>
+                            <span v-else-if="edu.end_date">{{ formatDate(edu.end_date) }}</span>
+                        </div>
+
+                        <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-6" v-if="edu.description">
+                            {{ edu.description }}
+                        </p>
+
+                        <a v-if="edu.url" :href="edu.url" target="_blank" class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal-500 hover:text-teal-400 transition-colors mt-auto">
+                            <span>{{ __('View Credential') }}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div v-if="!educations || educations.length === 0" class="text-center text-gray-500 dark:text-gray-400 italic">
+                    {{ __('No education or certificates found.') }}
                 </div>
             </div>
         </section>

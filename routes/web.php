@@ -16,6 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Admin Routes
     Route::resource('admin/experiences', \App\Http\Controllers\Admin\ExperienceController::class)->names('admin.experiences');
+    Route::resource('admin/education', \App\Http\Controllers\Admin\EducationController::class)->names('admin.education');
     Route::resource('admin/skills', \App\Http\Controllers\Admin\SkillController::class)->names('admin.skills');
     Route::resource('admin/projects', \App\Http\Controllers\Admin\ProjectController::class)->names('admin.projects');
     Route::resource('admin/sections', \App\Http\Controllers\Admin\PageSectionController::class)->names('admin.sections');

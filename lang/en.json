@@ -48,5 +48,17 @@
     "If you did not request a password reset, no further action is required.": "If you did not request a password reset, no further action is required.",
     "Regards": "Regards",
     "passwords.sent": "We have emailed your password reset link.",
-    "validation.exists": "The selected :attribute is invalid."
+    "validation.exists": "The selected :attribute is invalid.",
+    "Education": "Education",
+    "Education & Certificates": "Education & Certificates",
+    "Certificate": "Certificate",
+    "Education & Certificates Management": "Education & Certificates Management",
+    "Institution & Degree": "Institution & Degree",
+    "Dates": "Dates",
+    "Type": "Type",
+    "No dates provided": "No dates provided",
+    "No records found. Click \"Add New\" to get started.": "No records found. Click \"Add New\" to get started.",
+    "View Credential": "View Credential",
+    "No education or certificates found.": "No education or certificates found.",
+    "Currently studying / Present": "Currently studying / Present"
 }

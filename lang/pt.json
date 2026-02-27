@@ -48,5 +48,17 @@
     "If you did not request a password reset, no further action is required.": "Se não solicitou uma recuperação de palavra-passe, não é necessária qualquer outra ação.",
     "Regards": "Com os melhores cumprimentos",
     "passwords.sent": "Enviámos-lhe o link de recuperação de palavra-passe por email.",
-    "validation.exists": "O :attribute selecionado é inválido (não existe na nossa base de dados)."
+    "validation.exists": "O :attribute selecionado é inválido (não existe na nossa base de dados).",
+    "Education": "Educação",
+    "Education & Certificates": "Educação e Certificados",
+    "Certificate": "Certificado",
+    "Education & Certificates Management": "Gestão de Educação e Certificados",
+    "Institution & Degree": "Instituição e Grau",
+    "Dates": "Datas",
+    "Type": "Tipo",
+    "No dates provided": "Sem datas",
+    "No records found. Click \"Add New\" to get started.": "Sem registos. Clique em \"Adicionar Novo\" para começar.",
+    "View Credential": "Ver Credencial",
+    "No education or certificates found.": "Nenhuma educação ou certificado encontrado.",
+    "Currently studying / Present": "A estudar atualmente / Presente"
 }

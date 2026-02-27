@@ -48,5 +48,17 @@
     "If you did not request a password reset, no further action is required.": "Als u geen wachtwoordherstel heeft aangevraagd, hoeft u verder niets te doen.",
     "Regards": "Met vriendelijke groet",
     "passwords.sent": "We hebben u een e-mail gestuurd met een link om uw wachtwoord opnieuw in te stellen.",
-    "validation.exists": "Het geselecteerde :attribute is ongeldig."
+    "validation.exists": "Het geselecteerde :attribute is ongeldig.",
+    "Education": "Opleiding",
+    "Education & Certificates": "Opleidingen & Certificaten",
+    "Certificate": "Certificaat",
+    "Education & Certificates Management": "Opleidingen & Certificaten Beheren",
+    "Institution & Degree": "Instelling & Graad",
+    "Dates": "Data",
+    "Type": "Type",
+    "No dates provided": "Geen data opgegeven",
+    "No records found. Click \"Add New\" to get started.": "Geen records gevonden. Klik op \"Nieuw Toevoegen\" om te beginnen.",
+    "View Credential": "Bekijk Referentie",
+    "No education or certificates found.": "Geen opleidingen of certificaten gevonden.",
+    "Currently studying / Present": "Huidige studie / Heden"
 }
