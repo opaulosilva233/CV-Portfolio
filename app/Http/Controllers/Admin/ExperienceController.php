@@ -11,8 +11,14 @@ class ExperienceController extends Controller
 {
     public function index()
     {
+        $experiences = Experience::with(['roles' => function ($q) {
+            $q->orderBy('start_date', 'desc');
+        }])->get()->sortByDesc(function ($exp) {
+            return $exp->roles->max('start_date');
+        })->values();
+
         return Inertia::render('Admin/Experiences/Index', [
-            'experiences' => Experience::orderBy('sort_order')->orderBy('start_date', 'desc')->get()
+            'experiences' => $experiences
         ]);
     }
 
@@ -23,6 +29,10 @@ class ExperienceController extends Controller
 
     public function edit(Experience $experience)
     {
+        $experience->load(['roles' => function ($query) {
+            $query->orderBy('start_date', 'desc');
+        }]);
+
         return Inertia::render('Admin/Experiences/Edit', [
             'experience' => $experience,
         ]);
@@ -32,16 +42,23 @@ class ExperienceController extends Controller
     {
         $validated = $request->validate([
             'company' => 'required|string|max:255',
-            'role' => 'required|string|max:255',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'is_current' => 'boolean',
-            'description' => 'nullable|string',
             'location' => 'nullable|string',
-            'sort_order' => 'integer',
+            'roles' => 'required|array|min:1',
+            'roles.*.role' => 'required|string|max:255',
+            'roles.*.start_date' => 'required|date',
+            'roles.*.end_date' => 'nullable|date|after_or_equal:roles.*.start_date',
+            'roles.*.is_current' => 'boolean',
+            'roles.*.description' => 'nullable|string',
         ]);
 
-        Experience::create($validated);
+        $experience = Experience::create([
+            'company' => $validated['company'],
+            'location' => $validated['location'] ?? null,
+        ]);
+
+        foreach ($validated['roles'] as $roleData) {
+            $experience->roles()->create($roleData);
+        }
 
         return redirect()->route('admin.experiences.index')->with('success', 'Experience created successfully.');
     }
@@ -50,16 +67,24 @@ class ExperienceController extends Controller
     {
         $validated = $request->validate([
             'company' => 'required|string|max:255',
-            'role' => 'required|string|max:255',
-            'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'is_current' => 'boolean',
-            'description' => 'nullable|string',
             'location' => 'nullable|string',
-            'sort_order' => 'integer',
+            'roles' => 'required|array|min:1',
+            'roles.*.role' => 'required|string|max:255',
+            'roles.*.start_date' => 'required|date',
+            'roles.*.end_date' => 'nullable|date|after_or_equal:roles.*.start_date',
+            'roles.*.is_current' => 'boolean',
+            'roles.*.description' => 'nullable|string',
         ]);
 
-        $experience->update($validated);
+        $experience->update([
+            'company' => $validated['company'],
+            'location' => $validated['location'] ?? null,
+        ]);
+
+        $experience->roles()->delete();
+        foreach ($validated['roles'] as $roleData) {
+            $experience->roles()->create($roleData);
+        }
 
         return redirect()->route('admin.experiences.index')->with('success', 'Experience updated successfully.');
     }

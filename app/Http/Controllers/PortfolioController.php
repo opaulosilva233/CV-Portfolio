@@ -24,7 +24,11 @@ class PortfolioController extends Controller
         });
 
         $experiences = Cache::remember('portfolio_experiences', 3600, function () {
-            return Experience::orderBy('start_date', 'desc')->get();
+            return Experience::with(['roles' => function ($q) {
+                $q->orderBy('start_date', 'desc');
+            }])->orderBy('sort_order')->get()->sortByDesc(function ($exp) {
+                return $exp->roles->max('start_date');
+            })->values();
         });
 
         return Inertia::render('Welcome', [

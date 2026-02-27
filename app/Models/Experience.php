@@ -12,19 +12,11 @@ class Experience extends Model
 
     protected $fillable = [
         'company',
-        'role',
-        'start_date',
-        'end_date',
-        'is_current',
-        'description',
         'location',
-        'sort_order',
     ];
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-        'is_current' => 'boolean',
+        //
     ];
 
     /**
@@ -33,5 +25,10 @@ class Experience extends Model
     protected function serializeDate(\DateTimeInterface $date): string
     {
         return $date->format('Y-m-d');
+    }
+
+    public function roles()
+    {
+        return $this->hasMany(ExperienceRole::class)->orderBy('start_date', 'desc');
     }
 }

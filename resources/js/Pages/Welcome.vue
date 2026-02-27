@@ -110,13 +110,32 @@ const formatDate = (dateString) => {
                 <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-cyan-500">#</span> {{ __('Experience') }}</h2>
                 <div class="space-y-12">
                     <div v-for="exp in experiences" :key="exp.id" class="relative pl-8 border-l-2 border-purple-200 dark:border-purple-900/50">
+                        <!-- Company Node -->
                         <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-600 ring-4 ring-white dark:ring-black shadow-[0_0_10px_rgba(147,51,234,0.5)]"></div>
-                        <div class="mb-1 text-sm text-purple-600 dark:text-purple-400 font-bold uppercase tracking-wide">
-                            {{ formatDate(exp.start_date) }} - {{ exp.is_current ? __('Present') : formatDate(exp.end_date) }}
+                        
+                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ exp.company }}</h3>
+                        <div class="text-md font-medium text-gray-500 dark:text-gray-400 mb-4 pb-4 border-b border-gray-100 dark:border-white/5" v-if="exp.location">{{ exp.location }}</div>
+                        <div class="text-md font-medium text-gray-500 dark:text-gray-400 mb-4 pb-4 border-b border-gray-100 dark:border-white/5" v-else></div>
+                        
+                        <!-- Nested Roles -->
+                        <div class="space-y-6 mt-4 relative">
+                            <!-- Inner vertical line to connect roles -->
+                            <div class="absolute left-[7px] top-4 bottom-4 w-px bg-gradient-to-b from-cyan-500/50 via-cyan-500/20 to-transparent dark:from-cyan-500/30 dark:to-transparent" v-if="exp.roles && exp.roles.length > 1"></div>
+                            
+                            <div v-for="(role, index) in exp.roles" :key="index" class="relative pl-8">
+                                <!-- Role Node bullet -->
+                                <div class="absolute left-[3.5px] top-2.5 w-2 h-2 rounded-full bg-cyan-500 ring-2 ring-white dark:ring-black" v-if="exp.roles && exp.roles.length > 1"></div>
+                                
+                                <h4 class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ role.role }}</h4>
+                                <div class="mb-2 mt-1 text-sm text-cyan-600 dark:text-cyan-400 font-bold uppercase tracking-wide flex items-center gap-2">
+                                    {{ formatDate(role.start_date) }} - {{ role.is_current ? __('Present') : formatDate(role.end_date) }}
+                                    <span v-if="role.is_current" class="px-2 py-0.5 inline-flex text-[10px] leading-4 font-semibold rounded bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]">
+                                        {{ __('Current') }}
+                                    </span>
+                                </div>
+                                <p class="text-gray-600 dark:text-gray-400 whitespace-pre-line leading-relaxed text-sm">{{ role.description }}</p>
+                            </div>
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ exp.role }}</h3>
-                        <div class="text-lg font-medium text-gray-500 dark:text-gray-400 mb-2">{{ exp.company }}</div>
-                        <p class="text-gray-600 dark:text-gray-300 whitespace-pre-line leading-relaxed">{{ exp.description }}</p>
                     </div>
                 </div>
             </div>

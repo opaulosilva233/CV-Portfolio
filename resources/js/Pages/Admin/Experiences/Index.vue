@@ -39,8 +39,7 @@ const formatDate = (dateString) => {
                                 <thead class="bg-white/5">
                                     <tr>
                                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">{{ __('Company') }}</th>
-                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">{{ __('Role') }}</th>
-                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">{{ __('Dates') }}</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">{{ __('Roles & Dates') }}</th>
                                         <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">{{ __('Actions') }}</th>
                                     </tr>
                                 </thead>
@@ -50,15 +49,17 @@ const formatDate = (dateString) => {
                                             <div class="text-sm font-medium text-white">{{ experience.company }}</div>
                                             <div class="text-sm text-gray-400">{{ experience.location }}</div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-gray-300">{{ experience.role }}</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]" v-if="experience.is_current">
-                                                {{ __('Current') }}
-                                            </span>
-                                            <div class="text-sm text-gray-400 mt-1" v-if="!experience.is_current">{{ formatDate(experience.start_date) }} - {{ formatDate(experience.end_date) }}</div>
-                                            <div class="text-sm text-gray-400 mt-1" v-else>{{ formatDate(experience.start_date) }} - {{ __('Present') }}</div>
+                                        <td class="px-6 py-4">
+                                            <div v-for="(role, index) in experience.roles" :key="index" class="mb-3 last:mb-0">
+                                                <div class="text-sm text-gray-200 font-medium">{{ role.role }}</div>
+                                                <div class="text-xs text-gray-400 mt-1 flex items-center gap-2">
+                                                    <span class="px-2 py-0.5 inline-flex font-semibold rounded bg-green-500/20 text-green-400 border border-green-500/30 text-[10px]" v-if="role.is_current">
+                                                        {{ __('Current') }}
+                                                    </span>
+                                                    <span v-if="!role.is_current">{{ formatDate(role.start_date) }} - {{ formatDate(role.end_date) }}</span>
+                                                    <span v-else>{{ formatDate(role.start_date) }} - {{ __('Present') }}</span>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <Link :href="route('admin.experiences.edit', experience.id)" class="text-cyan-400 hover:text-cyan-300 mr-4 transition-colors">{{ __('Edit') }}</Link>
