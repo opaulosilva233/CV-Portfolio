@@ -1,9 +1,11 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 const props = defineProps({
     education: Object,
+    availableSkills: Array,
 });
 
 const form = useForm({
@@ -15,7 +17,27 @@ const form = useForm({
     type: props.education.type || 'education',
     url: props.education.url || '',
     description: props.education.description || '',
+    skills: props.education.skills ? props.education.skills.map(s => s.id) : [],
 });
+
+const groupedSkills = computed(() => {
+    const groups = {};
+    (props.availableSkills || []).forEach(skill => {
+        const cat = skill.category || 'Other';
+        if (!groups[cat]) groups[cat] = [];
+        groups[cat].push(skill);
+    });
+    return groups;
+});
+
+const toggleSkill = (id) => {
+    const idx = form.skills.indexOf(id);
+    if (idx === -1) {
+        form.skills.push(id);
+    } else {
+        form.skills.splice(idx, 1);
+    }
+};
 
 const submit = () => {
     form.put(route('admin.education.update', props.education.id), {
@@ -95,6 +117,34 @@ const submit = () => {
                                 <textarea id="description" v-model="form.description" rows="4" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors"></textarea>
                                 <div v-if="form.errors.description" class="text-red-400 text-xs mt-1">{{ form.errors.description }}</div>
                             </div>
+                        </div>
+
+                        <!-- Skills Selection -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Associated Skills</label>
+                            <div v-if="Object.keys(groupedSkills).length === 0" class="text-gray-500 text-sm italic">
+                                No skills created yet. Create skills first in the Skills section.
+                            </div>
+                            <div v-for="(skills, category) in groupedSkills" :key="category" class="mb-4">
+                                <p class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">{{ category }}</p>
+                                <div class="flex flex-wrap gap-2">
+                                    <button
+                                        v-for="skill in skills"
+                                        :key="skill.id"
+                                        type="button"
+                                        @click="toggleSkill(skill.id)"
+                                        :class="[
+                                            'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all duration-200',
+                                            form.skills.includes(skill.id)
+                                                ? 'bg-purple-600/30 border-purple-500/60 text-purple-200 shadow-[0_0_8px_rgba(168,85,247,0.3)]'
+                                                : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/30 hover:text-gray-200'
+                                        ]"
+                                    >
+                                        {{ skill.name }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div v-if="form.errors.skills" class="text-red-400 text-xs mt-1">{{ form.errors.skills }}</div>
                         </div>
 
                         <div class="flex items-center gap-4 pt-4 border-t border-white/10">

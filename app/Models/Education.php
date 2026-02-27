@@ -34,4 +34,9 @@ class Education extends Model
     {
         return $date->format('Y-m-d');
     }
+
+    public function skills()
+    {
+        return $this->morphToMany(Skill::class, 'skillable');
+    }
 }

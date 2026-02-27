@@ -26,4 +26,9 @@ class Project extends Model
         'tech_stack' => 'array',
         'is_featured' => 'boolean',
     ];
+
+    public function skills()
+    {
+        return $this->morphToMany(Skill::class, 'skillable');
+    }
 }

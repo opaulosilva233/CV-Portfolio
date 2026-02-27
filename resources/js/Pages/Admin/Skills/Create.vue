@@ -2,13 +2,35 @@
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
 
+const props = defineProps({
+    availableProjects: Array,
+    availableEducations: Array,
+    availableExperiences: Array,
+});
+
 const form = useForm({
     name: '',
     category: '',
-    proficiency: 50,
+    proficiency: 3,
     icon: '',
     sort_order: 0,
+    projects: [],
+    educations: [],
+    experiences: [],
 });
+
+const setStars = (n) => {
+    form.proficiency = n;
+};
+
+const toggleItem = (list, id) => {
+    const idx = list.indexOf(id);
+    if (idx === -1) {
+        list.push(id);
+    } else {
+        list.splice(idx, 1);
+    }
+};
 
 const submit = () => {
     form.post(route('admin.skills.index'), {
@@ -59,11 +81,21 @@ const submit = () => {
                         </div>
 
                         <div>
-                            <div class="flex justify-between">
-                                <label for="proficiency" class="block text-sm font-medium text-gray-300">Proficiency (%)</label>
-                                <span class="text-cyan-400 font-mono text-sm">{{ form.proficiency }}%</span>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">Proficiency</label>
+                            <div class="flex items-center gap-1">
+                                <button
+                                    v-for="star in 5"
+                                    :key="star"
+                                    type="button"
+                                    @click="setStars(star)"
+                                    class="transition-all duration-200 hover:scale-110 focus:outline-none"
+                                >
+                                    <svg class="w-8 h-8" :class="star <= form.proficiency ? 'text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.5)]' : 'text-gray-600'" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
+                                </button>
+                                <span class="ml-3 text-cyan-400 font-mono text-sm">{{ form.proficiency }} / 5</span>
                             </div>
-                            <input id="proficiency" v-model="form.proficiency" type="range" min="0" max="100" class="mt-2 block w-full accent-cyan-500" />
                             <div v-if="form.errors.proficiency" class="text-red-400 text-xs mt-1">{{ form.errors.proficiency }}</div>
                         </div>
 
@@ -75,6 +107,77 @@ const submit = () => {
                             <div>
                                 <label for="sort_order" class="block text-sm font-medium text-gray-300">List Order</label>
                                 <input id="sort_order" v-model="form.sort_order" type="number" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-cyan-500 focus:ring-cyan-500 transition-colors" />
+                            </div>
+                        </div>
+
+                        <!-- Associations -->
+                        <div class="pt-4 border-t border-white/10 space-y-5">
+                            <h3 class="text-lg font-semibold text-white">Associate with</h3>
+
+                            <!-- Projects -->
+                            <div>
+                                <label class="block text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">Projects</label>
+                                <div v-if="availableProjects && availableProjects.length > 0" class="flex flex-wrap gap-2">
+                                    <button
+                                        v-for="project in availableProjects"
+                                        :key="project.id"
+                                        type="button"
+                                        @click="toggleItem(form.projects, project.id)"
+                                        :class="[
+                                            'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all duration-200',
+                                            form.projects.includes(project.id)
+                                                ? 'bg-blue-600/30 border-blue-500/60 text-blue-200 shadow-[0_0_8px_rgba(59,130,246,0.3)]'
+                                                : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/30 hover:text-gray-200'
+                                        ]"
+                                    >
+                                        {{ project.title }}
+                                    </button>
+                                </div>
+                                <p v-else class="text-gray-500 text-sm italic">No projects created yet.</p>
+                            </div>
+
+                            <!-- Education -->
+                            <div>
+                                <label class="block text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">Education / Certificates</label>
+                                <div v-if="availableEducations && availableEducations.length > 0" class="flex flex-wrap gap-2">
+                                    <button
+                                        v-for="edu in availableEducations"
+                                        :key="edu.id"
+                                        type="button"
+                                        @click="toggleItem(form.educations, edu.id)"
+                                        :class="[
+                                            'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all duration-200',
+                                            form.educations.includes(edu.id)
+                                                ? 'bg-purple-600/30 border-purple-500/60 text-purple-200 shadow-[0_0_8px_rgba(168,85,247,0.3)]'
+                                                : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/30 hover:text-gray-200'
+                                        ]"
+                                    >
+                                        {{ edu.institution }} {{ edu.degree ? '— ' + edu.degree : '' }}
+                                    </button>
+                                </div>
+                                <p v-else class="text-gray-500 text-sm italic">No education records created yet.</p>
+                            </div>
+
+                            <!-- Experiences -->
+                            <div>
+                                <label class="block text-xs font-semibold text-green-400 uppercase tracking-wider mb-2">Experiences</label>
+                                <div v-if="availableExperiences && availableExperiences.length > 0" class="flex flex-wrap gap-2">
+                                    <button
+                                        v-for="exp in availableExperiences"
+                                        :key="exp.id"
+                                        type="button"
+                                        @click="toggleItem(form.experiences, exp.id)"
+                                        :class="[
+                                            'px-3 py-1.5 rounded-lg text-sm font-medium border transition-all duration-200',
+                                            form.experiences.includes(exp.id)
+                                                ? 'bg-green-600/30 border-green-500/60 text-green-200 shadow-[0_0_8px_rgba(34,197,94,0.3)]'
+                                                : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/30 hover:text-gray-200'
+                                        ]"
+                                    >
+                                        {{ exp.company }} {{ exp.roles && exp.roles.length > 0 ? '— ' + exp.roles.map(r => r.role).join(', ') : '' }}
+                                    </button>
+                                </div>
+                                <p v-else class="text-gray-500 text-sm italic">No experiences created yet.</p>
                             </div>
                         </div>
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Education;
+use App\Models\Skill;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -14,7 +15,7 @@ class EducationController extends Controller
      */
     public function index()
     {
-        $educations = Education::orderBy('start_date', 'desc')->get();
+        $educations = Education::with('skills')->orderBy('start_date', 'desc')->get();
 
         return Inertia::render('Admin/Education/Index', [
             'educations' => $educations
@@ -26,7 +27,9 @@ class EducationController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Admin/Education/Create');
+        return Inertia::render('Admin/Education/Create', [
+            'availableSkills' => Skill::orderBy('category')->orderBy('name')->get(['id', 'name', 'category']),
+        ]);
     }
 
     /**
@@ -43,9 +46,15 @@ class EducationController extends Controller
             'type' => 'required|string|in:education,certificate',
             'url' => 'nullable|url|max:255',
             'description' => 'nullable|string',
+            'skills' => 'nullable|array',
+            'skills.*' => 'integer|exists:skills,id',
         ]);
 
-        Education::create($validated);
+        $skillIds = $validated['skills'] ?? [];
+        unset($validated['skills']);
+
+        $education = Education::create($validated);
+        $education->skills()->sync($skillIds);
 
         return redirect()->route('admin.education.index')->with('success', 'Education/Certificate created successfully.');
     }
@@ -63,8 +72,11 @@ class EducationController extends Controller
      */
     public function edit(Education $education)
     {
+        $education->load('skills');
+
         return Inertia::render('Admin/Education/Edit', [
             'education' => $education,
+            'availableSkills' => Skill::orderBy('category')->orderBy('name')->get(['id', 'name', 'category']),
         ]);
     }
 
@@ -82,9 +94,15 @@ class EducationController extends Controller
             'type' => 'required|string|in:education,certificate',
             'url' => 'nullable|url|max:255',
             'description' => 'nullable|string',
+            'skills' => 'nullable|array',
+            'skills.*' => 'integer|exists:skills,id',
         ]);
 
+        $skillIds = $validated['skills'] ?? [];
+        unset($validated['skills']);
+
         $education->update($validated);
+        $education->skills()->sync($skillIds);
 
         return redirect()->route('admin.education.index')->with('success', 'Education/Certificate updated successfully.');
     }

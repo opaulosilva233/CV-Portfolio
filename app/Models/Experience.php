@@ -31,4 +31,9 @@ class Experience extends Model
     {
         return $this->hasMany(ExperienceRole::class)->orderBy('start_date', 'desc');
     }
+
+    public function skills()
+    {
+        return $this->morphToMany(Skill::class, 'skillable');
+    }
 }

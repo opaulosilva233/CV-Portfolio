@@ -17,4 +17,19 @@ class Skill extends Model
         'icon',
         'sort_order',
     ];
+
+    public function projects()
+    {
+        return $this->morphedByMany(Project::class, 'skillable');
+    }
+
+    public function educations()
+    {
+        return $this->morphedByMany(Education::class, 'skillable');
+    }
+
+    public function experiences()
+    {
+        return $this->morphedByMany(Experience::class, 'skillable');
+    }
 }
