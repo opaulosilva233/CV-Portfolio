@@ -14,7 +14,6 @@ const form = useForm({
     category: '',
     proficiency: 3,
     icon: '',
-    sort_order: 0,
     projects: [],
     educations: [],
     experiences: [],
@@ -103,11 +102,7 @@ const submit = () => {
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="col-span-1 md:col-span-2">
                                 <label for="icon" class="block text-sm font-medium text-gray-300 mb-2">Icon</label>
-                                <IconPicker id="icon" v-model="form.icon" />
-                            </div>
-                            <div>
-                                <label for="sort_order" class="block text-sm font-medium text-gray-300">List Order</label>
-                                <input id="sort_order" v-model="form.sort_order" type="number" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-cyan-500 focus:ring-cyan-500 transition-colors" />
+                                <IconPicker id="icon" v-model="form.icon" :category="form.category" />
                             </div>
                         </div>
 
