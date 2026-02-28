@@ -2,6 +2,9 @@ services:
     app:
 
         image: cv-portfolio-app
+        build:
+            context: .
+            dockerfile: docker/php/Dockerfile
         restart: unless-stopped
         working_dir: /var/www/html
         volumes:

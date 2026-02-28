@@ -25,6 +25,9 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd intl zip opca
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Set www-data to match host user UID/GID to avoid permission issues
+RUN usermod -u 1000 www-data && groupmod -g 1000 www-data
+
 # Set working directory
 WORKDIR /var/www/html
 
