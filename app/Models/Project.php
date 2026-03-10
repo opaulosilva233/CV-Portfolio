@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Project extends Model
 {
     /** @use HasFactory<\Database\Factories\ProjectFactory> */
-    use HasFactory;
+    use HasFactory, \App\Traits\HasTranslations;
+
+    public function getTranslatableFields()
+    {
+        return ['title', 'description'];
+    }
 
     protected $fillable = [
         'title',

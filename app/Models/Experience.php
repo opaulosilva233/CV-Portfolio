@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Experience extends Model
 {
     /** @use HasFactory<\Database\Factories\ExperienceFactory> */
-    use HasFactory;
+    use HasFactory, \App\Traits\HasTranslations;
+
+    public function getTranslatableFields()
+    {
+        return ['company', 'location'];
+    }
 
     protected $fillable = [
         'company',

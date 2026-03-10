@@ -16,23 +16,23 @@ class PortfolioController extends Controller
     {
         // Cache portfolio data for better performance
         $projects = Cache::remember('portfolio_projects', 3600, function () {
-            return Project::where('is_featured', true)->orderBy('sort_order')->get();
+            return Project::with('translations')->where('is_featured', true)->orderBy('sort_order')->get();
         });
 
         $skills = Cache::remember('portfolio_skills', 3600, function () {
-            return Skill::orderBy('sort_order')->get()->groupBy('category');
+            return Skill::with('translations')->orderBy('sort_order')->get()->groupBy('category');
         });
 
         $experiences = Cache::remember('portfolio_experiences', 3600, function () {
-            return Experience::with(['roles' => function ($q) {
-                $q->orderBy('start_date', 'desc');
+            return Experience::with(['translations', 'roles' => function ($q) {
+                $q->with('translations')->orderBy('start_date', 'desc');
             }])->orderBy('sort_order')->get()->sortByDesc(function ($exp) {
                 return $exp->roles->max('start_date');
             })->values();
         });
 
         $educations = Cache::remember('portfolio_educations', 3600, function () {
-            return \App\Models\Education::orderBy('start_date', 'desc')->get();
+            return \App\Models\Education::with('translations')->orderBy('start_date', 'desc')->get();
         });
 
         return Inertia::render('Welcome', [

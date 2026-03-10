@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class PageSection extends Model
 {
     /** @use HasFactory<\Database\Factories\PageSectionFactory> */
-    use HasFactory;
+    use HasFactory, \App\Traits\HasTranslations;
+
+    public function getTranslatableFields()
+    {
+        return ['title'];
+    }
 
     protected $fillable = [
         'name',

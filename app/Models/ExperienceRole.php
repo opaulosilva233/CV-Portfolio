@@ -6,6 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class ExperienceRole extends Model
 {
+    use \App\Traits\HasTranslations;
+
+    public function getTranslatableFields()
+    {
+        return ['role', 'description'];
+    }
+
     protected $fillable = [
         'experience_id',
         'role',

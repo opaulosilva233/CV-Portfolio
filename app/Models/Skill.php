@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Skill extends Model
 {
     /** @use HasFactory<\Database\Factories\SkillFactory> */
-    use HasFactory;
+    use HasFactory, \App\Traits\HasTranslations;
+
+    public function getTranslatableFields()
+    {
+        return ['name', 'category'];
+    }
 
     protected $fillable = [
         'name',

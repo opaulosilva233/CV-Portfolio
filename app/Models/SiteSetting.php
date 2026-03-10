@@ -8,17 +8,27 @@ use Illuminate\Support\Facades\Cache;
 
 class SiteSetting extends Model
 {
-    use HasFactory;
+    use HasFactory, \App\Traits\HasTranslations;
+
+    public function getTranslatableFields()
+    {
+        return ['value'];
+    }
+
+    public function isTranslatable()
+    {
+        return in_array($this->key, ['job_title', 'bio']);
+    }
 
     protected $fillable = ['key', 'value', 'type', 'group'];
 
     /**
      * Get all settings from cache or database
      */
-    protected static function getAllCached(): array
+    protected static function getAllCached()
     {
-        return Cache::remember('site_settings', 3600, function () {
-            return self::pluck('value', 'key')->toArray();
+        return Cache::remember('site_settings_models', 3600, function () {
+            return self::with('translations')->get()->keyBy('key');
         });
     }
 
@@ -28,7 +38,13 @@ class SiteSetting extends Model
     public static function getValue($key, $default = null)
     {
         $settings = self::getAllCached();
-        return $settings[$key] ?? $default;
+        
+        if (isset($settings[$key])) {
+            $setting = $settings[$key];
+            return $setting->isTranslatable() ? $setting->translated('value') : $setting->value;
+        }
+        
+        return $default;
     }
 
     /**
@@ -37,6 +53,7 @@ class SiteSetting extends Model
     public static function clearCache(): void
     {
         Cache::forget('site_settings');
+        Cache::forget('site_settings_models');
     }
 
     /**

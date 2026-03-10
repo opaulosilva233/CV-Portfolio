@@ -166,10 +166,6 @@ const menuItems = [
 
                             <template #content>
                                 <div class="bg-gray-900/90 border border-white/10 rounded-xl overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.5)] backdrop-blur-xl w-48 mt-1">
-                                    <DropdownLink :href="route('profile.edit')" class="hover:bg-white/10 text-gray-200 block px-4 py-2 text-sm transition-colors">
-                                        {{ __('Profile') }}
-                                    </DropdownLink>
-                                    <div class="border-t border-white/10"></div>
                                     <DropdownLink :href="route('logout')" method="post" as="button" class="hover:bg-red-500/20 text-red-400 hover:text-red-300 w-full text-left block px-4 py-2 text-sm transition-colors">
                                         {{ __('Log Out') }}
                                     </DropdownLink>

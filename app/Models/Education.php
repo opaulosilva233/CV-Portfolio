@@ -8,7 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Education extends Model
 {
     /** @use HasFactory<\Database\Factories\EducationFactory> */
-    use HasFactory;
+    use HasFactory, \App\Traits\HasTranslations;
+
+    public function getTranslatableFields()
+    {
+        return ['institution', 'degree', 'description'];
+    }
 
     protected $fillable = [
         'institution',
