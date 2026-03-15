@@ -5,6 +5,20 @@ import { Head, Link } from '@inertiajs/vue3';
 defineProps({
     skills: Array,
 });
+
+const categoryColors = {
+    frontend:  { bg: 'bg-blue-500/20',    text: 'text-blue-400',    border: 'border-blue-500/30',    shadow: 'shadow-[0_0_10px_rgba(59,130,246,0.2)]' },
+    backend:   { bg: 'bg-green-500/20',   text: 'text-green-400',   border: 'border-green-500/30',   shadow: 'shadow-[0_0_10px_rgba(34,197,94,0.2)]' },
+    database:  { bg: 'bg-amber-500/20',   text: 'text-amber-400',   border: 'border-amber-500/30',   shadow: 'shadow-[0_0_10px_rgba(245,158,11,0.2)]' },
+    tools:     { bg: 'bg-purple-500/20',  text: 'text-purple-400',  border: 'border-purple-500/30',  shadow: 'shadow-[0_0_10px_rgba(168,85,247,0.2)]' },
+    soft:      { bg: 'bg-pink-500/20',    text: 'text-pink-400',    border: 'border-pink-500/30',    shadow: 'shadow-[0_0_10px_rgba(236,72,153,0.2)]' },
+    other:     { bg: 'bg-gray-500/20',    text: 'text-gray-400',    border: 'border-gray-500/30',    shadow: 'shadow-[0_0_10px_rgba(107,114,128,0.2)]' },
+};
+
+const getCategoryClasses = (category) => {
+    const c = categoryColors[category] || categoryColors.other;
+    return [c.bg, c.text, c.border, c.shadow].join(' ');
+};
 </script>
 
 <template>
@@ -46,15 +60,17 @@ defineProps({
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 capitalize shadow-[0_0_10px_rgba(6,182,212,0.2)]">
+                                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full border capitalize" :class="getCategoryClasses(skill.category)">
                                                 {{ skill.category }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="w-full bg-gray-900/50 rounded-full h-2.5 border border-white/10 max-w-[100px] overflow-hidden">
-                                                <div class="bg-gradient-to-r from-purple-500 to-cyan-500 h-2.5 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.5)]" :style="{ width: skill.proficiency + '%' }"></div>
+                                            <div class="flex items-center gap-0.5">
+                                                <svg v-for="star in 5" :key="star" class="w-5 h-5" :class="star <= skill.proficiency ? 'text-yellow-400 drop-shadow-[0_0_6px_rgba(250,204,21,0.5)]' : 'text-gray-600'" fill="currentColor" viewBox="0 0 24 24">
+                                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                </svg>
+                                                <span class="ml-2 text-cyan-400 font-mono text-xs">{{ skill.proficiency }} / 5</span>
                                             </div>
-                                            <div class="text-xs text-cyan-400 mt-1 font-mono">{{ skill.proficiency }}%</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                             <Link :href="route('admin.skills.edit', skill.id)" class="text-cyan-400 hover:text-cyan-300 mr-4 transition-colors">Edit</Link>
