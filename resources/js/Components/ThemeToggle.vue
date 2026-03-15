@@ -290,28 +290,30 @@ const handleClick = (event) => {
     position: relative;
     width: 64px;
     height: 32px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 9999px;
     cursor: pointer;
     overflow: hidden;
     padding: 2px;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(8px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .cyber-toggle--dark {
-    background: rgba(0, 0, 0, 0.8);
-    border-color: rgba(139, 92, 246, 0.5); /* Purple border in dark mode */
-    box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+    background: rgba(0, 0, 0, 0.5);
+    border-color: rgba(139, 92, 246, 0.4);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), 0 0 15px rgba(139, 92, 246, 0.2);
 }
 
 .cyber-toggle:hover {
-    border-color: rgba(6, 182, 212, 0.5); /* Cyan hover */
+    border-color: rgba(168, 85, 247, 0.4);
+    background: rgba(168, 85, 247, 0.05);
 }
 .cyber-toggle--dark:hover {
-    border-color: rgba(139, 92, 246, 0.8);
+    border-color: rgba(6, 182, 212, 0.6);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3), 0 0 20px rgba(6, 182, 212, 0.3);
 }
 
 .cyber-toggle__track {

@@ -43,8 +43,8 @@ const switchLanguage = (locale) => {
     <div class="relative">
         <Dropdown align="right" width="48" contentClasses="py-1 bg-transparent shadow-none border-none">
             <template #trigger>
-                <button class="flex items-center gap-2 px-3 py-2 border border-white/10 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    <span class="text-base leading-none">{{ currentLanguage.flag }}</span>
+                <button class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-purple-500/10 dark:hover:bg-white/10 transition-colors text-sm font-bold text-gray-700 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500 group">
+                    <span class="text-lg leading-none group-hover:scale-110 transition-transform">{{ currentLanguage.flag }}</span>
                     <span class="hidden sm:inline-block">{{ currentLanguage.name }}</span>
                     <svg class="h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />

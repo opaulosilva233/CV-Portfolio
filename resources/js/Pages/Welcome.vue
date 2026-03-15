@@ -1,6 +1,9 @@
 <script setup>
+import { ref, onMounted, onUnmounted, computed, nextTick, watch } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import CyberLayout from '@/Layouts/CyberLayout.vue';
+import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
+import ThemeToggle from '@/Components/ThemeToggle.vue';
 
 defineProps({
     hero: Object,
@@ -10,6 +13,102 @@ defineProps({
     educations: Array,
     socials: [Object, Array],
     canLogin: Boolean,
+});
+
+const activeSection = ref('about');
+const sectionsList = ['about', 'skills', 'experience', 'education', 'projects'];
+const navButtons = ref([]);
+const indicatorLeft = ref(0);
+const indicatorWidth = ref(0);
+const scrollProgress = ref(0);
+let observer = null;
+
+const isDragging = ref(false);
+
+const activeColorClass = computed(() => {
+    switch (activeSection.value) {
+        case 'about': return 'from-purple-600 to-indigo-600 shadow-purple-500/50';
+        case 'skills': return 'from-cyan-500 to-blue-500 shadow-cyan-500/50';
+        case 'experience': return 'from-pink-500 to-rose-500 shadow-pink-500/50';
+        case 'education': return 'from-teal-500 to-emerald-500 shadow-teal-500/50';
+        case 'projects': return 'from-orange-500 to-red-500 shadow-orange-500/50';
+        default: return 'from-purple-600 to-indigo-600';
+    }
+});
+
+const activeTextClass = computed(() => {
+    switch (activeSection.value) {
+        case 'about': return 'text-purple-600 dark:text-purple-400';
+        case 'skills': return 'text-cyan-600 dark:text-cyan-400';
+        case 'experience': return 'text-pink-600 dark:text-pink-400';
+        case 'education': return 'text-teal-600 dark:text-teal-400';
+        case 'projects': return 'text-orange-600 dark:text-orange-400';
+        default: return 'text-purple-600 dark:text-purple-400';
+    }
+});
+
+const updateIndicator = () => {
+    const activeIndex = sectionsList.indexOf(activeSection.value);
+    if (activeIndex !== -1 && navButtons.value[activeIndex]) {
+        const el = navButtons.value[activeIndex];
+        indicatorLeft.value = el.offsetLeft;
+        indicatorWidth.value = el.offsetWidth;
+    }
+};
+
+const updateScrollProgress = () => {
+    // Determine the scroll progress percentage
+    const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    scrollProgress.value = height > 0 ? (winScroll / height) * 100 : 0;
+};
+
+// --- Custom Draggable Scroll Logic ---
+const trackElement = ref(null);
+
+const startDrag = (e) => {
+    e.preventDefault();
+    isDragging.value = true;
+    document.body.style.userSelect = 'none'; // prevent text selection while dragging
+    window.addEventListener('mousemove', onDrag);
+    window.addEventListener('mouseup', endDrag);
+};
+
+const onDrag = (e) => {
+    if (!isDragging.value || !trackElement.value) return;
+    
+    const trackRect = trackElement.value.getBoundingClientRect();
+    const trackHeight = trackRect.height;
+    
+    // Calculate where mouse is relative to the track
+    let offsetY = e.clientY - trackRect.top;
+    
+    // Bound the values
+    offsetY = Math.max(0, Math.min(offsetY, trackHeight));
+    
+    // Calculate percentage
+    const percentage = offsetY / trackHeight;
+    
+    // Convert percentage to actual page scroll value
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    window.scrollTo({
+        top: percentage * maxScroll,
+        // Disable smooth behavior to prevent stuttering while dragging
+        behavior: 'auto' 
+    });
+};
+
+const endDrag = () => {
+    isDragging.value = false;
+    document.body.style.userSelect = '';
+    window.removeEventListener('mousemove', onDrag);
+    window.removeEventListener('mouseup', endDrag);
+};
+// ------------------------------------
+
+watch(activeSection, async () => {
+    await nextTick();
+    updateIndicator();
 });
 
 const scrollTo = (id) => {
@@ -24,36 +123,169 @@ const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' });
 };
+
+onMounted(() => {
+    observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    activeSection.value = entry.target.id;
+                }
+            });
+        },
+        { rootMargin: '-30% 0px -70% 0px' }
+    );
+
+    sectionsList.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) {
+            observer.observe(el);
+        }
+    });
+
+    window.addEventListener('scroll', updateScrollProgress);
+    window.addEventListener('resize', updateIndicator);
+    
+    // Initial updates
+    setTimeout(() => {
+        updateIndicator();
+        updateScrollProgress();
+    }, 100);
+});
+
+onUnmounted(() => {
+    if (observer) {
+        observer.disconnect();
+    }
+    window.removeEventListener('scroll', updateScrollProgress);
+    window.removeEventListener('resize', updateIndicator);
+});
 </script>
+
+<style scoped>
+.terminal-fade-enter-active {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.terminal-fade-leave-active {
+    transition: all 0.2s ease;
+}
+.terminal-fade-enter-from, .terminal-fade-leave-to {
+    transform: translateY(10px) rotateX(90deg);
+    opacity: 0;
+    filter: blur(4px);
+}
+</style>
 
 <template>
     <CyberLayout>
         <Head title="Portfolio" />
         
-        <!-- Navigation (Adjusted for Cyber Layout) -->
-        <nav class="fixed top-0 w-full z-40 bg-white/5 dark:bg-black/20 backdrop-blur-md border-b border-white/10">
+        <!-- Out of the Box: Interactive HUD Header -->
+        <header class="fixed top-0 w-full z-50 bg-white/70 dark:bg-[#030712]/70 backdrop-blur-2xl transition-all duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between h-16 items-center">
+                <div class="flex justify-between items-center h-24 gap-4 xl:gap-8">
+                    <!-- Logo & Cyber HUD Area -->
+                    <div class="flex items-center gap-5 cursor-pointer group" @click="scrollTo('about')">
+                        <div class="relative">
+                            <img src="/images/Logotipo.png" alt="Logotipo" class="h-12 w-auto transform group-hover:scale-110 group-hover:rotate-[-5deg] transition-all duration-500 drop-shadow-lg" />
+                            <div class="absolute inset-0 bg-white dark:bg-black mix-blend-color opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                        </div>
+                        
+                        <!-- High Emphasis Dynamic Name with HUD -->
+                        <div class="flex flex-col justify-center translate-y-1">
+                            <span class="font-black text-3xl lg:text-4xl tracking-tighter text-transparent bg-clip-text bg-gradient-to-r transition-all duration-700 hidden sm:block whitespace-nowrap drop-shadow-sm group-hover:drop-shadow-lg"
+                                  :class="activeColorClass">
+                                {{ hero.name || 'PORTFOLIO' }}
+                            </span>
+                            <div class="hidden sm:flex items-center gap-3 h-6 mt-0.5">
+                                <span class="text-[10px] font-black tracking-[0.3em] uppercase transition-colors duration-500 flex items-center gap-1"
+                                      :class="activeTextClass">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></div>
+                                    SYS.NAV
+                                </span>
+                                <div class="w-12 h-[1px] bg-gradient-to-r from-gray-300 to-transparent dark:from-white/20 dark:to-transparent"></div>
+                                <transition name="terminal-fade" mode="out-in">
+                                    <span :key="activeSection" class="text-[11px] font-bold tracking-[0.2em] uppercase text-gray-400 dark:text-gray-500">
+                                        // CURRENT_LOC: <span class="text-gray-800 dark:text-gray-200">{{ __(activeSection) }}</span>
+                                    </span>
+                                </transition>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center Navigation Links: Gliding Pill -->
+                    <nav class="hidden lg:flex relative items-center p-1.5 bg-gray-200/40 dark:bg-white/5 rounded-2xl border border-gray-300/50 dark:border-white/10 shadow-inner">
+                        
+                        <!-- The Liquid Gliding Pill -->
+                        <div class="absolute top-1.5 bottom-1.5 left-0 bg-gradient-to-r rounded-xl transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-0"
+                             :class="activeColorClass"
+                             :style="{
+                                 transform: `translateX(${indicatorLeft}px)`,
+                                 width: `${indicatorWidth}px`
+                             }">
+                             <!-- Inner Glow for that sleek modern look -->
+                             <div class="absolute inset-0 bg-white/20 dark:bg-black/10 rounded-xl"></div>
+                        </div>
+
+                        <!-- Buttons dynamically bound to refs -->
+                        <button 
+                            v-for="(section, index) in sectionsList"
+                            :key="section"
+                            :ref="el => navButtons[index] = el"
+                            @click="scrollTo(section)"
+                            class="relative z-10 px-3 xl:px-5 py-2 xl:py-2.5 rounded-xl text-[10px] xl:text-[11px] font-black tracking-wider xl:tracking-[0.15em] uppercase transition-all duration-300"
+                            :class="activeSection === section ? 'text-white scale-100 xl:scale-105' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:scale-100 xl:hover:scale-105'"
+                        >
+                            {{ __(section.charAt(0).toUpperCase() + section.slice(1)) }}
+                        </button>
+                    </nav>
+
+                    <!-- Right Options & Admin -->
                     <div class="flex items-center gap-4">
-                        <img src="/images/Logotipo.png" alt="Logotipo" class="h-14 w-auto scale-125 transform hover:scale-[1.35] transition-transform duration-300" />
-                        <span class="font-bold text-xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-purple-500 ml-2">{{ hero.name || 'Portfolio' }}</span>
-                    </div>
-                    <div class="hidden md:flex space-x-8">
-                        <button @click="scrollTo('about')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('About') }}</button>
-                        <button @click="scrollTo('skills')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Skills') }}</button>
-                        <button @click="scrollTo('experience')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Experience') }}</button>
-                        <button @click="scrollTo('education')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Education') }}</button>
-                        <button @click="scrollTo('projects')" class="text-gray-600 dark:text-gray-300 hover:text-purple-600 dark:hover:text-purple-400 transition font-medium">{{ __('Projects') }}</button>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <!-- ThemeToggle removed (handled by CyberLayout) -->
-                         <Link v-if="canLogin" :href="route('dashboard')" class="text-sm font-bold uppercase tracking-widest text-gray-500 hover:text-purple-600 dark:hover:text-cyan-400 transition">
+                        <div class="flex items-center gap-2 p-1 bg-gray-100 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
+                            <LanguageSwitcher />
+                            <div class="w-px h-5 bg-gray-300 dark:bg-gray-700"></div>
+                            <ThemeToggle variant="cyber" />
+                        </div>
+                        
+                        <Link v-if="canLogin" :href="route('dashboard')" class="hidden md:flex ml-2 px-5 py-2 rounded-xl bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 text-xs font-black uppercase tracking-widest transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
                             {{ __('Admin') }}
                         </Link>
                     </div>
                 </div>
             </div>
-        </nav>
+            
+            <!-- Laser Scroll Progress Bar -->
+            <div class="absolute bottom-0 left-0 w-full h-[2px] bg-gray-200/50 dark:bg-white/5 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]">
+                <div class="h-full bg-gradient-to-r relative transition-all duration-100 ease-out"
+                     :class="activeColorClass"
+                     :style="{ width: scrollProgress + '%' }">
+                     <!-- Laser Head Glow -->
+                     <div class="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-[2px] bg-white opacity-80 blur-[2px]"></div>
+                     <div class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-[2px] bg-white"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sleek & Minimal Custom DOM Scrollbar -->
+        <div class="fixed right-2 top-32 bottom-12 z-40 flex items-center justify-center w-8 pointer-events-none hidden md:flex transition-all duration-500"
+             :class="isDragging ? 'opacity-100' : 'opacity-20 hover:opacity-100'">
+            <!-- Scroll Track Base -->
+            <div class="relative h-full w-[3px] bg-gray-300/50 dark:bg-gray-700/50 rounded-full" ref="trackElement">
+                
+                <!-- The Elevator Thumb (Interactive) -->
+                <!-- Added extra padding so it's easier to grab -->
+                <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-auto cursor-ns-resize px-4 py-2 group/thumb"
+                     :style="{ top: `calc(${scrollProgress}% - 20px)` }"
+                     @mousedown="startDrag">
+                    
+                    <!-- Sleek Core Capsule -->
+                    <div class="w-1.5 h-8 rounded-full transition-all duration-300"
+                         :class="isDragging ? 'bg-gray-900 dark:bg-white scale-y-125' : 'bg-gray-500 dark:bg-gray-400 group-hover/thumb:bg-gray-800 dark:group-hover/thumb:bg-gray-200'">
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Hero Section -->
         <section id="about" class="pt-32 pb-20 px-4 min-h-screen flex items-center">

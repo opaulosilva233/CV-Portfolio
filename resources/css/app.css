@@ -59,3 +59,18 @@
         clip-path: polygon(100% 100%, 200% -200%, -200% 200%);
     }
 }
+
+/* ==============================================================
+   CUSTOM SCROLLBAR (Cyber/Modern Aesthetic)
+   ============================================================== */
+   
+/* completely hide native scrollbar to use our custom Vue scrollbar */
+::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+}
+* {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
