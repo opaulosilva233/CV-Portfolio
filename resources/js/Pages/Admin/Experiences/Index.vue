@@ -46,8 +46,16 @@ const formatDate = (dateString) => {
                                 <tbody class="divide-y divide-white/10 bg-transparent">
                                     <tr v-for="experience in experiences" :key="experience.id" class="hover:bg-white/5 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-white">{{ experience.company }}</div>
-                                            <div class="text-sm text-gray-400">{{ experience.location }}</div>
+                                            <div class="flex items-center gap-3">
+                                                <img v-if="experience.image_url" :src="experience.image_url" :alt="experience.company" class="w-10 h-10 rounded-lg object-contain bg-white/10 border border-white/10 p-0.5 flex-shrink-0" />
+                                                <div v-else class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-medium text-white">{{ experience.company }}</div>
+                                                    <div class="text-sm text-gray-400">{{ experience.location }}</div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4">
                                             <div v-for="(role, index) in experience.roles" :key="index" class="mb-3 last:mb-0">

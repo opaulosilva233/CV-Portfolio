@@ -24,12 +24,44 @@ class Experience extends Model
         //
     ];
 
+    protected $appends = ['image_url'];
+
     /**
      * Prepare a date for array / JSON serialization.
      */
     protected function serializeDate(\DateTimeInterface $date): string
     {
         return $date->format('Y-m-d');
+    }
+
+    /**
+     * Get the path to the experience image file, if it exists.
+     */
+    public function getImagePath(): ?string
+    {
+        $dir = storage_path('experiences/' . $this->id);
+
+        if (!is_dir($dir)) {
+            return null;
+        }
+
+        $files = glob($dir . '/logo.*');
+
+        return !empty($files) ? $files[0] : null;
+    }
+
+    /**
+     * Accessor: image_url
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        $path = $this->getImagePath();
+
+        if (!$path) {
+            return null;
+        }
+
+        return route('experiences.image', $this->id) . '?v=' . filemtime($path);
     }
 
     public function roles()

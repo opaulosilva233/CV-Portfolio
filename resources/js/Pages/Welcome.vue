@@ -347,7 +347,10 @@ onUnmounted(() => {
                         <!-- Company Node -->
                         <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-600 ring-4 ring-white dark:ring-black shadow-[0_0_10px_rgba(147,51,234,0.5)]"></div>
                         
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ exp.company }}</h3>
+                        <div class="flex items-center gap-3 mb-1">
+                            <img v-if="exp.image_url" :src="exp.image_url" :alt="exp.company" class="w-10 h-10 rounded-lg object-contain bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/10 p-0.5" />
+                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ exp.company }}</h3>
+                        </div>
                         <div class="text-md font-medium text-gray-500 dark:text-gray-400 mb-4 pb-4 border-b border-gray-100 dark:border-white/5" v-if="exp.location">{{ exp.location }}</div>
                         <div class="text-md font-medium text-gray-500 dark:text-gray-400 mb-4 pb-4 border-b border-gray-100 dark:border-white/5" v-else></div>
                         
@@ -360,7 +363,12 @@ onUnmounted(() => {
                                 <!-- Role Node bullet -->
                                 <div class="absolute left-[3.5px] top-2.5 w-2 h-2 rounded-full bg-cyan-500 ring-2 ring-white dark:ring-black" v-if="exp.roles && exp.roles.length > 1"></div>
                                 
-                                <h4 class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ role.role }}</h4>
+                                <h4 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+                                    {{ role.role }}
+                                    <span v-if="role.employment_type" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-500 dark:text-purple-400 border border-purple-500/20 align-middle">
+                                        {{ {full_time: __('Full Time'), part_time: __('Part Time'), temporary: __('Temporary Work'), internship: __('Internship')}[role.employment_type] }}
+                                    </span>
+                                </h4>
                                 <div class="mb-2 mt-1 text-sm text-cyan-600 dark:text-cyan-400 font-bold uppercase tracking-wide flex items-center gap-2">
                                     {{ formatDate(role.start_date) }} - {{ role.is_current ? __('Present') : formatDate(role.end_date) }}
                                     <span v-if="role.is_current" class="px-2 py-0.5 inline-flex text-[10px] leading-4 font-semibold rounded bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]">

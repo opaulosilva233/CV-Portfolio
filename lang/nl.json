@@ -60,5 +60,11 @@
     "No records found. Click \"Add New\" to get started.": "Geen records gevonden. Klik op \"Nieuw Toevoegen\" om te beginnen.",
     "View Credential": "Bekijk Referentie",
     "No education or certificates found.": "Geen opleidingen of certificaten gevonden.",
-    "Currently studying / Present": "Huidige studie / Heden"
+    "Currently studying / Present": "Huidige studie / Heden",
+    "Full Time": "Voltijd",
+    "Part Time": "Deeltijd",
+    "Temporary Work": "Tijdelijk Werk",
+    "Internship": "Stage",
+    "Roles & Dates": "Functies & Data",
+    "Current": "Huidig"
 }

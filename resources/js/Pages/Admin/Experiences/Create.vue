@@ -1,7 +1,7 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps({
     availableSkills: Array,
@@ -10,9 +10,11 @@ const props = defineProps({
 const form = useForm({
     company: '',
     location: '',
+    image: null,
     roles: [
         {
             role: '',
+            employment_type: '',
             start_date: '',
             end_date: '',
             is_current: false,
@@ -21,6 +23,8 @@ const form = useForm({
     ],
     skills: [],
 });
+
+const imagePreview = ref(null);
 
 const groupedSkills = computed(() => {
     const groups = {};
@@ -44,6 +48,7 @@ const toggleSkill = (id) => {
 const addRole = () => {
     form.roles.push({
         role: '',
+        employment_type: '',
         start_date: '',
         end_date: '',
         is_current: false,
@@ -57,9 +62,27 @@ const removeRole = (index) => {
     }
 };
 
+const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        form.image = file;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            imagePreview.value = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+};
+
+const clearImage = () => {
+    form.image = null;
+    imagePreview.value = null;
+};
+
 const submit = () => {
     form.post(route('admin.experiences.index'), {
         preserveScroll: true,
+        forceFormData: true,
     });
 };
 </script>
@@ -85,6 +108,30 @@ const submit = () => {
                 <div class="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl sm:rounded-2xl overflow-hidden p-6 max-w-3xl">
                     <form @submit.prevent="submit" class="space-y-6">
                         
+                        <!-- Company Logo Upload -->
+                        <div class="pb-6 border-b border-white/10">
+                            <label class="block text-sm font-medium text-gray-300 mb-3">Company Logo</label>
+                            <div class="flex items-start gap-6">
+                                <!-- Preview -->
+                                <div v-if="imagePreview" class="relative flex-shrink-0">
+                                    <img :src="imagePreview" alt="Logo preview" class="w-20 h-20 rounded-xl object-contain bg-white/10 border border-white/10 p-1" />
+                                    <button type="button" @click="clearImage" class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 hover:bg-red-400 rounded-full flex items-center justify-center text-white transition-colors">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
+                                </div>
+                                <!-- Upload area -->
+                                <label class="flex-1 flex flex-col items-center justify-center px-6 py-4 rounded-xl bg-gray-900/50 border-2 border-dashed border-white/10 hover:border-purple-500/50 cursor-pointer transition-colors group">
+                                    <svg class="w-8 h-8 text-gray-500 group-hover:text-purple-400 transition-colors mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">Click to upload logo</span>
+                                    <span class="text-xs text-gray-500 mt-1">PNG, JPG, GIF, WEBP, SVG (max 2MB)</span>
+                                    <input type="file" accept="image/*" @change="handleImageChange" class="hidden" />
+                                </label>
+                            </div>
+                            <div v-if="form.errors.image" class="text-red-400 text-xs mt-2">{{ form.errors.image }}</div>
+                        </div>
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-white/10">
                             <div>
                                 <label for="company" class="block text-sm font-medium text-gray-300">Company</label>
@@ -117,6 +164,18 @@ const submit = () => {
                                         <label :for="'role_' + index" class="block text-sm font-medium text-gray-300">Role / Job Title</label>
                                         <input :id="'role_' + index" v-model="role.role" type="text" required class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                         <div v-if="form.errors[`roles.${index}.role`]" class="text-red-400 text-xs mt-1">{{ form.errors[`roles.${index}.role`] }}</div>
+                                    </div>
+
+                                    <div>
+                                        <label :for="'employment_type_' + index" class="block text-sm font-medium text-gray-300">Employment Type</label>
+                                        <select :id="'employment_type_' + index" v-model="role.employment_type" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors">
+                                            <option value="">Select type...</option>
+                                            <option value="full_time">Full Time</option>
+                                            <option value="part_time">Part Time</option>
+                                            <option value="temporary">Trabalho Temporário</option>
+                                            <option value="internship">Estágio</option>
+                                        </select>
+                                        <div v-if="form.errors[`roles.${index}.employment_type`]" class="text-red-400 text-xs mt-1">{{ form.errors[`roles.${index}.employment_type`] }}</div>
                                     </div>
 
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

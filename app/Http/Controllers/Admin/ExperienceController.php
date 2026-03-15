@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Experience;
 use App\Models\Skill;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
 
 class ExperienceController extends Controller
@@ -47,8 +48,10 @@ class ExperienceController extends Controller
         $validated = $request->validate([
             'company' => 'required|string|max:255',
             'location' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,svg|max:2048',
             'roles' => 'required|array|min:1',
             'roles.*.role' => 'required|string|max:255',
+            'roles.*.employment_type' => 'nullable|string|in:internship,temporary,full_time,part_time',
             'roles.*.start_date' => 'required|date',
             'roles.*.end_date' => 'nullable|date|after_or_equal:roles.*.start_date',
             'roles.*.is_current' => 'boolean',
@@ -70,6 +73,11 @@ class ExperienceController extends Controller
 
         $experience->skills()->sync($skillIds);
 
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $this->saveImage($experience, $request->file('image'));
+        }
+
         return redirect()->route('admin.experiences.index')->with('success', 'Experience created successfully.');
     }
 
@@ -78,8 +86,11 @@ class ExperienceController extends Controller
         $validated = $request->validate([
             'company' => 'required|string|max:255',
             'location' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,svg|max:2048',
+            'remove_image' => 'nullable|boolean',
             'roles' => 'required|array|min:1',
             'roles.*.role' => 'required|string|max:255',
+            'roles.*.employment_type' => 'nullable|string|in:internship,temporary,full_time,part_time',
             'roles.*.start_date' => 'required|date',
             'roles.*.end_date' => 'nullable|date|after_or_equal:roles.*.start_date',
             'roles.*.is_current' => 'boolean',
@@ -102,12 +113,67 @@ class ExperienceController extends Controller
 
         $experience->skills()->sync($skillIds);
 
+        // Handle image removal
+        if ($request->boolean('remove_image')) {
+            $this->deleteImage($experience);
+        }
+
+        // Handle image upload (overrides removal if both sent)
+        if ($request->hasFile('image')) {
+            $this->deleteImage($experience);
+            $this->saveImage($experience, $request->file('image'));
+        }
+
         return redirect()->route('admin.experiences.index')->with('success', 'Experience updated successfully.');
     }
 
     public function destroy(Experience $experience)
     {
+        // Delete image folder
+        $this->deleteImage($experience);
+
         $experience->delete();
         return redirect()->back();
+    }
+
+    /**
+     * Serve the experience image from storage (public route).
+     */
+    public function serveImage(Experience $experience)
+    {
+        $path = $experience->getImagePath();
+
+        if (!$path) {
+            abort(404);
+        }
+
+        return response()->file($path);
+    }
+
+    /**
+     * Save an uploaded image to storage/experiences/{id}/logo.{ext}
+     */
+    private function saveImage(Experience $experience, $file): void
+    {
+        $dir = storage_path('experiences/' . $experience->id);
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $extension = $file->getClientOriginalExtension();
+        $file->move($dir, 'logo.' . $extension);
+    }
+
+    /**
+     * Delete the image directory for an experience.
+     */
+    private function deleteImage(Experience $experience): void
+    {
+        $dir = storage_path('experiences/' . $experience->id);
+
+        if (is_dir($dir)) {
+            File::deleteDirectory($dir);
+        }
     }
 }

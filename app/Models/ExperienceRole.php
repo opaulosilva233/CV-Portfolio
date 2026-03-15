@@ -16,6 +16,7 @@ class ExperienceRole extends Model
     protected $fillable = [
         'experience_id',
         'role',
+        'employment_type',
         'start_date',
         'end_date',
         'is_current',
@@ -27,6 +28,14 @@ class ExperienceRole extends Model
         'end_date' => 'date',
         'is_current' => 'boolean',
     ];
+
+    /**
+     * Prepare a date for array / JSON serialization.
+     */
+    protected function serializeDate(\DateTimeInterface $date): string
+    {
+        return $date->format('Y-m-d');
+    }
 
     public function experience()
     {

@@ -8,6 +8,8 @@ Route::get('/', [\App\Http\Controllers\PortfolioController::class, 'index'])->na
 
 Route::post('/language', [\App\Http\Controllers\LanguageController::class, 'update'])->name('language.switch');
 
+Route::get('/experiences/{experience}/image', [\App\Http\Controllers\Admin\ExperienceController::class, 'serveImage'])->name('experiences.image');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('Dashboard');
