@@ -15,7 +15,7 @@ class ProjectController extends Controller
     public function index()
     {
         return Inertia::render('Admin/Projects/Index', [
-            'projects' => Project::with('skills')->orderBy('sort_order')->orderBy('created_at', 'desc')->get()
+            'projects' => Project::with('skills')->orderBy('completed_at', 'desc')->orderBy('created_at', 'desc')->get()
         ]);
     }
 
@@ -43,9 +43,8 @@ class ProjectController extends Controller
             'description' => 'required|string',
             'project_url' => 'nullable|url',
             'github_url' => 'nullable|url',
-            'tech_stack' => 'nullable|array',
             'is_featured' => 'boolean',
-            'sort_order' => 'integer',
+            'completed_at' => 'nullable|date',
             'skills' => 'nullable|array',
             'skills.*' => 'integer|exists:skills,id',
             'images' => 'nullable|array',
@@ -76,9 +75,8 @@ class ProjectController extends Controller
             'description' => 'required|string',
             'project_url' => 'nullable|url',
             'github_url' => 'nullable|url',
-            'tech_stack' => 'nullable|array',
             'is_featured' => 'boolean',
-            'sort_order' => 'integer',
+            'completed_at' => 'nullable|date',
             'skills' => 'nullable|array',
             'skills.*' => 'integer|exists:skills,id',
             'images' => 'nullable|array',

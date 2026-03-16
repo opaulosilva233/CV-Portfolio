@@ -33,7 +33,7 @@ defineProps({
                                 <thead class="bg-white/5">
                                     <tr>
                                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Title</th>
-                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Tech Stack</th>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Completed At</th>
                                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Status</th>
                                         <th scope="col" class="px-6 py-4 text-right text-xs font-semibold text-gray-300 uppercase tracking-wider">Actions</th>
                                     </tr>
@@ -54,10 +54,8 @@ defineProps({
                                                 </div>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 flex flex-wrap gap-2">
-                                            <span v-for="tech in project.tech_stack" :key="tech" class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-white/5 text-gray-300 border border-white/10">
-                                                {{ tech }}
-                                            </span>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm text-gray-300">{{ project.completed_at ? new Date(project.completed_at).toLocaleDateString() : 'N/A' }}</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 shadow-[0_0_10px_rgba(234,179,8,0.2)]" v-if="project.is_featured">

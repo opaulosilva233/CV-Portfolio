@@ -12,9 +12,8 @@ const form = useForm({
     description: '',
     project_url: '',
     github_url: '',
-    tech_stack: [],
     is_featured: false,
-    sort_order: 0,
+    completed_at: '',
     skills: [],
     // Gallery fields
     images: [], // File objects
@@ -208,8 +207,9 @@ const submit = () => {
                                 </div>
                                 
                                 <div class="flex-1">
-                                    <label for="sort_order" class="block text-sm font-medium text-gray-300">Sort Order</label>
-                                    <input id="sort_order" v-model="form.sort_order" type="number" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
+                                    <label for="completed_at" class="block text-sm font-medium text-gray-300">Completion Date</label>
+                                    <input id="completed_at" v-model="form.completed_at" type="date" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
+                                    <div v-if="form.errors.completed_at" class="text-red-400 text-xs mt-1">{{ form.errors.completed_at }}</div>
                                 </div>
                             </div>
                         </div>

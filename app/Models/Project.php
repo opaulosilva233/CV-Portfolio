@@ -22,14 +22,13 @@ class Project extends Model
         'image_url',
         'project_url',
         'github_url',
-        'tech_stack',
         'is_featured',
-        'sort_order',
+        'completed_at',
     ];
 
     protected $casts = [
-        'tech_stack' => 'array',
         'is_featured' => 'boolean',
+        'completed_at' => 'date',
     ];
 
     protected $appends = ['main_image_url', 'gallery'];

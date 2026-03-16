@@ -16,7 +16,7 @@ class PortfolioController extends Controller
     {
         // Cache portfolio data for better performance
         $projects = Cache::remember('portfolio_projects', 3600, function () {
-            return Project::with('translations')->where('is_featured', true)->orderBy('sort_order')->get();
+            return Project::with(['translations', 'skills'])->where('is_featured', true)->orderBy('completed_at', 'desc')->get();
         });
 
         $skills = Cache::remember('portfolio_skills', 3600, function () {
