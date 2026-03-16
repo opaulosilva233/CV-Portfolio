@@ -17,7 +17,7 @@ class SiteSetting extends Model
 
     public function isTranslatable()
     {
-        return in_array($this->key, ['job_title', 'bio']);
+        return in_array($this->key, ['job_title', 'bio', 'footer_text', 'seo_title', 'seo_description', 'seo_keywords']);
     }
 
     protected $fillable = ['key', 'value', 'type', 'group'];

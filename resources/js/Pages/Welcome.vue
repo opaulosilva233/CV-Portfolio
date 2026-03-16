@@ -13,6 +13,8 @@ defineProps({
     educations: Array,
     socials: [Object, Array],
     canLogin: Boolean,
+    seo: Object,
+    footer_text: String,
 });
 
 const activeSection = ref('about');
@@ -178,7 +180,10 @@ onUnmounted(() => {
 
 <template>
     <CyberLayout>
-        <Head title="Portfolio" />
+        <Head :title="seo?.title || 'Portfolio'">
+            <meta name="description" :content="seo?.description" v-if="seo?.description" />
+            <meta name="keywords" :content="seo?.keywords" v-if="seo?.keywords" />
+        </Head>
         
         <!-- Out of the Box: Interactive HUD Header -->
         <header class="fixed top-0 w-full z-50 bg-white/70 dark:bg-[#030712]/70 backdrop-blur-2xl transition-all duration-300">
@@ -469,7 +474,7 @@ onUnmounted(() => {
         </section>
 
         <footer class="py-10 text-center text-gray-500 dark:text-gray-400 text-sm font-medium border-t border-white/10">
-            &copy; {{ new Date().getFullYear() }} {{ hero.name }}. <span class="opacity-50">{{ __('System Online.') }}</span>
+            &copy; {{ new Date().getFullYear() }} {{ hero.name }}. <span class="opacity-50" v-if="footer_text">{{ footer_text }}</span>
         </footer>
     </CyberLayout>
 </template>

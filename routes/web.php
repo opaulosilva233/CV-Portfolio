@@ -11,6 +11,7 @@ Route::post('/language', [\App\Http\Controllers\LanguageController::class, 'upda
 Route::get('/experiences/{experience}/image', [\App\Http\Controllers\Admin\ExperienceController::class, 'serveImage'])->name('experiences.image');
 Route::get('/projects/{project}/image/{filename?}', [\App\Http\Controllers\Admin\ProjectController::class, 'serveImage'])->name('projects.image');
 Route::get('/educations/{education}/image', [\App\Http\Controllers\Admin\EducationController::class, 'serveImage'])->name('educations.image');
+Route::get('/settings/hero-image', [\App\Http\Controllers\Admin\SettingController::class, 'serveHeroImage'])->name('settings.hero-image');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {

@@ -46,7 +46,18 @@ class PortfolioController extends Controller
             'skills' => $skills,
             'experiences' => $experiences,
             'educations' => $educations,
-            'socials' => SiteSetting::getValue('social_links', []),
+            'socials' => array_filter([
+                'GitHub' => SiteSetting::getValue('social_github'),
+                'LinkedIn' => SiteSetting::getValue('social_linkedin'),
+                'Twitter' => SiteSetting::getValue('social_twitter'),
+                'Instagram' => SiteSetting::getValue('social_instagram'),
+            ]),
+            'footer_text' => SiteSetting::getValue('footer_text', 'System Online.'),
+            'seo' => [
+                'title' => SiteSetting::getValue('seo_title', 'Portfolio'),
+                'description' => SiteSetting::getValue('seo_description', ''),
+                'keywords' => SiteSetting::getValue('seo_keywords', ''),
+            ]
         ]);
     }
 }
