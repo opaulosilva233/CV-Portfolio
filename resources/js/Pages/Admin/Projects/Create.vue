@@ -13,6 +13,7 @@ const form = useForm({
     project_url: '',
     github_url: '',
     is_featured: false,
+    in_progress: false,
     completed_at: '',
     skills: [],
     // Gallery fields
@@ -205,8 +206,13 @@ const submit = () => {
                                     <input id="is_featured" v-model="form.is_featured" type="checkbox" class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50" />
                                     <label for="is_featured" class="ml-2 block text-sm font-medium text-gray-300">Featured Project</label>
                                 </div>
+
+                                <div class="flex items-center">
+                                    <input id="in_progress" v-model="form.in_progress" type="checkbox" class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50" />
+                                    <label for="in_progress" class="ml-2 block text-sm font-medium text-gray-300">Em Andamento</label>
+                                </div>
                                 
-                                <div class="flex-1">
+                                <div class="flex-1" v-if="!form.in_progress">
                                     <label for="completed_at" class="block text-sm font-medium text-gray-300">Completion Date</label>
                                     <input id="completed_at" v-model="form.completed_at" type="date" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                     <div v-if="form.errors.completed_at" class="text-red-400 text-xs mt-1">{{ form.errors.completed_at }}</div>

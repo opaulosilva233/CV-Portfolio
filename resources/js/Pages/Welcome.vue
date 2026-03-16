@@ -448,7 +448,10 @@ onUnmounted(() => {
                             />
                         </div>
                         <div class="p-6 relative z-20">
-                            <h3 class="text-xl font-bold mb-2 text-gray-900 dark:text-white group-hover:text-pink-500 transition-colors">{{ project.title }}</h3>
+                            <div class="flex items-start justify-between mb-2">
+                                <h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-pink-500 transition-colors">{{ project.title }}</h3>
+                                <span v-if="project.in_progress" class="px-2 py-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">Em Andamento</span>
+                            </div>
                             <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{{ project.description }}</p>
                             <div class="flex flex-wrap gap-2 mb-4">
                                 <span v-for="skill in project.skills" :key="skill.id" class="text-[10px] uppercase font-bold px-2 py-1 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 rounded border border-transparent group-hover:border-pink-500/30 transition-colors">

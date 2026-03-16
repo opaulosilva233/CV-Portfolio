@@ -23,11 +23,13 @@ class Project extends Model
         'project_url',
         'github_url',
         'is_featured',
+        'in_progress',
         'completed_at',
     ];
 
     protected $casts = [
         'is_featured' => 'boolean',
+        'in_progress' => 'boolean',
         'completed_at' => 'date',
     ];
 

@@ -35,3 +35,5 @@ WORKDIR /var/www/html
 RUN chown -R www-data:www-data /var/www/html
 # Configure OPcache for better performance
 COPY docker/php/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+# Configure PHP upload limits
+COPY docker/php/custom.ini /usr/local/etc/php/conf.d/custom.ini
