@@ -1,96 +1,48 @@
-# Portefólio e CV Online Profissional
+# Portfólio & CV Digital
 
-## Objetivo do Projeto
+> Uma plataforma moderna e centralizada para gestão de identidade profissional, projetos e currículo.
 
-Este projeto consiste no desenvolvimento de um site pessoal que atua simultaneamente como portefólio e Currículo Online (CV). O objetivo principal é disponibilizar uma plataforma centralizada onde é possível apresentar projetos, competências e experiências profissionais de forma moderna, limpa e profissional.
+## 🎯 Objetivo do Projeto
 
-Além da vertente pública, o site inclui uma área de administração (backoffice) completa, permitindo a gestão autónoma de todos os conteúdos (textos, imagens, projetos, dados curriculares) sem necessidade de intervenção direta no código-fonte.
+Este projeto foi concebido para ser a peça central da presença online de um profissional. Mais do que um simples portfólio, é uma ferramenta de gestão de carreira que permite apresentar competências, experiências e projetos de forma visualmente impactante e profissional.
 
-## Tecnologias Utilizadas
+O foco principal é a **autonomia**: através de um painel de administração robusto, o utilizador tem controlo total sobre cada pedaço de conteúdo, eliminando a dependência de alterações no código-fonte para atualizações de rotina.
 
-O projeto é construído sobre uma stack robusta e moderna, garantindo performance, escalabilidade e facilidade de manutenção:
+## ✨ Funcionalidades Principais
 
-- **Backend framework**: [Laravel](https://laravel.com/) (PHP)
-- **Frontend framework**: [Vue.js](https://vuejs.org/) (JavaScript)
-- **Estilização**: Tailwind CSS (Recomendado/A definir)
-- **Base de Dados**: MySQL/PostgreSQL (A definir na configuração)
+### 🌐 Suporte Multilingue
+Alcance um público global. A plataforma está preparada para suportar múltiplos idiomas, permitindo que os visitantes alternem facilmente entre traduções completas de todo o site.
 
-## Estrutura Geral do Projeto
+### 🖼️ Galeria de Projetos Imersiva
+Apresente o seu trabalho em detalhe. Cada projeto suporta múltiplas imagens, descrições detalhadas e metadados, oferecendo uma experiência de visualização rica e profissional.
 
-A estrutura segue as convenções padrão do Laravel com Vue.js:
+### ⏳ Linha do Tempo de Carreira
+Uma representação visual e cronológica da sua jornada. Organize as suas experiências profissionais e formação académica de forma clara e fácil de consumir.
 
-- `app/`: Lógica de backend (Models, Controllers, etc.)
-- `resources/js/`: Código fonte Vue.js (Componentes, Views, Stores)
-- `resources/is/Components`: Componentes Vue reutilizáveis
-- `resources/is/Pages`: Páginas da aplicação (Frontend e Backoffice)
-- `routes/`: Definições de rotas (API e Web)
-- `database/`: Migrations e Seeders
+### 🛠️ Backoffice Completo (CMS)
+Um painel de controlo intuitivo para gerir tudo:
+- **Dados Pessoais & Bio**: Atualize o seu perfil num instante.
+- **Gestão de Skills**: Catalogue as suas competências técnicas com ícones dinâmicos.
+- **Editor de Projetos**: Controle a ordem, imagens e descrições dos seus trabalhos.
+- **Gestão de CV**: Adicione ou edite experiências e formação em tempo real.
 
-## Funcionalidades Previstas
+### 🧩 Seções Dinâmicas
+Flexibilidade total na organização do conteúdo da página inicial e outras seções do site, permitindo ajustes rápidos na mensagem e no layout.
 
-### 1. Área Pública (Frontend)
-- **Homepage**: Introdução impactante com design clean e moderno.
-- **Portefólio**: Galeria de projetos com filtros, detalhes e links.
-- **Sobre Mim / CV**: Linha do tempo de experiências, formação e competências.
-- **Contactos**: Formulário de contacto e links para redes sociais.
+## 🚀 Tecnologias no Coração
 
-### 2. Área de Administração (Backoffice)
-- **Dashboard**: Visão geral do site.
-- **Gestão de Perfil**: Edição de dados pessoais, foto, bio.
-- **Gestão de Projetos**: Criar, editar e remover projetos do portefólio.
-- **Gestão de CV**: Adicionar experiências profissionais, educação e skills.
-- **Gestão de Conteúdos**: Edição de textos estáticos do site.
+A plataforma utiliza o que há de mais moderno no ecossistema web para garantir velocidade e segurança:
+- **Backend**: Laravel (PHP)
+- **Frontend**: Vue.js via Inertia.js
+- **Estilização**: Tailwind CSS
 
-## Instruções de Instalação e Execução
+## ⚙️ Instalação Rápida
 
-### Pré-requisitos
-- PHP >= 8.1
-- Composer
-- Node.js & NPM
+Para quem deseja clonar e testar o projeto:
 
-### Passo a Passo
-
-1. **Clonar o repositório**
-   ```bash
-   git clone <url-do-repositorio>
-   cd <nome-da-pasta>
-   ```
-
-2. **Instalar dependências de Backend**
-   ```bash
-   composer install
-   ```
-
-3. **Instalar dependências de Frontend**
-   ```bash
-   npm install
-   ```
-
-4. **Configurar Ambiente**
-   - Copie o ficheiro de exemplo `.env`:
-     ```bash
-     cp .env.example .env
-     ```
-   - Gere a chave da aplicação:
-     ```bash
-     php artisan key:generate
-     ```
-   - Configure os dados da base de dados no ficheiro `.env`.
-
-5. **Executar Migrações**
-   ```bash
-   php artisan migrate
-   ```
-
-6. **Iniciar Servidores de Desenvolvimento**
-   - Backend (Num terminal):
-     ```bash
-     php artisan serve
-     ```
-   - Frontend (Noutro terminal):
-     ```bash
-     npm run dev
-     ```
-
-7. **Aceder**
-   - O site estará disponível em `http://localhost:8000`.
+1. `composer install`
+2. `npm install`
+3. `cp .env.example .env` (e configurar base de dados)
+4. `php artisan key:generate`
+5. `php artisan migrate`
+6. `php artisan serve` & `npm run dev`
