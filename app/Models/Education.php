@@ -76,4 +76,9 @@ class Education extends Model
     {
         return $this->morphToMany(Skill::class, 'skillable');
     }
+
+    public function experienceRoles()
+    {
+        return $this->hasMany(ExperienceRole::class);
+    }
 }

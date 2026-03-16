@@ -21,6 +21,7 @@ class ExperienceRole extends Model
         'end_date',
         'is_current',
         'description',
+        'education_id',
     ];
 
     protected $casts = [
@@ -40,5 +41,10 @@ class ExperienceRole extends Model
     public function experience()
     {
         return $this->belongsTo(Experience::class);
+    }
+
+    public function education()
+    {
+        return $this->belongsTo(Education::class);
     }
 }

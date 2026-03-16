@@ -7,6 +7,7 @@ import { computed, ref } from 'vue';
 const props = defineProps({
     experience: Object,
     availableSkills: Array,
+    availableEducations: Array,
 });
 
 const form = useCachedForm(`experience_edit_${props.experience.id}`, {
@@ -25,6 +26,7 @@ const form = useCachedForm(`experience_edit_${props.experience.id}`, {
                 end_date: '',
                 is_current: false,
                 description: '',
+                education_id: null,
             }
         ],
     skills: props.experience.skills ? props.experience.skills.map(s => s.id) : [],
@@ -60,6 +62,7 @@ const addRole = () => {
         end_date: '',
         is_current: false,
         description: '',
+        education_id: null,
     });
 };
 
@@ -198,6 +201,17 @@ const submit = () => {
                                             <option value="internship">Estágio</option>
                                         </select>
                                         <div v-if="form.errors[`roles.${index}.employment_type`]" class="text-red-400 text-xs mt-1">{{ form.errors[`roles.${index}.employment_type`] }}</div>
+                                    </div>
+
+                                    <div v-if="role.employment_type === 'internship'">
+                                        <label :for="'education_id_' + index" class="block text-sm font-medium text-gray-300">Associated Education</label>
+                                        <select :id="'education_id_' + index" v-model="role.education_id" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors">
+                                            <option :value="null">None</option>
+                                            <option v-for="edu in availableEducations" :key="edu.id" :value="edu.id">
+                                                {{ edu.institution }} - {{ edu.degree }}
+                                            </option>
+                                        </select>
+                                        <div v-if="form.errors[`roles.${index}.education_id`]" class="text-red-400 text-xs mt-1">{{ form.errors[`roles.${index}.education_id`] }}</div>
                                     </div>
 
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

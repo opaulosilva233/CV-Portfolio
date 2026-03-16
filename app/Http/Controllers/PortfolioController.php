@@ -25,7 +25,7 @@ class PortfolioController extends Controller
 
         $experiences = Cache::remember('portfolio_experiences', 3600, function () {
             return Experience::with(['translations', 'roles' => function ($q) {
-                $q->with('translations')->orderBy('start_date', 'desc');
+                $q->with(['translations', 'education.translations'])->orderBy('start_date', 'desc');
             }])->orderBy('sort_order')->get()->sortByDesc(function ($exp) {
                 return $exp->roles->max('start_date');
             })->values();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Experience;
 use App\Models\Skill;
+use App\Models\Education;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
@@ -28,6 +29,7 @@ class ExperienceController extends Controller
     {
         return Inertia::render('Admin/Experiences/Create', [
             'availableSkills' => Skill::orderBy('category')->orderBy('name')->get(['id', 'name', 'category']),
+            'availableEducations' => Education::orderBy('start_date', 'desc')->get(['id', 'institution', 'degree']),
         ]);
     }
 
@@ -40,6 +42,7 @@ class ExperienceController extends Controller
         return Inertia::render('Admin/Experiences/Edit', [
             'experience' => $experience,
             'availableSkills' => Skill::orderBy('category')->orderBy('name')->get(['id', 'name', 'category']),
+            'availableEducations' => Education::orderBy('start_date', 'desc')->get(['id', 'institution', 'degree']),
         ]);
     }
 
@@ -56,6 +59,7 @@ class ExperienceController extends Controller
             'roles.*.end_date' => 'nullable|date|after_or_equal:roles.*.start_date',
             'roles.*.is_current' => 'boolean',
             'roles.*.description' => 'nullable|string',
+            'roles.*.education_id' => 'nullable|exists:education,id',
             'skills' => 'nullable|array',
             'skills.*' => 'integer|exists:skills,id',
         ]);
@@ -95,6 +99,7 @@ class ExperienceController extends Controller
             'roles.*.end_date' => 'nullable|date|after_or_equal:roles.*.start_date',
             'roles.*.is_current' => 'boolean',
             'roles.*.description' => 'nullable|string',
+            'roles.*.education_id' => 'nullable|exists:education,id',
             'skills' => 'nullable|array',
             'skills.*' => 'integer|exists:skills,id',
         ]);
