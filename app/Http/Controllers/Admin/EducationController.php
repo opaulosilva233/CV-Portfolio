@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Education;
 use App\Models\Skill;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Inertia\Inertia;
 
 class EducationController extends Controller
@@ -40,6 +41,7 @@ class EducationController extends Controller
         $validated = $request->validate([
             'institution' => 'required|string|max:255',
             'degree' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,svg|max:2048',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'is_current' => 'boolean',
@@ -51,10 +53,15 @@ class EducationController extends Controller
         ]);
 
         $skillIds = $validated['skills'] ?? [];
-        unset($validated['skills']);
+        unset($validated['skills'], $validated['image']);
 
         $education = Education::create($validated);
         $education->skills()->sync($skillIds);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $this->saveImage($education, $request->file('image'));
+        }
 
         return redirect()->route('admin.education.index')->with('success', 'Education/Certificate created successfully.');
     }
@@ -88,6 +95,8 @@ class EducationController extends Controller
         $validated = $request->validate([
             'institution' => 'required|string|max:255',
             'degree' => 'nullable|string|max:255',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,svg|max:2048',
+            'remove_image' => 'nullable|boolean',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'is_current' => 'boolean',
@@ -99,10 +108,21 @@ class EducationController extends Controller
         ]);
 
         $skillIds = $validated['skills'] ?? [];
-        unset($validated['skills']);
+        unset($validated['skills'], $validated['image'], $validated['remove_image']);
 
         $education->update($validated);
         $education->skills()->sync($skillIds);
+
+        // Handle image removal
+        if ($request->boolean('remove_image')) {
+            $this->deleteImage($education);
+        }
+
+        // Handle image upload (overrides removal if both sent)
+        if ($request->hasFile('image')) {
+            $this->deleteImage($education);
+            $this->saveImage($education, $request->file('image'));
+        }
 
         return redirect()->route('admin.education.index')->with('success', 'Education/Certificate updated successfully.');
     }
@@ -112,7 +132,51 @@ class EducationController extends Controller
      */
     public function destroy(Education $education)
     {
+        // Delete image folder
+        $this->deleteImage($education);
+
         $education->delete();
         return redirect()->back()->with('success', 'Education deleted successfully.');
+    }
+
+    /**
+     * Serve the education image from storage (public route).
+     */
+    public function serveImage(Education $education)
+    {
+        $path = $education->getImagePath();
+
+        if (!$path) {
+            abort(404);
+        }
+
+        return response()->file($path);
+    }
+
+    /**
+     * Save an uploaded image to storage/educations/{id}/logo.{ext}
+     */
+    private function saveImage(Education $education, $file): void
+    {
+        $dir = storage_path('educations/' . $education->id);
+
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $extension = $file->getClientOriginalExtension();
+        $file->move($dir, 'logo.' . $extension);
+    }
+
+    /**
+     * Delete the image directory for an education.
+     */
+    private function deleteImage(Education $education): void
+    {
+        $dir = storage_path('educations/' . $education->id);
+
+        if (is_dir($dir)) {
+            File::deleteDirectory($dir);
+        }
     }
 }

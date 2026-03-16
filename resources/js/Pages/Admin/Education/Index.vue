@@ -47,8 +47,16 @@ const formatDate = (dateString) => {
                                 <tbody class="divide-y divide-white/10 bg-transparent">
                                     <tr v-for="education in educations" :key="education.id" class="hover:bg-white/5 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-white">{{ education.institution }}</div>
-                                            <div class="text-sm text-gray-400">{{ education.degree }}</div>
+                                            <div class="flex items-center gap-3">
+                                                <img v-if="education.image_url" :src="education.image_url" :alt="education.institution" class="w-10 h-10 rounded-lg object-contain bg-white/10 border border-white/10 p-0.5 flex-shrink-0" />
+                                                <div v-else class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path></svg>
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-medium text-white">{{ education.institution }}</div>
+                                                    <div class="text-sm text-gray-400">{{ education.degree }}</div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-xs text-gray-400 flex items-center gap-2">

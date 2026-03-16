@@ -9,6 +9,8 @@ Route::get('/', [\App\Http\Controllers\PortfolioController::class, 'index'])->na
 Route::post('/language', [\App\Http\Controllers\LanguageController::class, 'update'])->name('language.switch');
 
 Route::get('/experiences/{experience}/image', [\App\Http\Controllers\Admin\ExperienceController::class, 'serveImage'])->name('experiences.image');
+Route::get('/projects/{project}/image/{filename?}', [\App\Http\Controllers\Admin\ProjectController::class, 'serveImage'])->name('projects.image');
+Route::get('/educations/{education}/image', [\App\Http\Controllers\Admin\EducationController::class, 'serveImage'])->name('educations.image');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
