@@ -1,6 +1,7 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import { Head, useForm, Link } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
+import { useCachedForm } from '@/Composables/useCachedForm';
 import { computed, ref } from 'vue';
 
 const props = defineProps({
@@ -8,7 +9,7 @@ const props = defineProps({
     availableSkills: Array,
 });
 
-const form = useForm({
+const form = useCachedForm(`education_edit_${props.education.id}`, {
     _method: 'PUT',
     institution: props.education.institution,
     degree: props.education.degree || '',

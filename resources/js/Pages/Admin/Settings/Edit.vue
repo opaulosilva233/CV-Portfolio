@@ -1,12 +1,13 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
+import { useCachedForm } from '@/Composables/useCachedForm';
 
 const props = defineProps({
     settings: Object,
 });
 
-const form = useForm({
+const form = useCachedForm('settings_edit', {
     name: props.settings.name?.value || '',
     job_title: props.settings.job_title?.value || '',
     bio: props.settings.bio?.value || '',

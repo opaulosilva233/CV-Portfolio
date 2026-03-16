@@ -1,14 +1,16 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
-import { Head, useForm, Link } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
+import { useCachedForm } from '@/Composables/useCachedForm';
 
 const props = defineProps({
     project: Object,
 });
 
 const isEditing = !!props.project;
+const cacheKey = isEditing ? `project_edit_${props.project.id}` : 'project_create';
 
-const form = useForm({
+const form = useCachedForm(cacheKey, {
     title: props.project?.title || '',
     description: props.project?.description || '',
     image_url: props.project?.image_url || '',

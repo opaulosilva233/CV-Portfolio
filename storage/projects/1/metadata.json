@@ -1,3 +1,8 @@
 {
-    "en": []
+    "en": {
+        "principal": "Página inicial (Homepage) do projeto 'Oficina do Cabelo'. A interface apresenta um design moderno em dark mode com uma paleta de cores sofisticada, utilizando tons escuros e detalhes em cobre. Destaque para a área central (Hero Section) com um efeito glassmorphism elegante, que foca a atenção no Call to Action de agendamento, mantendo o ambiente da barbearia visível no fundo desfocado.",
+        "1": "Ecrã do primeiro passo do processo de marcação: a seleção do serviço. A interface foi desenhada para guiar o utilizador de forma intuitiva, mostrando de imediato em que fase do agendamento se encontra através do menu lateral. A listagem de serviços está agrupada por categorias de forma clara, com os preços em destaque, garantindo transparência e facilitando a escolha do cliente antes de avançar para o próximo passo.",
+        "2": "Ecrã de autenticação (Login) da 'Oficina do Cabelo'. O design adota um layout de ecrã dividido (split-screen), contrastando uma fotografia imersiva com overlay escuro à esquerda – que reforça a identidade visual e o ambiente da barbearia – com um formulário clean e luminoso à direita. Os campos de preenchimento utilizam ícones minimalistas e o botão de 'Entrar' mantém a cor de destaque (cobre) da marca.",
+        "3": "Ecrã do Dashboard de gestão (Backoffice) da 'Oficina do Cabelo'. A interface mantém a consistência visual do projeto com um tema escuro (dark mode) elegante e organizado. O layout apresenta uma barra lateral de navegação intuitiva e uma área de conteúdo estruturada com cartões de métricas (KPIs), um gráfico de barras para a performance semanal codificado por cores e uma lista limpa com as próximas marcações"
+    }
 }

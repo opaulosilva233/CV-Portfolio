@@ -1,6 +1,7 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import { Head, useForm, Link, router } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { useCachedForm } from '@/Composables/useCachedForm';
 import { computed, ref } from 'vue';
 
 const props = defineProps({
@@ -8,7 +9,7 @@ const props = defineProps({
     availableSkills: Array,
 });
 
-const form = useForm({
+const form = useCachedForm(`experience_edit_${props.experience.id}`, {
     _method: 'PUT',
     company: props.experience.company,
     location: props.experience.location,

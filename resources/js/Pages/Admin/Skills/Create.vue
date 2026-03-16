@@ -1,6 +1,7 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import { Head, useForm, Link } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
+import { useCachedForm } from '@/Composables/useCachedForm';
 import IconPicker from '@/Components/IconPicker.vue';
 
 const props = defineProps({
@@ -9,7 +10,7 @@ const props = defineProps({
     availableExperiences: Array,
 });
 
-const form = useForm({
+const form = useCachedForm('skill_create', {
     name: '',
     category: '',
     proficiency: 3,
