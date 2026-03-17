@@ -3,7 +3,7 @@ import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
 import Breadcrumbs from '@/Components/Breadcrumbs.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, watch, computed } from 'vue';
-import debounce from 'lodash/debounce';
+import { debounce } from '@/Composables/useDebounce';
 
 const props = defineProps({
     experiences: Array,

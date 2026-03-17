@@ -6,6 +6,7 @@ use App\Models\Experience;
 use App\Models\Project;
 use App\Models\SiteSetting;
 use App\Models\Skill;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -53,11 +54,35 @@ class PortfolioController extends Controller
                 'Instagram' => SiteSetting::getValue('social_instagram'),
             ]),
             'footer_text' => SiteSetting::getValue('footer_text', 'System Online.'),
+            'contact_email' => SiteSetting::getValue('contact_email'),
+            'contact_phone' => SiteSetting::getValue('contact_phone'),
+            'contact_address' => SiteSetting::getValue('contact_address'),
+            'resume_url' => SiteSetting::getValue('resume_url'),
             'seo' => [
                 'title' => SiteSetting::getValue('seo_title', 'Portfolio'),
                 'description' => SiteSetting::getValue('seo_description', ''),
                 'keywords' => SiteSetting::getValue('seo_keywords', ''),
             ]
         ]);
+    }
+
+    public function storeMessage(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'subject' => 'nullable|string|max:255',
+            'message' => 'required|string|min:10',
+        ]);
+
+        Message::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'subject' => $validated['subject'] ?? 'Website Contact',
+            'message' => $validated['message'],
+            'status' => 'unread',
+        ]);
+
+        return redirect()->back()->with('success', 'Message sent successfully!');
     }
 }

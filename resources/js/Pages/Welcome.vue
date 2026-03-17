@@ -4,6 +4,8 @@ import { Head, Link } from '@inertiajs/vue3';
 import CyberLayout from '@/Layouts/CyberLayout.vue';
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 import ThemeToggle from '@/Components/ThemeToggle.vue';
+import ContactSection from '@/Components/ContactSection.vue';
+import CyberTerminal from '@/Components/CyberTerminal.vue';
 
 const props = defineProps({
     hero: Object,
@@ -15,10 +17,14 @@ const props = defineProps({
     canLogin: Boolean,
     seo: Object,
     footer_text: String,
+    contact_email: String,
+    contact_phone: String,
+    contact_address: String,
+    resume_url: String,
 });
 
 const activeSection = ref('about');
-const sectionsList = ['about', 'skills', 'timeline'];
+const sectionsList = ['about', 'skills', 'timeline', 'terminal', 'contact'];
 const navButtons = ref([]);
 const indicatorLeft = ref(0);
 const indicatorWidth = ref(0);
@@ -32,6 +38,8 @@ const activeColorClass = computed(() => {
         case 'about': return 'from-purple-600 to-indigo-600 shadow-purple-500/50';
         case 'skills': return 'from-cyan-500 to-blue-500 shadow-cyan-500/50';
         case 'timeline': return 'from-pink-500 to-rose-500 shadow-pink-500/50';
+        case 'terminal': return 'from-emerald-500 to-teal-500 shadow-emerald-500/50';
+        case 'contact': return 'from-orange-500 to-red-500 shadow-orange-500/50';
         default: return 'from-purple-600 to-indigo-600';
     }
 });
@@ -41,6 +49,8 @@ const activeTextClass = computed(() => {
         case 'about': return 'text-purple-600 dark:text-purple-400';
         case 'skills': return 'text-cyan-600 dark:text-cyan-400';
         case 'timeline': return 'text-pink-600 dark:text-pink-400';
+        case 'terminal': return 'text-emerald-600 dark:text-emerald-400';
+        case 'contact': return 'text-orange-600 dark:text-orange-400';
         default: return 'text-purple-600 dark:text-purple-400';
     }
 });
@@ -314,9 +324,15 @@ const formatDate = (date) => {
                                 </span>
                                 <div class="w-12 h-[1px] bg-gradient-to-r from-gray-300 to-transparent dark:from-white/20 dark:to-transparent"></div>
                                 <transition name="terminal-fade" mode="out-in">
-                                    <span :key="activeSection" class="text-[11px] font-bold tracking-[0.2em] uppercase text-gray-400 dark:text-gray-500">
-                                        // CURRENT_LOC: <span class="text-gray-800 dark:text-gray-200">{{ __(activeSection) }}</span>
-                                    </span>
+                                    <div :key="activeSection" class="flex items-center gap-4">
+                                        <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-gray-400 dark:text-gray-500">
+                                            // CURRENT_LOC: <span class="text-gray-800 dark:text-gray-200">{{ __(activeSection) }}</span>
+                                        </span>
+                                        <div class="h-4 w-px bg-gray-300 dark:bg-white/10 hidden xl:block"></div>
+                                        <span class="text-[10px] font-mono text-gray-400 hidden xl:block">
+                                            REGION: {{ new Intl.DateTimeFormat().resolvedOptions().timeZone }}
+                                        </span>
+                                    </div>
                                 </transition>
                             </div>
                         </div>
@@ -395,6 +411,13 @@ const formatDate = (date) => {
                     <div class="pt-4 flex gap-4">
                         <a v-for="(link, platform) in socials" :key="platform" :href="link" target="_blank" class="px-6 py-3 bg-gray-900 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md border border-white/10 text-white dark:text-white rounded-xl font-bold uppercase tracking-wide hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-purple-500/30">
                             {{ platform }}
+                        </a>
+                        <!-- FETCH_RESUME.EXE Button -->
+                        <a v-if="resume_url" :href="resume_url" target="_blank" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:scale-105 hover:rotate-1 transition-all duration-300 shadow-xl shadow-emerald-500/20 group/resume flex items-center gap-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            {{ __('FETCH_RESUME.EXE') }}
                         </a>
                     </div>
                 </div>
@@ -552,6 +575,32 @@ const formatDate = (date) => {
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- Interactive Terminal Section -->
+        <section id="terminal" class="py-24 px-4 scroll-mt-24 bg-gray-50/50 dark:bg-gray-950/20">
+            <div class="max-w-7xl mx-auto">
+                <div class="flex flex-col md:flex-row gap-12 items-center">
+                    <div class="md:w-1/3 space-y-4">
+                        <div class="flex items-center gap-2">
+                             <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                             <span class="text-[10px] font-black tracking-widest text-emerald-500 uppercase">{{ __('Interactive Override') }}</span>
+                        </div>
+                        <h2 class="text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tighter uppercase whitespace-pre-wrap">{{ __('System') }}<br/><span class="text-emerald-500">{{ __('Access') }}</span></h2>
+                        <p class="text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+                            {{ __("Interact directly with the system core via this terminal. Type 'help' to begin exploration.") }}
+                        </p>
+                    </div>
+                    <div class="md:w-2/3 w-full">
+                         <CyberTerminal :hero="hero" :projects="projects" :skills="skills" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="scroll-mt-24">
+            <ContactSection :email="contact_email" :phone="contact_phone" :address="contact_address" />
         </section>
 
         <footer class="py-10 text-center text-gray-500 dark:text-gray-400 text-sm font-medium border-t border-white/10">

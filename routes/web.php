@@ -7,6 +7,7 @@ use Inertia\Inertia;
 Route::get('/', [\App\Http\Controllers\PortfolioController::class, 'index'])->name('home');
 
 Route::post('/language', [\App\Http\Controllers\LanguageController::class, 'update'])->name('language.switch');
+Route::post('/contact', [\App\Http\Controllers\PortfolioController::class, 'storeMessage'])->name('contact.store');
 
 Route::get('/experiences/{experience}/image', [\App\Http\Controllers\Admin\ExperienceController::class, 'serveImage'])->name('experiences.image');
 Route::get('/projects/{project}/image/{filename?}', [\App\Http\Controllers\Admin\ProjectController::class, 'serveImage'])->name('projects.image');
