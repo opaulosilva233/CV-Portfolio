@@ -1,8 +1,10 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
+import Breadcrumbs from '@/Components/Breadcrumbs.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { useCachedForm } from '@/Composables/useCachedForm';
 import { computed, ref } from 'vue';
+import RichTextEditor from '@/Components/RichTextEditor.vue';
 
 const props = defineProps({
     availableSkills: Array,
@@ -26,6 +28,12 @@ const form = useCachedForm('experience_create', {
     ],
     skills: [],
 });
+
+const breadcrumbs = [
+    { label: 'Dashboard', href: route('dashboard') },
+    { label: 'Experiences', href: route('admin.experiences.index') },
+    { label: 'Create', active: true },
+];
 
 const imagePreview = ref(null);
 
@@ -96,14 +104,11 @@ const submit = () => {
 
     <CyberAdminLayout>
         <template #header>
-            <div class="flex justify-between items-center">
+            <div class="flex flex-col">
+                <Breadcrumbs :items="breadcrumbs" />
                 <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-                    Add New Experience
+                    {{ __('Add New Experience') }}
                 </h2>
-                <Link :href="route('admin.experiences.index')" class="text-gray-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Back to List
-                </Link>
             </div>
         </template>
 
@@ -213,8 +218,11 @@ const submit = () => {
                                     </div>
 
                                     <div>
-                                        <label :for="'description_' + index" class="block text-sm font-medium text-gray-300">Description / Responsibilities</label>
-                                        <textarea :id="'description_' + index" v-model="role.description" rows="4" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors"></textarea>
+                                        <RichTextEditor 
+                                            v-model="role.description" 
+                                            label="Description / Responsibilities" 
+                                            placeholder="Enter role details..."
+                                        />
                                         <div v-if="form.errors[`roles.${index}.description`]" class="text-red-400 text-xs mt-1">{{ form.errors[`roles.${index}.description`] }}</div>
                                     </div>
                                 </div>

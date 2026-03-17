@@ -25,6 +25,7 @@ class Project extends Model
         'is_featured',
         'in_progress',
         'completed_at',
+        'sort_order',
     ];
 
     protected $casts = [

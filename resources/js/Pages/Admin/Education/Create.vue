@@ -3,6 +3,7 @@ import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { useCachedForm } from '@/Composables/useCachedForm';
 import { computed, ref } from 'vue';
+import RichTextEditor from '@/Components/RichTextEditor.vue';
 
 const props = defineProps({
     availableSkills: Array,
@@ -20,6 +21,12 @@ const form = useCachedForm('education_create', {
     description: '',
     skills: [],
 });
+
+const breadcrumbs = [
+    { label: 'Dashboard', href: route('dashboard') },
+    { label: 'Education', href: route('admin.education.index') },
+    { label: 'Create', active: true },
+];
 
 const imagePreview = ref(null);
 
@@ -72,10 +79,13 @@ const submit = () => {
 
     <CyberAdminLayout>
         <template #header>
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-                    Add New Education / Certificate
-                </h2>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex flex-col">
+                    <Breadcrumbs :items="breadcrumbs" />
+                    <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
+                        {{ __('Add New Education / Certificate') }}
+                    </h2>
+                </div>
                 <Link :href="route('admin.education.index')" class="text-gray-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     Back to List
@@ -158,8 +168,11 @@ const submit = () => {
                             </div>
 
                             <div class="md:col-span-2">
-                                <label for="description" class="block text-sm font-medium text-gray-300">Description</label>
-                                <textarea id="description" v-model="form.description" rows="4" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors"></textarea>
+                                <RichTextEditor 
+                                    v-model="form.description" 
+                                    label="Description" 
+                                    placeholder="Enter education details..."
+                                />
                                 <div v-if="form.errors.description" class="text-red-400 text-xs mt-1">{{ form.errors.description }}</div>
                             </div>
                         </div>

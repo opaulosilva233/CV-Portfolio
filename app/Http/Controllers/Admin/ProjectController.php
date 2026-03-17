@@ -12,10 +12,26 @@ use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+
+        $query = Project::query()->with('skills');
+
+        if ($search) {
+            $query->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+        }
+
+        $projects = $query->orderBy('completed_at', 'desc')
+                          ->orderBy('created_at', 'desc')
+                          ->get();
+
         return Inertia::render('Admin/Projects/Index', [
-            'projects' => Project::with('skills')->orderBy('completed_at', 'desc')->orderBy('created_at', 'desc')->get()
+            'projects' => $projects,
+            'filters' => [
+                'search' => $search
+            ]
         ]);
     }
 
@@ -114,6 +130,33 @@ class ProjectController extends Controller
 
         $project->delete();
         return redirect()->back();
+    }
+
+    public function reorder(Request $request)
+    {
+        $orderedIds = $request->input('ids');
+
+        foreach ($orderedIds as $index => $id) {
+            Project::where('id', $id)->update(['sort_order' => $index]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+        $projects = Project::whereIn('id', $ids)->get();
+
+        foreach ($projects as $project) {
+            $dir = storage_path('projects/' . $project->id);
+            if (is_dir($dir)) {
+                File::deleteDirectory($dir);
+            }
+            $project->delete();
+        }
+
+        return redirect()->back()->with('success', 'Selected projects deleted successfully.');
     }
 
     /**

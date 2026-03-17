@@ -1,6 +1,7 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import Breadcrumbs from '@/Components/Breadcrumbs.vue';
+import { Head, useForm, Link } from '@inertiajs/vue3';
 import { useCachedForm } from '@/Composables/useCachedForm';
 import IconPicker from '@/Components/IconPicker.vue';
 
@@ -20,6 +21,12 @@ const form = useCachedForm(`skill_edit_${props.skill.id}`, {
     educations: props.skill.educations ? props.skill.educations.map(e => e.id) : [],
     experiences: props.skill.experiences ? props.skill.experiences.map(e => e.id) : [],
 });
+
+const breadcrumbs = [
+    { label: 'Dashboard', href: route('dashboard') },
+    { label: 'Skills', href: route('admin.skills.index') },
+    { label: 'Edit', active: true },
+];
 
 const setStars = (n) => {
     form.proficiency = n;
@@ -46,10 +53,13 @@ const submit = () => {
 
     <CyberAdminLayout>
         <template #header>
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-                    Edit Skill
-                </h2>
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div class="flex flex-col">
+                    <Breadcrumbs :items="breadcrumbs" />
+                    <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
+                        {{ __('Edit Skill') }}
+                    </h2>
+                </div>
                 <Link :href="route('admin.skills.index')" class="text-gray-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     Back to List

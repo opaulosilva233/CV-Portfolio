@@ -12,16 +12,30 @@ use Inertia\Inertia;
 
 class ExperienceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $experiences = Experience::with(['roles' => function ($q) {
+        $search = $request->input('search');
+
+        $query = Experience::query()->with(['roles' => function ($q) {
             $q->orderBy('start_date', 'desc');
-        }, 'skills'])->get()->sortByDesc(function ($exp) {
+        }, 'skills']);
+
+        if ($search) {
+            $query->where('company', 'like', "%{$search}%")
+                  ->orWhereHas('roles', function ($q) use ($search) {
+                      $q->where('role', 'like', "%{$search}%");
+                  });
+        }
+
+        $experiences = $query->get()->sortByDesc(function ($exp) {
             return $exp->roles->max('start_date');
         })->values();
 
         return Inertia::render('Admin/Experiences/Index', [
-            'experiences' => $experiences
+            'experiences' => $experiences,
+            'filters' => [
+                'search' => $search
+            ]
         ]);
     }
 
@@ -139,6 +153,19 @@ class ExperienceController extends Controller
 
         $experience->delete();
         return redirect()->back();
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+        $experiences = Experience::whereIn('id', $ids)->get();
+
+        foreach ($experiences as $experience) {
+            $this->deleteImage($experience);
+            $experience->delete();
+        }
+
+        return redirect()->back()->with('success', 'Selected experiences deleted successfully.');
     }
 
     /**

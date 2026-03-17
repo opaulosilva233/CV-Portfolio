@@ -14,12 +14,24 @@ class EducationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $educations = Education::with('skills')->orderBy('start_date', 'desc')->get();
+        $search = $request->input('search');
+
+        $query = Education::query()->with('skills');
+
+        if ($search) {
+            $query->where('institution', 'like', "%{$search}%")
+                  ->orWhere('degree', 'like', "%{$search}%");
+        }
+
+        $educations = $query->orderBy('start_date', 'desc')->get();
 
         return Inertia::render('Admin/Education/Index', [
-            'educations' => $educations
+            'educations' => $educations,
+            'filters' => [
+                'search' => $search
+            ]
         ]);
     }
 
@@ -137,6 +149,19 @@ class EducationController extends Controller
 
         $education->delete();
         return redirect()->back()->with('success', 'Education deleted successfully.');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+        $educations = Education::whereIn('id', $ids)->get();
+
+        foreach ($educations as $education) {
+            $this->deleteImage($education);
+            $education->delete();
+        }
+
+        return redirect()->back()->with('success', 'Selected records deleted successfully.');
     }
 
     /**

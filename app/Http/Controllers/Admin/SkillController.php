@@ -12,10 +12,24 @@ use Inertia\Inertia;
 
 class SkillController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $search = $request->input('search');
+
+        $query = Skill::query();
+
+        if ($search) {
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+        }
+
+        $skills = $query->orderBy('sort_order')->orderBy('proficiency', 'desc')->get();
+
         return Inertia::render('Admin/Skills/Index', [
-            'skills' => Skill::orderBy('sort_order')->orderBy('proficiency', 'desc')->get()
+            'skills' => $skills,
+            'filters' => [
+                'search' => $search
+            ]
         ]);
     }
 
@@ -102,5 +116,23 @@ class SkillController extends Controller
     {
         $skill->delete();
         return redirect()->back();
+    }
+
+    public function reorder(Request $request)
+    {
+        $orderedIds = $request->input('ids');
+
+        foreach ($orderedIds as $index => $id) {
+            Skill::where('id', $id)->update(['sort_order' => $index]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+        Skill::whereIn('id', $ids)->delete();
+        return redirect()->back()->with('success', 'Selected skills deleted successfully.');
     }
 }
