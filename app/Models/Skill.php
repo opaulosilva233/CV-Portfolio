@@ -12,7 +12,7 @@ class Skill extends Model
 
     public function getTranslatableFields()
     {
-        return ['name', 'category'];
+        return ['category'];
     }
 
     protected $fillable = [

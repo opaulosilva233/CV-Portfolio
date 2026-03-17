@@ -12,7 +12,7 @@ class Education extends Model
 
     public function getTranslatableFields()
     {
-        return ['institution', 'degree', 'description'];
+        return ['degree', 'description'];
     }
 
     protected $fillable = [

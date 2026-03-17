@@ -59,6 +59,63 @@ class TranslationService
                 }
             }
         }
+
+        // Project specific logic for Gallery Metadata
+        if ($model instanceof \App\Models\Project) {
+            $this->translateProjectGallery($model);
+        }
+    }
+
+    /**
+     * Translates project gallery descriptions directly in metadata.json
+     */
+    protected function translateProjectGallery(\App\Models\Project $project): void
+    {
+        $dir = storage_path('projects/' . $project->id);
+        $metadataPath = $dir . '/metadata.json';
+        
+        if (!file_exists($metadataPath)) {
+            return;
+        }
+
+        $fullMetadata = json_decode(file_get_contents($metadataPath), true);
+        
+        // Assume 'pt' is the source of truth for translations if it exists
+        $sourceLocale = 'pt';
+        if (!isset($fullMetadata[$sourceLocale]) || empty($fullMetadata[$sourceLocale])) {
+            return;
+        }
+
+        $hasChanges = false;
+
+        foreach ($fullMetadata[$sourceLocale] as $imageKey => $description) {
+            if (empty($description)) continue;
+
+            foreach ($this->targetLocales as $locale) {
+                if (!isset($fullMetadata[$locale])) {
+                    $fullMetadata[$locale] = [];
+                }
+
+                // Translate only if it doesn't exist yet or if we want to force
+                // (To force it we would need to check if the PT source changed, but for now we just translate if missing or different)
+                // Actually, let's just translate if missing. If the user wants to force update, they can delete the key and save.
+                if (!isset($fullMetadata[$locale][$imageKey]) || empty($fullMetadata[$locale][$imageKey])) {
+                    try {
+                        $translatedText = $this->translateText($description, $sourceLocale, $locale);
+                        if ($translatedText) {
+                            $fullMetadata[$locale][$imageKey] = $translatedText;
+                            $hasChanges = true;
+                        }
+                    } catch (\Exception $e) {
+                         Log::error("Gallery Translation failed for {$locale} on Project (ID: {$project->id}) image {$imageKey}: " . $e->getMessage());
+                    }
+                }
+            }
+        }
+
+        if ($hasChanges) {
+            \Illuminate\Support\Facades\File::put($metadataPath, json_encode($fullMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        }
     }
 
     /**

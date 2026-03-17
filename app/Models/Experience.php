@@ -12,7 +12,7 @@ class Experience extends Model
 
     public function getTranslatableFields()
     {
-        return ['company', 'location'];
+        return [];
     }
 
     protected $fillable = [

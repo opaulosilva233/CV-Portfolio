@@ -12,7 +12,7 @@ class Project extends Model
 
     public function getTranslatableFields()
     {
-        return ['title', 'description'];
+        return ['description'];
     }
 
     protected $fillable = [
