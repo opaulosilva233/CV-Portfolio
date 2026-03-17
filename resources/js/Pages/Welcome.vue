@@ -5,7 +5,7 @@ import CyberLayout from '@/Layouts/CyberLayout.vue';
 import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 import ThemeToggle from '@/Components/ThemeToggle.vue';
 
-defineProps({
+const props = defineProps({
     hero: Object,
     projects: Array,
     skills: Object,
@@ -18,7 +18,7 @@ defineProps({
 });
 
 const activeSection = ref('about');
-const sectionsList = ['about', 'skills', 'experience', 'education', 'projects'];
+const sectionsList = ['about', 'skills', 'timeline'];
 const navButtons = ref([]);
 const indicatorLeft = ref(0);
 const indicatorWidth = ref(0);
@@ -31,9 +31,7 @@ const activeColorClass = computed(() => {
     switch (activeSection.value) {
         case 'about': return 'from-purple-600 to-indigo-600 shadow-purple-500/50';
         case 'skills': return 'from-cyan-500 to-blue-500 shadow-cyan-500/50';
-        case 'experience': return 'from-pink-500 to-rose-500 shadow-pink-500/50';
-        case 'education': return 'from-teal-500 to-emerald-500 shadow-teal-500/50';
-        case 'projects': return 'from-orange-500 to-red-500 shadow-orange-500/50';
+        case 'timeline': return 'from-pink-500 to-rose-500 shadow-pink-500/50';
         default: return 'from-purple-600 to-indigo-600';
     }
 });
@@ -42,12 +40,100 @@ const activeTextClass = computed(() => {
     switch (activeSection.value) {
         case 'about': return 'text-purple-600 dark:text-purple-400';
         case 'skills': return 'text-cyan-600 dark:text-cyan-400';
-        case 'experience': return 'text-pink-600 dark:text-pink-400';
-        case 'education': return 'text-teal-600 dark:text-teal-400';
-        case 'projects': return 'text-orange-600 dark:text-orange-400';
+        case 'timeline': return 'text-pink-600 dark:text-pink-400';
         default: return 'text-purple-600 dark:text-purple-400';
     }
 });
+
+const timelineItems = computed(() => {
+    const items = [];
+
+    // Add projects
+    props.projects.forEach(p => {
+        items.push({
+            id: `project-${p.id}`,
+            type: 'project',
+            date: new Date(p.completed_at || p.created_at),
+            title: p.title,
+            description: p.description,
+            image: p.image_url,
+            tags: p.skills,
+            project_url: p.project_url,
+            github_url: p.github_url,
+            in_progress: p.in_progress
+        });
+    });
+
+    // Add experiences
+    props.experiences.forEach(exp => {
+        exp.roles.forEach((role, idx) => {
+            items.push({
+                id: `exp-${exp.id}-${idx}`,
+                type: 'experience',
+                date: new Date(role.start_date),
+                endDate: role.is_current ? new Date() : new Date(role.end_date),
+                title: role.role,
+                subtitle: exp.company,
+                description: role.description,
+                image: exp.image_url,
+                location: exp.location,
+                is_current: role.is_current,
+                employment_type: role.employment_type
+            });
+        });
+    });
+
+    // Add education
+    props.educations.forEach(edu => {
+        items.push({
+            id: `edu-${edu.id}`,
+            type: 'education',
+            date: new Date(edu.start_date || edu.end_date),
+            title: edu.degree || edu.institution,
+            subtitle: edu.degree ? edu.institution : '',
+            description: edu.description,
+            eduType: edu.type,
+            url: edu.url,
+            is_current: edu.is_current
+        });
+    });
+
+    return items.sort((a, b) => b.date - a.date);
+});
+
+const timelineContainer = ref(null);
+const horizontalTarget = ref(null);
+const translateX = ref(0);
+const scrollProgressTimeline = ref(0);
+
+const handleTimelineScroll = () => {
+    if (!timelineContainer.value) return;
+
+    const rect = timelineContainer.value.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    
+    // Calculate progress within the timeline container
+    // Start measuring when the container starts entering the viewport
+    // End when it finishes
+    const start = 0;
+    const end = rect.height - windowHeight;
+    const current = -rect.top;
+    
+    let progress = current / end;
+    progress = Math.max(0, Math.min(1, progress));
+    
+    scrollProgressTimeline.value = progress * 100;
+    
+    // We want to translate from 0 to -(totalWidth - viewportWidth)
+    if (horizontalTarget.value) {
+        const totalWidth = horizontalTarget.value.scrollWidth;
+        const viewportWidth = window.innerWidth;
+        const maxTranslate = totalWidth - viewportWidth;
+        translateX.value = progress * maxTranslate;
+    }
+};
+
+const trackElement = ref(null);
 
 const updateIndicator = () => {
     const activeIndex = sectionsList.indexOf(activeSection.value);
@@ -59,74 +145,28 @@ const updateIndicator = () => {
 };
 
 const updateScrollProgress = () => {
-    // Determine the scroll progress percentage
     const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
     const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
     scrollProgress.value = height > 0 ? (winScroll / height) * 100 : 0;
 };
 
-// --- Custom Draggable Scroll Logic ---
-const trackElement = ref(null);
-
-const startDrag = (e) => {
-    e.preventDefault();
-    isDragging.value = true;
-    document.body.style.userSelect = 'none'; // prevent text selection while dragging
-    window.addEventListener('mousemove', onDrag);
-    window.addEventListener('mouseup', endDrag);
-};
-
-const onDrag = (e) => {
-    if (!isDragging.value || !trackElement.value) return;
-    
-    const trackRect = trackElement.value.getBoundingClientRect();
-    const trackHeight = trackRect.height;
-    
-    // Calculate where mouse is relative to the track
-    let offsetY = e.clientY - trackRect.top;
-    
-    // Bound the values
-    offsetY = Math.max(0, Math.min(offsetY, trackHeight));
-    
-    // Calculate percentage
-    const percentage = offsetY / trackHeight;
-    
-    // Convert percentage to actual page scroll value
-    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-    window.scrollTo({
-        top: percentage * maxScroll,
-        // Disable smooth behavior to prevent stuttering while dragging
-        behavior: 'auto' 
-    });
-};
-
-const endDrag = () => {
-    isDragging.value = false;
-    document.body.style.userSelect = '';
-    window.removeEventListener('mousemove', onDrag);
-    window.removeEventListener('mouseup', endDrag);
-};
-// ------------------------------------
-
-watch(activeSection, async () => {
-    await nextTick();
-    updateIndicator();
-});
-
-const scrollTo = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
-    }
-};
-
-const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' });
-};
+// Intersection Observer for Timeline Items
+const itemRefs = ref([]);
+const visibleItems = ref(new Set());
 
 onMounted(() => {
+    const itemObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                visibleItems.value.add(entry.target.dataset.id);
+            }
+        });
+    }, { threshold: 0.2, rootMargin: '0px 0px -100px 0px' });
+
+    itemRefs.value.forEach(el => {
+        if (el) itemObserver.observe(el);
+    });
+
     observer = new IntersectionObserver(
         (entries) => {
             entries.forEach((entry) => {
@@ -146,22 +186,65 @@ onMounted(() => {
     });
 
     window.addEventListener('scroll', updateScrollProgress);
+    window.addEventListener('scroll', handleTimelineScroll);
     window.addEventListener('resize', updateIndicator);
+    window.addEventListener('resize', handleTimelineScroll);
     
-    // Initial updates
     setTimeout(() => {
         updateIndicator();
         updateScrollProgress();
+        handleTimelineScroll();
     }, 100);
 });
 
 onUnmounted(() => {
-    if (observer) {
-        observer.disconnect();
-    }
+    if (observer) observer.disconnect();
     window.removeEventListener('scroll', updateScrollProgress);
+    window.removeEventListener('scroll', handleTimelineScroll);
     window.removeEventListener('resize', updateIndicator);
+    window.removeEventListener('resize', handleTimelineScroll);
 });
+
+const startDrag = (e) => {
+    e.preventDefault();
+    isDragging.value = true;
+    document.body.style.userSelect = 'none';
+    window.addEventListener('mousemove', onDrag);
+    window.addEventListener('mouseup', endDrag);
+};
+const onDrag = (e) => {
+    if (!isDragging.value || !trackElement.value) return;
+    const trackRect = trackElement.value.getBoundingClientRect();
+    const trackHeight = trackRect.height;
+    let offsetY = e.clientY - trackRect.top;
+    offsetY = Math.max(0, Math.min(offsetY, trackHeight));
+    const percentage = offsetY / trackHeight;
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    window.scrollTo({ top: percentage * maxScroll, behavior: 'auto' });
+};
+const endDrag = () => {
+    isDragging.value = false;
+    document.body.style.userSelect = '';
+    window.removeEventListener('mousemove', onDrag);
+    window.removeEventListener('mouseup', endDrag);
+};
+
+watch(activeSection, async () => {
+    await nextTick();
+    updateIndicator();
+});
+
+const scrollTo = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+    }
+};
+
+const formatDate = (date) => {
+    if (!date) return '';
+    return date.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' });
+};
 </script>
 
 <style scoped>
@@ -176,6 +259,31 @@ onUnmounted(() => {
     opacity: 0;
     filter: blur(4px);
 }
+
+.timeline-line-grow {
+    width: v-bind('scrollProgressTimeline + "%"');
+    transition: width 0.1s ease-out;
+}
+
+.timeline-item {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.timeline-item.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (min-width: 768px) {
+    .timeline-item {
+        transform: translateX(50px);
+    }
+    .timeline-item.is-visible {
+        transform: translateX(0);
+    }
+}
 </style>
 
 <template>
@@ -185,18 +293,14 @@ onUnmounted(() => {
             <meta name="keywords" :content="seo?.keywords" v-if="seo?.keywords" />
         </Head>
         
-        <!-- Out of the Box: Interactive HUD Header -->
         <header class="fixed top-0 w-full z-50 bg-white/70 dark:bg-[#030712]/70 backdrop-blur-2xl transition-all duration-300">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-24 gap-4 xl:gap-8">
-                    <!-- Logo & Cyber HUD Area -->
                     <div class="flex items-center gap-5 cursor-pointer group" @click="scrollTo('about')">
                         <div class="relative">
                             <img src="/images/Logotipo.png" alt="Logotipo" class="h-12 w-auto transform group-hover:scale-110 group-hover:rotate-[-5deg] transition-all duration-500 drop-shadow-lg" />
                             <div class="absolute inset-0 bg-white dark:bg-black mix-blend-color opacity-0 group-hover:opacity-20 transition-opacity"></div>
                         </div>
-                        
-                        <!-- High Emphasis Dynamic Name with HUD -->
                         <div class="flex flex-col justify-center translate-y-1">
                             <span class="font-black text-3xl lg:text-4xl tracking-tighter text-transparent bg-clip-text bg-gradient-to-r transition-all duration-700 hidden sm:block whitespace-nowrap drop-shadow-sm group-hover:drop-shadow-lg"
                                   :class="activeColorClass">
@@ -218,21 +322,15 @@ onUnmounted(() => {
                         </div>
                     </div>
 
-                    <!-- Center Navigation Links: Gliding Pill -->
                     <nav class="hidden lg:flex relative items-center p-1.5 bg-gray-200/40 dark:bg-white/5 rounded-2xl border border-gray-300/50 dark:border-white/10 shadow-inner">
-                        
-                        <!-- The Liquid Gliding Pill -->
                         <div class="absolute top-1.5 bottom-1.5 left-0 bg-gradient-to-r rounded-xl transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-0"
                              :class="activeColorClass"
                              :style="{
                                  transform: `translateX(${indicatorLeft}px)`,
                                  width: `${indicatorWidth}px`
                              }">
-                             <!-- Inner Glow for that sleek modern look -->
                              <div class="absolute inset-0 bg-white/20 dark:bg-black/10 rounded-xl"></div>
                         </div>
-
-                        <!-- Buttons dynamically bound to refs -->
                         <button 
                             v-for="(section, index) in sectionsList"
                             :key="section"
@@ -245,14 +343,12 @@ onUnmounted(() => {
                         </button>
                     </nav>
 
-                    <!-- Right Options & Admin -->
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-2 p-1 bg-gray-100 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/10">
                             <LanguageSwitcher />
                             <div class="w-px h-5 bg-gray-300 dark:bg-gray-700"></div>
                             <ThemeToggle variant="cyber" />
                         </div>
-                        
                         <Link v-if="canLogin" :href="route('dashboard')" class="hidden md:flex ml-2 px-5 py-2 rounded-xl bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 text-white dark:text-gray-900 text-xs font-black uppercase tracking-widest transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
                             {{ __('Admin') }}
                         </Link>
@@ -260,31 +356,22 @@ onUnmounted(() => {
                 </div>
             </div>
             
-            <!-- Laser Scroll Progress Bar -->
             <div class="absolute bottom-0 left-0 w-full h-[2px] bg-gray-200/50 dark:bg-white/5 overflow-hidden shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]">
                 <div class="h-full bg-gradient-to-r relative transition-all duration-100 ease-out"
                      :class="activeColorClass"
                      :style="{ width: scrollProgress + '%' }">
-                     <!-- Laser Head Glow -->
                      <div class="absolute right-0 top-1/2 -translate-y-1/2 w-8 h-[2px] bg-white opacity-80 blur-[2px]"></div>
                      <div class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-[2px] bg-white"></div>
                 </div>
             </div>
         </header>
 
-        <!-- Sleek & Minimal Custom DOM Scrollbar -->
         <div class="fixed right-2 top-32 bottom-12 z-40 flex items-center justify-center w-8 pointer-events-none hidden md:flex transition-all duration-500"
              :class="isDragging ? 'opacity-100' : 'opacity-20 hover:opacity-100'">
-            <!-- Scroll Track Base -->
             <div class="relative h-full w-[3px] bg-gray-300/50 dark:bg-gray-700/50 rounded-full" ref="trackElement">
-                
-                <!-- The Elevator Thumb (Interactive) -->
-                <!-- Added extra padding so it's easier to grab -->
                 <div class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-auto cursor-ns-resize px-4 py-2 group/thumb"
                      :style="{ top: `calc(${scrollProgress}% - 20px)` }"
                      @mousedown="startDrag">
-                    
-                    <!-- Sleek Core Capsule -->
                     <div class="w-1.5 h-8 rounded-full transition-all duration-300"
                          :class="isDragging ? 'bg-gray-900 dark:bg-white scale-y-125' : 'bg-gray-500 dark:bg-gray-400 group-hover/thumb:bg-gray-800 dark:group-hover/thumb:bg-gray-200'">
                     </div>
@@ -327,7 +414,7 @@ onUnmounted(() => {
         </section>
 
         <!-- Skills Section -->
-        <section id="skills" class="py-20 px-4">
+        <section id="skills" class="py-20 px-4 scroll-mt-24">
             <div class="max-w-7xl mx-auto px-4">
                 <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-purple-500">#</span> {{ __('Technical Skills') }}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -343,135 +430,124 @@ onUnmounted(() => {
             </div>
         </section>
 
-        <!-- Experience Section -->
-        <section id="experience" class="py-20 px-4">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-cyan-500">#</span> {{ __('Experience') }}</h2>
-                <div class="space-y-12">
-                    <div v-for="exp in experiences" :key="exp.id" class="relative pl-8 border-l-2 border-purple-200 dark:border-purple-900/50">
-                        <!-- Company Node -->
-                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-purple-600 ring-4 ring-white dark:ring-black shadow-[0_0_10px_rgba(147,51,234,0.5)]"></div>
+        <!-- Dynamic Timeline Section -->
+        <!-- Desktop Horizontal Timeline -->
+        <section id="timeline" ref="timelineContainer" class="relative hidden md:block" :style="{ height: (timelineItems.length * 50) + 'vh' }">
+            <div class="sticky top-0 h-screen flex flex-col justify-center overflow-hidden bg-gray-50/30 dark:bg-[#030712]/30">
+                <div class="max-w-7xl mx-auto w-full px-8 mb-12">
+                    <h2 class="text-5xl lg:text-7xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+                        {{ __('History') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500">&</span> {{ __('Projects') }}
+                    </h2>
+                </div>
+
+                <div class="relative flex items-center transition-transform duration-100 ease-out" ref="horizontalTarget" :style="{ transform: `translateX(-${translateX}px)` }">
+                    <!-- The Interactive Growing Horizontal Line -->
+                    <div class="absolute top-1/2 left-0 w-full h-[2px] bg-gray-200/50 dark:bg-white/5">
+                        <div class="h-full bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-400 timeline-line-grow rounded-full shadow-[0_0_15px_rgba(236,72,153,0.5)]"></div>
+                    </div>
+
+                    <!-- Timeline Loop -->
+                    <div v-for="(item, index) in timelineItems" :key="item.id" 
+                         :ref="el => itemRefs[index] = el"
+                         :data-id="item.id"
+                         class="timeline-item flex-shrink-0 w-[450px] mx-12 relative"
+                         :class="[
+                             visibleItems.has(item.id) ? 'is-visible' : '',
+                             index % 2 === 0 ? '-translate-y-8' : 'translate-y-8'
+                         ]">
                         
-                        <div class="flex items-center gap-3 mb-1">
-                            <img v-if="exp.image_url" :src="exp.image_url" :alt="exp.company" class="w-10 h-10 rounded-lg object-contain bg-white/80 dark:bg-white/10 border border-gray-200 dark:border-white/10 p-0.5" />
-                            <h3 class="text-2xl font-bold text-gray-900 dark:text-white">{{ exp.company }}</h3>
+                        <!-- Timeline Node -->
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-10 transition-transform duration-500"
+                             :class="visibleItems.has(item.id) ? 'scale-110' : 'scale-0'">
+                            <div class="w-4 h-4 rounded-full ring-4 ring-white dark:ring-[#030712] shadow-xl"
+                                 :class="{
+                                     'bg-purple-600 shadow-purple-500/50': item.type === 'experience',
+                                     'bg-cyan-500 shadow-cyan-500/50': item.type === 'education',
+                                     'bg-pink-600 shadow-pink-500/50': item.type === 'project'
+                                 }">
+                            </div>
                         </div>
-                        <div class="text-md font-medium text-gray-500 dark:text-gray-400 mb-4 pb-4 border-b border-gray-100 dark:border-white/5" v-if="exp.location">{{ exp.location }}</div>
-                        <div class="text-md font-medium text-gray-500 dark:text-gray-400 mb-4 pb-4 border-b border-gray-100 dark:border-white/5" v-else></div>
-                        
-                        <!-- Nested Roles -->
-                        <div class="space-y-6 mt-4 relative">
-                            <!-- Inner vertical line to connect roles -->
-                            <div class="absolute left-[7px] top-4 bottom-4 w-px bg-gradient-to-b from-cyan-500/50 via-cyan-500/20 to-transparent dark:from-cyan-500/30 dark:to-transparent" v-if="exp.roles && exp.roles.length > 1"></div>
-                            
-                            <div v-for="(role, index) in exp.roles" :key="index" class="relative pl-8">
-                                <!-- Role Node bullet -->
-                                <div class="absolute left-[3.5px] top-2.5 w-2 h-2 rounded-full bg-cyan-500 ring-2 ring-white dark:ring-black" v-if="exp.roles && exp.roles.length > 1"></div>
+
+                        <!-- Content Card -->
+                        <div class="group">
+                            <div class="bg-white/60 dark:bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/20 dark:border-white/10 shadow-xl group-hover:border-current transition-all duration-300 relative overflow-hidden"
+                                 :class="{
+                                     'hover:shadow-purple-500/20 text-purple-600 dark:text-purple-400': item.type === 'experience',
+                                     'hover:shadow-cyan-500/20 text-cyan-500 dark:text-cyan-400': item.type === 'education',
+                                     'hover:shadow-pink-500/20 text-pink-500 dark:text-pink-400': item.type === 'project'
+                                 }">
                                 
-                                <h4 class="text-xl font-bold text-gray-800 dark:text-gray-200">
-                                    {{ role.role }}
-                                    <span v-if="role.employment_type" class="ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-500 dark:text-purple-400 border border-purple-500/20 align-middle">
-                                        {{ {full_time: __('Full Time'), part_time: __('Part Time'), temporary: __('Temporary Work'), internship: __('Internship')}[role.employment_type] }}
-                                    </span>
-                                </h4>
-                                <div class="mb-2 mt-1 text-sm text-cyan-600 dark:text-cyan-400 font-bold uppercase tracking-wide flex items-center gap-2">
-                                    {{ formatDate(role.start_date) }} - {{ role.is_current ? __('Present') : formatDate(role.end_date) }}
-                                    <span v-if="role.is_current" class="px-2 py-0.5 inline-flex text-[10px] leading-4 font-semibold rounded bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_10px_rgba(34,197,94,0.2)]">
-                                        {{ __('Current') }}
-                                    </span>
+                                <div class="absolute -top-12 -right-12 w-24 h-24 bg-current opacity-5 blur-[40px] rounded-full group-hover:opacity-10 transition-opacity"></div>
+
+                                <div class="flex items-start justify-between mb-4">
+                                    <div class="flex items-center gap-3">
+                                        <div v-if="item.image" class="w-10 h-10 rounded-lg overflow-hidden bg-white/80 dark:bg-white/10 border border-current/20 p-1 flex-shrink-0">
+                                            <img :src="item.image" class="w-full h-full object-contain" />
+                                        </div>
+                                        <div>
+                                            <span class="text-[9px] font-black uppercase tracking-widest opacity-60 mb-1 block">
+                                                {{ __(item.type) }}
+                                            </span>
+                                            <h3 class="text-lg font-black text-gray-900 dark:text-white leading-tight line-clamp-1">
+                                                {{ item.title }}
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0">
+                                        <span class="text-[10px] font-black px-2 py-1 bg-current/10 rounded-lg">
+                                            {{ item.date.getFullYear() }}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div v-if="role.employment_type === 'internship' && role.education" class="mb-3">
-                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-white/5 border border-white/10 text-gray-300">
-                                        🎓 Associated with {{ role.education.degree || role.education.institution }} at {{ role.education.institution }}
-                                    </span>
+
+                                <div v-if="item.type === 'project' && item.image" class="mt-4 mb-4 rounded-xl overflow-hidden border border-white/10 aspect-video relative group/img">
+                                    <img :src="item.image" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110" />
                                 </div>
-                                <p class="text-gray-600 dark:text-gray-400 whitespace-pre-line leading-relaxed text-sm">{{ role.description }}</p>
+
+                                <p class="text-gray-600 dark:text-gray-400 text-xs leading-relaxed mb-4 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
+                                    {{ item.description }}
+                                </p>
+
+                                <div class="flex flex-wrap items-center justify-between gap-4 mt-auto">
+                                    <div class="flex gap-4">
+                                        <a v-if="item.project_url" :href="item.project_url" target="_blank" class="text-[9px] font-black uppercase tracking-wider hover:underline transition-all">{{ __('View Live') }}</a>
+                                        <a v-if="item.github_url" :href="item.github_url" target="_blank" class="text-[9px] font-black uppercase tracking-wider opacity-60 hover:opacity-100 transition-all">GitHub</a>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- Date Spacer -->
+                        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-8 text-4xl font-black text-gray-200 dark:text-white/5 select-none pointer-events-none transform -rotate-12 transition-all duration-500">
+                            {{ formatDate(item.date) }}
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Education && Certificates Section -->
-        <section id="education" class="py-20 px-4">
-            <div class="max-w-4xl mx-auto">
-                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-teal-500">#</span> {{ __('Education & Certificates') }}</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div v-for="edu in educations" :key="edu.id" class="bg-white/50 dark:bg-black/40 backdrop-blur-xl p-8 rounded-2xl shadow-lg border border-white/20 dark:border-white/5 hover:border-teal-500/50 hover:shadow-teal-500/20 transition-all duration-300 group relative overflow-hidden">
-                        
-                        <!-- Glowing accent line -->
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r" :class="edu.type === 'certificate' ? 'from-cyan-500 to-blue-500' : 'from-teal-500 to-emerald-500'"></div>
-
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <span 
-                                    class="inline-block px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full mb-3 border"
-                                    :class="edu.type === 'certificate' ? 'bg-cyan-500/10 text-cyan-500 border-cyan-500/30' : 'bg-teal-500/10 text-teal-500 border-teal-500/30'"
-                                >
-                                    {{ edu.type === 'certificate' ? __('Certificate') : __('Education') }}
-                                </span>
-                                <h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-teal-400 transition-colors">{{ edu.degree || edu.institution }}</h3>
-                                <h4 class="text-md font-medium text-gray-600 dark:text-gray-300 mt-1" v-if="edu.degree">{{ edu.institution }}</h4>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-2 text-sm font-bold text-gray-500 dark:text-gray-400 tracking-wide uppercase mb-4" v-if="edu.start_date || edu.end_date || edu.is_current">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <span v-if="edu.start_date && edu.end_date">{{ formatDate(edu.start_date) }} - {{ formatDate(edu.end_date) }}</span>
-                            <span v-else-if="edu.start_date && edu.is_current">{{ formatDate(edu.start_date) }} - {{ __('Present') }}</span>
-                            <span v-else-if="edu.is_current">{{ __('Present') }}</span>
-                            <span v-else-if="edu.start_date">{{ formatDate(edu.start_date) }} - {{ __('Present') }}</span>
-                            <span v-else-if="edu.end_date">{{ formatDate(edu.end_date) }}</span>
-                        </div>
-
-                        <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed mb-6" v-if="edu.description">
-                            {{ edu.description }}
-                        </p>
-
-                        <a v-if="edu.url" :href="edu.url" target="_blank" class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-teal-500 hover:text-teal-400 transition-colors mt-auto">
-                            <span>{{ __('View Credential') }}</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                        </a>
+        <!-- Mobile Vertical Timeline -->
+        <section id="timeline-mobile" class="py-24 px-4 relative overflow-hidden md:hidden scroll-mt-24">
+            <h2 class="text-4xl font-black mb-16 text-center text-gray-900 dark:text-white uppercase tracking-tighter">
+                {{ __('History') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500">&</span> {{ __('Projects') }}
+            </h2>
+            <div class="relative">
+                <div class="absolute left-4 top-0 bottom-0 w-[2px] bg-gray-200 dark:bg-white/5"></div>
+                <div v-for="item in timelineItems" :key="item.id" class="pl-10 mb-12 relative">
+                    <div class="absolute left-[13px] top-1.5 w-3 h-3 rounded-full ring-2 ring-white dark:ring-black"
+                         :class="{
+                             'bg-purple-600 shadow-purple-500/50': item.type === 'experience',
+                             'bg-cyan-500 shadow-cyan-500/50': item.type === 'education',
+                             'bg-pink-600 shadow-pink-500/50': item.type === 'project'
+                         }">
                     </div>
-                </div>
-
-                <div v-if="!educations || educations.length === 0" class="text-center text-gray-500 dark:text-gray-400 italic">
-                    {{ __('No education or certificates found.') }}
-                </div>
-            </div>
-        </section>
-
-        <!-- Projects Section -->
-        <section id="projects" class="py-20 px-4">
-            <div class="max-w-7xl mx-auto">
-                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-pink-500">#</span> {{ __('Featured Projects') }}</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div v-for="project in projects" :key="project.id" class="group bg-white/50 dark:bg-black/40 backdrop-blur-xl rounded-2xl overflow-hidden shadow-lg border border-white/20 dark:border-white/5 hover:border-pink-500/50 hover:shadow-pink-500/20 transition-all duration-300 hover:-translate-y-2">
-                        <div class="h-48 overflow-hidden bg-gray-200 dark:bg-gray-800 relative">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent z-10 opacity-60"></div>
-                            <img 
-                                :src="project.image_url || 'https://via.placeholder.com/400x300?text=' + project.title" 
-                                :alt="project.title"
-                                class="w-full h-full object-cover transition duration-500 group-hover:scale-110"
-                            />
-                        </div>
-                        <div class="p-6 relative z-20">
-                            <div class="flex items-start justify-between mb-2">
-                                <h3 class="text-xl font-bold text-gray-900 dark:text-white group-hover:text-pink-500 transition-colors">{{ project.title }}</h3>
-                                <span v-if="project.in_progress" class="px-2 py-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">Em Andamento</span>
-                            </div>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{{ project.description }}</p>
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                <span v-for="skill in project.skills" :key="skill.id" class="text-[10px] uppercase font-bold px-2 py-1 bg-gray-100 dark:bg-white/10 text-gray-700 dark:text-gray-300 rounded border border-transparent group-hover:border-pink-500/30 transition-colors">
-                                    {{ skill.name }}
-                                </span>
-                            </div>
-                            <div class="flex gap-4 mt-auto">
-                                <a v-if="project.project_url" :href="project.project_url" target="_blank" class="text-pink-600 font-bold hover:underline uppercase text-xs tracking-wider">{{ __('View Live') }}</a>
-                                <a v-if="project.github_url" :href="project.github_url" target="_blank" class="text-gray-500 hover:text-gray-900 dark:hover:text-white font-bold uppercase text-xs tracking-wider">GitHub</a>
-                            </div>
+                    <div class="bg-white/60 dark:bg-white/5 backdrop-blur-xl p-6 rounded-2xl border border-white/20 dark:border-white/10">
+                        <span class="text-[10px] font-black uppercase tracking-widest opacity-60 mb-2 block">{{ item.date.getFullYear() }} // {{ __(item.type) }}</span>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ item.title }}</h3>
+                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{{ item.description }}</p>
+                        <div class="flex gap-4">
+                            <a v-if="item.project_url" :href="item.project_url" target="_blank" class="text-xs font-bold uppercase tracking-wider text-current">{{ __('View Live') }}</a>
+                            <a v-if="item.github_url" :href="item.github_url" target="_blank" class="text-xs font-bold uppercase tracking-wider opacity-60">GitHub</a>
                         </div>
                     </div>
                 </div>
