@@ -36,6 +36,10 @@ class PortfolioController extends Controller
             return \App\Models\Education::with('translations')->orderBy('start_date', 'desc')->get();
         });
 
+        $interests = Cache::remember('portfolio_interests', 3600, function () {
+            return \App\Models\Interest::where('is_active', true)->orderBy('order')->get()->groupBy('category');
+        });
+
         return Inertia::render('Welcome', [
             'hero' => [
                 'name' => SiteSetting::getValue('name', 'My Name'),
@@ -45,6 +49,7 @@ class PortfolioController extends Controller
             ],
             'projects' => $projects,
             'skills' => $skills,
+            'interests' => $interests,
             'experiences' => $experiences,
             'educations' => $educations,
             'socials' => array_filter([

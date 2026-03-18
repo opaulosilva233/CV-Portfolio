@@ -13,6 +13,7 @@ const props = defineProps({
     skills: Object,
     experiences: Array,
     educations: Array,
+    interests: Object,
     socials: [Object, Array],
     canLogin: Boolean,
     seo: Object,
@@ -24,7 +25,7 @@ const props = defineProps({
 });
 
 const activeSection = ref('about');
-const sectionsList = ['about', 'skills', 'timeline', 'terminal', 'contact'];
+const sectionsList = ['about', 'interests', 'skills', 'timeline', 'terminal', 'contact'];
 const navButtons = ref([]);
 const indicatorLeft = ref(0);
 const indicatorWidth = ref(0);
@@ -36,6 +37,7 @@ const isDragging = ref(false);
 const activeColorClass = computed(() => {
     switch (activeSection.value) {
         case 'about': return 'from-purple-600 to-indigo-600 shadow-purple-500/50';
+        case 'interests': return 'from-pink-500 to-purple-500 shadow-pink-500/50';
         case 'skills': return 'from-cyan-500 to-blue-500 shadow-cyan-500/50';
         case 'timeline': return 'from-pink-500 to-rose-500 shadow-pink-500/50';
         case 'terminal': return 'from-emerald-500 to-teal-500 shadow-emerald-500/50';
@@ -47,6 +49,7 @@ const activeColorClass = computed(() => {
 const activeTextClass = computed(() => {
     switch (activeSection.value) {
         case 'about': return 'text-purple-600 dark:text-purple-400';
+        case 'interests': return 'text-pink-600 dark:text-pink-400';
         case 'skills': return 'text-cyan-600 dark:text-cyan-400';
         case 'timeline': return 'text-pink-600 dark:text-pink-400';
         case 'terminal': return 'text-emerald-600 dark:text-emerald-400';
@@ -430,6 +433,41 @@ const formatDate = (date) => {
                                 alt="Profile" 
                                 class="w-full h-full object-cover"
                             />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Interests Section -->
+        <section id="interests" class="py-20 px-4" v-if="interests && Object.keys(interests).length > 0">
+            <div class="max-w-7xl mx-auto px-4">
+                <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-pink-500">#</span> {{ __('Beyond the Code') }}</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div v-for="(categoryInterests, category) in interests" :key="category" class="bg-white/30 dark:bg-white/5 backdrop-blur-xl p-8 rounded-3xl border border-white/20 dark:border-white/10 shadow-xl hover:shadow-pink-500/10 transition-all duration-500 group">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/20 flex items-center justify-center border border-pink-500/30 group-hover:scale-110 transition-transform duration-500">
+                                <span class="text-2xl" v-if="category === 'music'">🎸</span>
+                                <span class="text-2xl" v-else-if="category === 'hobby'">🎨</span>
+                                <span class="text-2xl" v-else-if="category === 'sport'">⚽</span>
+                                <span class="text-2xl" v-else-if="category === 'book'">📚</span>
+                                <span class="text-2xl" v-else-if="category === 'travel'">✈️</span>
+                                <span class="text-2xl" v-else>✨</span>
+                            </div>
+                            <h3 class="text-xl font-black capitalize tracking-tight text-gray-800 dark:text-gray-100 group-hover:text-pink-400 transition-colors">{{ __(category) }}</h3>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div v-for="interest in categoryInterests" :key="interest.id" class="relative group/item">
+                                <div class="flex items-start gap-3">
+                                    <div class="mt-1 w-6 h-6 shrink-0 [&>svg]:w-full [&>svg]:h-full text-pink-500" v-if="interest.icon" v-html="interest.icon"></div>
+                                    <div>
+                                        <h4 class="font-bold text-gray-900 dark:text-white leading-tight">{{ interest.name }}</h4>
+                                        <p v-if="interest.description" class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2 transition-all group-hover/item:line-clamp-none">{{ interest.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

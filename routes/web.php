@@ -33,6 +33,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('admin/sections', \App\Http\Controllers\Admin\PageSectionController::class)->names('admin.sections');
     Route::post('admin/messages/bulk-delete', [\App\Http\Controllers\Admin\MessageController::class, 'bulkDelete'])->name('admin.messages.bulk-delete');
     Route::resource('admin/messages', \App\Http\Controllers\Admin\MessageController::class)->only(['index', 'show', 'update', 'destroy'])->names('admin.messages');
+    Route::resource('admin/interests', \App\Http\Controllers\Admin\InterestController::class)->names('admin.interests');
+    Route::post('admin/interests/reorder', [\App\Http\Controllers\Admin\InterestController::class, 'updateOrder'])->name('admin.interests.reorder');
 
     Route::get('admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'edit'])->name('admin.settings.edit');
     Route::post('admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
