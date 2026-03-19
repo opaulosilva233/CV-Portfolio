@@ -25,7 +25,7 @@ class PortfolioController extends Controller
         });
 
         $experiences = Cache::remember('portfolio_experiences', 3600, function () {
-            return Experience::with(['translations', 'roles' => function ($q) {
+            return Experience::with(['translations', 'skills', 'roles' => function ($q) {
                 $q->with(['translations', 'education.translations'])->orderBy('start_date', 'desc');
             }])->orderBy('sort_order')->get()->sortByDesc(function ($exp) {
                 return $exp->roles->max('start_date');
@@ -33,7 +33,7 @@ class PortfolioController extends Controller
         });
 
         $educations = Cache::remember('portfolio_educations', 3600, function () {
-            return \App\Models\Education::with('translations')->orderBy('start_date', 'desc')->get();
+            return \App\Models\Education::with(['translations', 'skills'])->orderBy('start_date', 'desc')->get();
         });
 
         $interests = Cache::remember('portfolio_interests', 3600, function () {

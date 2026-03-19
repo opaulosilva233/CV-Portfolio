@@ -112,5 +112,14 @@
     "Region": "Region",
     "FETCH_RESUME.EXE": "FETCH_RESUME.EXE",
     "System": "System",
-    "Access": "Access"
+    "Access": "Access",
+    "Interests": "Interests",
+    "Timeline": "Timeline",
+    "Professional": "Professional",
+    "Journey": "Journey",
+    "Academic": "Academic",
+    "Background": "Background",
+    "Official Document": "Official Document",
+    "Featured": "Featured",
+    "In Progress": "In Progress"
 }

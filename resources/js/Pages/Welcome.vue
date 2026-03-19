@@ -26,6 +26,7 @@ const props = defineProps({
 
 const activeSection = ref('about');
 const sectionsList = ['about', 'interests', 'skills', 'timeline', 'terminal', 'contact'];
+const allSectionsList = ['about', 'interests', 'skills', 'timeline', 'experience', 'education', 'projects', 'terminal', 'contact'];
 const navButtons = ref([]);
 const indicatorLeft = ref(0);
 const indicatorWidth = ref(0);
@@ -40,6 +41,8 @@ const activeColorClass = computed(() => {
         case 'interests': return 'from-pink-500 to-purple-500 shadow-pink-500/50';
         case 'skills': return 'from-cyan-500 to-blue-500 shadow-cyan-500/50';
         case 'timeline': return 'from-pink-500 to-rose-500 shadow-pink-500/50';
+        case 'experience': return 'from-purple-500 to-violet-600 shadow-purple-500/50';
+        case 'education': return 'from-cyan-500 to-blue-600 shadow-cyan-500/50';
         case 'terminal': return 'from-emerald-500 to-teal-500 shadow-emerald-500/50';
         case 'contact': return 'from-orange-500 to-red-500 shadow-orange-500/50';
         default: return 'from-purple-600 to-indigo-600';
@@ -52,6 +55,8 @@ const activeTextClass = computed(() => {
         case 'interests': return 'text-pink-600 dark:text-pink-400';
         case 'skills': return 'text-cyan-600 dark:text-cyan-400';
         case 'timeline': return 'text-pink-600 dark:text-pink-400';
+        case 'experience': return 'text-purple-600 dark:text-purple-400';
+        case 'education': return 'text-cyan-600 dark:text-cyan-400';
         case 'terminal': return 'text-emerald-600 dark:text-emerald-400';
         case 'contact': return 'text-orange-600 dark:text-orange-400';
         default: return 'text-purple-600 dark:text-purple-400';
@@ -184,14 +189,19 @@ onMounted(() => {
         (entries) => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
-                    activeSection.value = entry.target.id;
+                    const id = entry.target.id;
+                    if (['experience', 'education', 'projects'].includes(id)) {
+                        activeSection.value = 'timeline';
+                    } else {
+                        activeSection.value = id;
+                    }
                 }
             });
         },
         { rootMargin: '-30% 0px -70% 0px' }
     );
 
-    sectionsList.forEach((id) => {
+    allSectionsList.forEach((id) => {
         const el = document.getElementById(id);
         if (el) {
             observer.observe(el);
@@ -609,6 +619,181 @@ const formatDate = (date) => {
                         <div class="flex gap-4">
                             <a v-if="item.project_url" :href="item.project_url" target="_blank" class="text-xs font-bold uppercase tracking-wider text-current">{{ __('View Live') }}</a>
                             <a v-if="item.github_url" :href="item.github_url" target="_blank" class="text-xs font-bold uppercase tracking-wider opacity-60">GitHub</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="py-24 px-4 scroll-mt-24 bg-gray-50/30 dark:bg-white/[0.02]">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-16">
+                    <h2 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+                        {{ __('Professional') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-violet-500">{{ __('Journey') }}</span>
+                    </h2>
+                    <div class="w-24 h-2 bg-purple-500 mt-4 rounded-full"></div>
+                </div>
+
+                <div class="space-y-12">
+                    <div v-for="exp in experiences" :key="exp.id" class="relative group">
+                        <div class="flex flex-col md:flex-row gap-8 items-start">
+                            <!-- Company Branding -->
+                            <div class="w-full md:w-1/4 flex flex-col items-center md:items-start text-center md:text-left">
+                                <div class="w-20 h-20 rounded-2xl bg-white dark:bg-white/5 border border-purple-500/20 p-2 shadow-xl mb-4 group-hover:scale-110 transition-transform duration-500">
+                                    <img v-if="exp.image_url" :src="exp.image_url" :alt="exp.company" class="w-full h-full object-contain" />
+                                    <div v-else class="w-full h-full flex items-center justify-center bg-purple-500/10 text-purple-500 font-bold text-2xl uppercase">
+                                        {{ exp.company.charAt(0) }}
+                                    </div>
+                                </div>
+                                <h3 class="text-xl font-black text-gray-900 dark:text-white group-hover:text-purple-500 transition-colors">{{ exp.company }}</h3>
+                                <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest mt-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                    {{ exp.location }}
+                                </div>
+                                <!-- Company Skills -->
+                                <div v-if="exp.skills && exp.skills.length > 0" class="flex flex-wrap gap-1.5 mt-6 justify-center md:justify-start">
+                                    <span v-for="skill in exp.skills" :key="skill.id" class="px-2 py-0.5 bg-purple-500/10 text-purple-600 dark:text-purple-400 text-[9px] font-black uppercase tracking-tight rounded-md border border-purple-500/10">
+                                        {{ skill.name }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Roles Timeline -->
+                            <div class="flex-1 space-y-8 relative">
+                                <div class="absolute left-0 md:left-[-2rem] top-0 bottom-0 w-px bg-gradient-to-b from-purple-500/50 via-purple-500/10 to-transparent hidden md:block"></div>
+                                
+                                <div v-for="role in exp.roles" :key="role.id" class="relative pl-0 md:pl-8">
+                                    <!-- Timeline Dot -->
+                                    <div class="absolute left-[-2.25rem] top-2 w-2 h-2 rounded-full bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.5)] hidden md:block group-hover:scale-150 transition-transform"></div>
+                                    
+                                    <div class="bg-white/40 dark:bg-white/5 backdrop-blur-xl p-6 rounded-3xl border border-white/20 dark:border-white/10 hover:border-purple-500/40 transition-all duration-300">
+                                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
+                                            <div>
+                                                <h4 class="text-lg font-black text-gray-800 dark:text-gray-100 group-hover:translate-x-1 transition-transform">{{ role.role }}</h4>
+                                                <span class="inline-block px-3 py-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 text-[10px] font-black uppercase tracking-widest rounded-full mt-1">
+                                                    {{ role.employment_type }}
+                                                </span>
+                                            </div>
+                                            <div class="text-[11px] font-black font-mono text-gray-500 dark:text-gray-400 bg-gray-100/50 dark:bg-black/20 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-white/5">
+                                                {{ new Date(role.start_date).toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }) }} — 
+                                                <span v-if="role.is_current" class="text-emerald-500">{{ __('Present') }}</span>
+                                                <span v-else>{{ new Date(role.end_date).toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }) }}</span>
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">{{ role.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="py-24 px-4 scroll-mt-24">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-16 text-right">
+                    <h2 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+                        {{ __('Academic') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-500">{{ __('Background') }}</span>
+                    </h2>
+                    <div class="w-24 h-2 bg-cyan-500 mt-4 rounded-full ml-auto"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div v-for="edu in educations" :key="edu.id" class="group h-full">
+                        <div class="h-full bg-white/40 dark:bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/20 dark:border-white/10 hover:border-cyan-500/40 transition-all duration-500 flex flex-col relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                                </svg>
+                            </div>
+
+                            <div class="flex items-center gap-2 text-xs font-black text-cyan-500 uppercase tracking-widest mb-4">
+                                <span class="px-2 py-1 bg-cyan-500/10 rounded-lg">{{ edu.type }}</span>
+                                <span class="w-4 h-px bg-cyan-500/30"></span>
+                                <span class="text-gray-500">{{ new Date(edu.start_date || edu.end_date).getFullYear() }}</span>
+                            </div>
+
+                            <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-2 leading-tight group-hover:text-cyan-500 transition-colors">{{ edu.degree }}</h3>
+                            <p class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-6">{{ edu.institution }}</p>
+                            
+                            <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6 flex-1 border-l-2 border-cyan-500/20 pl-4">{{ edu.description }}</p>
+
+                            <!-- Education Skills -->
+                            <div v-if="edu.skills && edu.skills.length > 0" class="flex flex-wrap gap-1.5 mb-6">
+                                <span v-for="skill in edu.skills" :key="skill.id" class="px-2 py-0.5 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-[9px] font-black uppercase tracking-tight rounded-md border border-cyan-500/10">
+                                    {{ skill.name }}
+                                </span>
+                            </div>
+
+                            <a v-if="edu.url" :href="edu.url" target="_blank" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400 hover:gap-4 transition-all group/link">
+                                {{ __('Official Document') }}
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover/link:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-24 px-4 scroll-mt-24 bg-gray-50/50 dark:bg-black/20">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-16">
+                    <h2 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
+                        {{ __('Featured') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-amber-500">{{ __('Projects') }}</span>
+                    </h2>
+                    <div class="w-24 h-2 bg-pink-500 mt-4 rounded-full"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div v-for="project in projects" :key="project.id" class="group h-full flex flex-col">
+                        <div class="flex-1 bg-white/60 dark:bg-white/5 backdrop-blur-xl rounded-[2rem] border border-white/20 dark:border-white/10 hover:border-pink-500/30 transition-all duration-500 overflow-hidden flex flex-col shadow-xl hover:shadow-pink-500/10">
+                            <!-- Project Image -->
+                            <div class="relative aspect-video overflow-hidden">
+                                <img v-if="project.image_url" :src="project.image_url" :alt="project.title" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                <div v-else class="w-full h-full bg-gradient-to-br from-pink-500/10 to-amber-500/10 flex items-center justify-center text-pink-500/20 text-4xl font-black uppercase">
+                                    {{ project.title.substring(0, 2) }}
+                                </div>
+                                <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-white/90 dark:from-black/80 to-transparent"></div>
+                                
+                                <div v-if="project.in_progress" class="absolute top-4 right-4 px-3 py-1 bg-amber-500 text-white text-[10px] font-black uppercase tracking-widest rounded-full shadow-lg">
+                                    {{ __('In Progress') }}
+                                </div>
+                            </div>
+
+                            <!-- Project Info -->
+                            <div class="p-8 flex-1 flex flex-col relative z-10">
+                                <h3 class="text-2xl font-black text-gray-800 dark:text-white mb-3 group-hover:text-pink-500 transition-colors">{{ project.title }}</h3>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">{{ project.description }}</p>
+
+                                <!-- Skills/Tags -->
+                                <div class="flex flex-wrap gap-2 mb-8">
+                                    <span v-for="skill in project.skills" :key="skill.id" class="px-3 py-1 bg-pink-500/5 text-pink-600 dark:text-pink-400 text-[10px] font-black uppercase tracking-widest rounded-lg border border-pink-500/10">
+                                        {{ skill.name }}
+                                    </span>
+                                </div>
+
+                                <!-- Links -->
+                                <div class="mt-auto flex items-center justify-between border-t border-gray-100 dark:border-white/5 pt-6">
+                                    <a v-if="project.project_url" :href="project.project_url" target="_blank" class="px-6 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg hover:shadow-pink-500/20">
+                                        {{ __('View Live') }}
+                                    </a>
+                                    <a v-if="project.github_url" :href="project.github_url" target="_blank" class="flex items-center gap-2 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group/gh">
+                                        <i class="fab fa-github text-xl"></i>
+                                        <span class="text-[10px] font-black uppercase tracking-widest hidden sm:block">GitHub</span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
