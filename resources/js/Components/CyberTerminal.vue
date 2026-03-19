@@ -142,7 +142,6 @@ onMounted(() => {
                     v-model="currentInput"
                     @keyup.enter="handleCommand"
                     type="text"
-                    autofocus
                     class="bg-transparent border-none outline-none p-0 flex-1 text-gray-300 placeholder-white/5"
                     spellcheck="false"
                     autocomplete="off"

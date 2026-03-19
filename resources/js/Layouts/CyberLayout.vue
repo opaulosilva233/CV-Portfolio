@@ -39,10 +39,11 @@ onUnmounted(() => {
 <template>
     <div 
         ref="containerRef"
-        class="min-h-screen relative overflow-hidden bg-gray-100 dark:bg-[#030303] transition-colors duration-500 font-sans text-gray-900 dark:text-gray-100"
+        class="min-h-screen relative bg-gray-100 dark:bg-[#030303] transition-colors duration-500 font-sans text-gray-900 dark:text-gray-100"
         @mousemove="handleMouseMove"
         @mouseleave="handleMouseLeave"
     >
+
         
         <!-- Interactive Spotlight (Follows Mouse) -->
         <div 

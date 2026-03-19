@@ -129,8 +129,8 @@ const handleTimelineScroll = () => {
     // Start measuring when the container starts entering the viewport
     // End when it finishes
     const start = 0;
-    const end = rect.height - windowHeight;
-    const current = -rect.top;
+    const end = Math.max(1, rect.height - windowHeight);
+    const current = Math.max(0, -rect.top);
     
     let progress = current / end;
     progress = Math.max(0, Math.min(1, progress));
