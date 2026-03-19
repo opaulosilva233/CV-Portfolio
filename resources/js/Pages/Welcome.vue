@@ -27,6 +27,41 @@ const props = defineProps({
 const activeSection = ref('about');
 const sectionsList = ['about', 'interests', 'skills', 'timeline', 'terminal', 'contact'];
 const allSectionsList = ['about', 'interests', 'skills', 'timeline', 'experience', 'education', 'projects', 'terminal', 'contact'];
+const selectedProject = ref(null);
+const showProjectModal = ref(false);
+const activeImageIndex = ref(0);
+
+const openProjectModal = (project) => {
+    selectedProject.value = project;
+    activeImageIndex.value = 0;
+    showProjectModal.value = true;
+    document.body.style.overflow = 'hidden';
+};
+
+const closeProjectModal = () => {
+    showProjectModal.value = false;
+    document.body.style.overflow = '';
+};
+
+const activeImageUrl = computed(() => {
+    if (!selectedProject.value) return null;
+    if (selectedProject.value.gallery && selectedProject.value.gallery.length > 0) {
+        return selectedProject.value.gallery[activeImageIndex.value].url;
+    }
+    return selectedProject.value.main_image_url;
+});
+
+const nextImage = () => {
+    if (selectedProject.value?.gallery?.length > 0) {
+        activeImageIndex.value = (activeImageIndex.value + 1) % selectedProject.value.gallery.length;
+    }
+};
+
+const prevImage = () => {
+    if (selectedProject.value?.gallery?.length > 0) {
+        activeImageIndex.value = (activeImageIndex.value - 1 + selectedProject.value.gallery.length) % selectedProject.value.gallery.length;
+    }
+};
 const navButtons = ref([]);
 const indicatorLeft = ref(0);
 const indicatorWidth = ref(0);
@@ -74,7 +109,7 @@ const timelineItems = computed(() => {
             date: new Date(p.completed_at || p.created_at),
             title: p.title,
             description: p.description,
-            image: p.image_url,
+            image: p.main_image_url,
             tags: p.skills,
             project_url: p.project_url,
             github_url: p.github_url,
@@ -111,6 +146,7 @@ const timelineItems = computed(() => {
             subtitle: edu.degree ? edu.institution : '',
             description: edu.description,
             eduType: edu.type,
+            image: edu.image_url,
             url: edu.url,
             is_current: edu.is_current
         });
@@ -705,40 +741,53 @@ const formatDate = (date) => {
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div v-for="edu in educations" :key="edu.id" class="group h-full">
-                        <div class="h-full bg-white/40 dark:bg-white/5 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white/20 dark:border-white/10 hover:border-cyan-500/40 transition-all duration-500 flex flex-col relative overflow-hidden">
-                            <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                                    <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
-                                </svg>
+                    <div v-for="edu in educations" :key="edu.id" class="group relative h-full">
+                        <!-- Education Card -->
+                        <div class="h-full bg-white/40 dark:bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/20 dark:border-white/10 hover:border-cyan-500/40 transition-all duration-700 flex flex-col relative overflow-hidden group-hover:shadow-[0_0_40px_-15px_rgba(6,182,212,0.15)]">
+                            <!-- Branding & Header -->
+                            <div class="flex items-start gap-6 mb-8">
+                                <div class="w-20 h-20 bg-white rounded-2xl p-3 shadow-xl border border-gray-100 dark:border-white/10 flex-shrink-0 flex items-center justify-center transition-all duration-700 group-hover:scale-110 group-hover:rotate-1">
+                                    <img v-if="edu.image_url" :src="edu.image_url" :alt="edu.institution" class="w-full h-full object-contain" />
+                                    <div v-else class="text-cyan-500/10 text-3xl font-black uppercase select-none">{{ edu.institution.substring(0, 2) }}</div>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-cyan-600 dark:text-cyan-400 text-xs font-black uppercase tracking-widest mb-1">{{ edu.type || 'Academic' }}</div>
+                                    <h3 class="text-2xl font-black text-gray-950 dark:text-white leading-tight mb-1 truncate group-hover:text-cyan-500 transition-colors">{{ edu.degree }}</h3>
+                                    <p class="text-sm font-bold text-gray-600 dark:text-gray-400 opacity-80 truncate">{{ edu.institution }}</p>
+                                </div>
+                                <div class="text-cyan-600 dark:text-cyan-400 text-2xl font-black tracking-tighter opacity-20 group-hover:opacity-100 transition-all duration-700 whitespace-nowrap">
+                                    {{ edu.end_date ? new Date(edu.end_date).getFullYear() : (edu.is_current ? 'Present' : '') }}
+                                </div>
                             </div>
-
-                            <div class="flex items-center gap-2 text-xs font-black text-cyan-500 uppercase tracking-widest mb-4">
-                                <span class="px-2 py-1 bg-cyan-500/10 rounded-lg">{{ edu.type }}</span>
-                                <span class="w-4 h-px bg-cyan-500/30"></span>
-                                <span class="text-gray-500">{{ new Date(edu.start_date || edu.end_date).getFullYear() }}</span>
-                            </div>
-
-                            <h3 class="text-2xl font-black text-gray-900 dark:text-white mb-2 leading-tight group-hover:text-cyan-500 transition-colors">{{ edu.degree }}</h3>
-                            <p class="text-lg font-bold text-gray-600 dark:text-gray-300 mb-6">{{ edu.institution }}</p>
                             
-                            <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6 flex-1 border-l-2 border-cyan-500/20 pl-4">{{ edu.description }}</p>
-
-                            <!-- Education Skills -->
-                            <div v-if="edu.skills && edu.skills.length > 0" class="flex flex-wrap gap-1.5 mb-6">
-                                <span v-for="skill in edu.skills" :key="skill.id" class="px-2 py-0.5 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-[9px] font-black uppercase tracking-tight rounded-md border border-cyan-500/10">
-                                    {{ skill.name }}
-                                </span>
+                            <!-- Description -->
+                            <div class="relative pl-6 border-l-2 border-cyan-500/20 mb-8 flex-1">
+                                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed whitespace-pre-line line-clamp-4">{{ edu.description }}</p>
                             </div>
 
-                            <a v-if="edu.url" :href="edu.url" target="_blank" class="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400 hover:gap-4 transition-all group/link">
-                                {{ __('Official Document') }}
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover/link:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                                </svg>
-                            </a>
+                            <div class="flex flex-col gap-6">
+                                <!-- Education Skills -->
+                                <div v-if="edu.skills && edu.skills.length > 0" class="flex flex-wrap gap-1.5">
+                                    <span v-for="skill in edu.skills" :key="skill.id" class="px-2.5 py-1 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-[9px] font-black uppercase tracking-widest rounded-lg border border-cyan-500/20">
+                                        {{ skill.name }}
+                                    </span>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest">
+                                        {{ edu.is_current ? 'IN PROGRESS' : 'GRADUATED' }}
+                                    </div>
+                                    <a v-if="edu.url" :href="edu.url" target="_blank" class="group/btn text-[9px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400 flex items-center gap-2 hover:gap-3 transition-all">
+                                        {{ __('Official Document') }}
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Decorative background glow -->
+                            <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-cyan-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
                         </div>
                     </div>
                 </div>
@@ -756,11 +805,11 @@ const formatDate = (date) => {
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <div v-for="project in projects" :key="project.id" class="group h-full flex flex-col">
+                    <div v-for="project in projects" :key="project.id" @click="openProjectModal(project)" class="group h-full flex flex-col cursor-pointer">
                         <div class="flex-1 bg-white/60 dark:bg-white/5 backdrop-blur-xl rounded-[2rem] border border-white/20 dark:border-white/10 hover:border-pink-500/30 transition-all duration-500 overflow-hidden flex flex-col shadow-xl hover:shadow-pink-500/10">
                             <!-- Project Image -->
                             <div class="relative aspect-video overflow-hidden">
-                                <img v-if="project.image_url" :src="project.image_url" :alt="project.title" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                <img v-if="project.main_image_url" :src="project.main_image_url" :alt="project.title" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                 <div v-else class="w-full h-full bg-gradient-to-br from-pink-500/10 to-amber-500/10 flex items-center justify-center text-pink-500/20 text-4xl font-black uppercase">
                                     {{ project.title.substring(0, 2) }}
                                 </div>
@@ -774,7 +823,7 @@ const formatDate = (date) => {
                             <!-- Project Info -->
                             <div class="p-8 flex-1 flex flex-col relative z-10">
                                 <h3 class="text-2xl font-black text-gray-800 dark:text-white mb-3 group-hover:text-pink-500 transition-colors">{{ project.title }}</h3>
-                                <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">{{ project.description }}</p>
+                                <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 transition-all duration-300">{{ project.description }}</p>
 
                                 <!-- Skills/Tags -->
                                 <div class="flex flex-wrap gap-2 mb-8">
@@ -829,5 +878,135 @@ const formatDate = (date) => {
         <footer class="py-10 text-center text-gray-500 dark:text-gray-400 text-sm font-medium border-t border-white/10">
             &copy; {{ new Date().getFullYear() }} {{ hero.name }}. <span class="opacity-50" v-if="footer_text">{{ footer_text }}</span>
         </footer>
+
+        <!-- Project Modal -->
+        <transition name="terminal-fade">
+            <div v-if="showProjectModal" class="fixed inset-0 z-[100] flex items-center justify-center p-0 md:p-6 lg:p-10 transition-all duration-700">
+                <div class="absolute inset-0 bg-gray-950/98 backdrop-blur-3xl" @click="closeProjectModal"></div>
+                
+                <div class="relative w-full h-full max-w-[2200px] bg-black md:rounded-[3.5rem] border border-white/10 shadow-[0_0_150px_-30px_rgba(0,0,0,1)] flex flex-col lg:flex-row overflow-hidden project-modal-glow">
+                    <!-- Close button -->
+                    <button @click="closeProjectModal" class="absolute top-8 right-8 z-[70] w-14 h-14 rounded-full bg-white/5 text-white/50 flex items-center justify-center hover:bg-red-500 hover:text-white hover:rotate-90 transition-all duration-500 border border-white/10 backdrop-blur-xl group/close">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+
+                    <!-- Left: Immersive Media Section -->
+                    <div class="lg:w-[70%] relative bg-black group/media flex flex-col h-full border-b lg:border-b-0 lg:border-r border-white/10 transition-all duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-br from-pink-500/5 to-cyan-500/5 mix-blend-overlay opacity-30 select-none pointer-events-none"></div>
+                        
+                        <!-- Main Viewport -->
+                        <div class="flex-1 relative flex items-center justify-center overflow-hidden h-full">
+                            <transition name="fade" mode="out-in">
+                                <img :key="activeImageUrl" :src="activeImageUrl" :alt="selectedProject.title" class="w-full h-full object-contain p-6 md:p-12 lg:p-20 transition-all duration-1000" />
+                            </transition>
+
+                            <!-- Navigation Controls -->
+                            <div v-if="selectedProject.gallery && selectedProject.gallery.length > 1" class="absolute inset-0 flex items-center justify-between px-6 lg:px-12 opacity-0 group-hover/media:opacity-100 transition-opacity duration-300">
+                                <button @click="prevImage" class="w-16 h-16 rounded-3xl bg-black/60 hover:bg-pink-500 text-white backdrop-blur-2xl border border-white/10 transition-all hover:scale-110 flex items-center justify-center shadow-2xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                                </button>
+                                <button @click="nextImage" class="w-16 h-16 rounded-3xl bg-black/60 hover:bg-cyan-500 text-white backdrop-blur-2xl border border-white/10 transition-all hover:scale-110 flex items-center justify-center shadow-2xl">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Gallery Thumbnails (Floating Overlay) -->
+                        <div v-if="selectedProject.gallery && selectedProject.gallery.length > 1" class="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 px-8 py-4 bg-black/40 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] shadow-2xl lg:opacity-0 lg:group-hover/media:opacity-100 transition-all duration-500 lg:translate-y-4 lg:group-hover/media:translate-y-0">
+                            <div class="flex items-center gap-4 overflow-x-auto scrollbar-none max-w-[80vw]">
+                                <button v-for="(img, idx) in selectedProject.gallery" :key="idx" 
+                                    @click="activeImageIndex = idx"
+                                    class="w-24 h-16 flex-shrink-0 rounded-2xl overflow-hidden border-2 transition-all duration-500 transform hover:scale-110"
+                                    :class="activeImageIndex === idx ? 'border-pink-500 shadow-lg shadow-pink-500/40 opacity-100' : 'border-white/5 opacity-40 hover:opacity-80 hover:border-white/20'">
+                                    <img :src="img.url" class="w-full h-full object-cover" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Decorative identifiers -->
+                        <div class="absolute top-10 left-10 pointer-events-none flex flex-col gap-2">
+                            <div class="w-20 h-px bg-pink-500"></div>
+                            <div class="w-10 h-px bg-pink-500/50"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Info Panel -->
+                    <div class="lg:w-[30%] flex flex-col relative bg-gradient-to-b from-white/[0.04] to-transparent border-t lg:border-t-0 border-white/10 overflow-y-auto">
+                        <div class="p-10 lg:p-16 flex flex-col min-h-full">
+                            <div class="mb-14">
+                                <div class="flex items-center gap-4 mb-8">
+                                    <span class="px-5 py-2 bg-pink-500/10 text-pink-500 text-[11px] font-black uppercase tracking-[0.4em] border border-pink-500/20 rounded-xl">
+                                        {{ __('Project') }} — {{ selectedProject.id }}
+                                    </span>
+                                    <div v-if="selectedProject.in_progress" class="px-5 py-2 bg-amber-500/10 text-amber-500 border border-amber-500/20 text-[11px] font-black uppercase tracking-[0.3em] rounded-xl">
+                                        DEV_MODE
+                                    </div>
+                                </div>
+                                <h2 class="text-5xl lg:text-7xl font-black text-white leading-[0.9] mb-10 tracking-tighter">{{ selectedProject.title }}</h2>
+                                
+                                <div class="flex flex-wrap gap-3">
+                                    <span v-for="skill in selectedProject.skills" :key="skill.id" class="px-4 py-2 bg-white/5 text-gray-400 text-[11px] font-black uppercase tracking-widest rounded-xl border border-white/10">
+                                        #{{ skill.name }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="space-y-12 mb-16 flex-1">
+                                <div class="text-gray-400 text-lg md:text-xl leading-relaxed font-medium">
+                                    <div class="whitespace-pre-line border-l-4 border-pink-500/30 pl-10 leading-loose tracking-wide">{{ selectedProject.description }}</div>
+                                </div>
+                            </div>
+
+                            <!-- Final Actions -->
+                            <div class="flex flex-col gap-6 pt-12 border-t border-white/10 mt-auto">
+                                <a v-if="selectedProject.project_url" :href="selectedProject.project_url" target="_blank" class="group/btn relative px-10 py-6 bg-white text-black rounded-[2rem] text-center font-black uppercase tracking-[0.2em] text-xs overflow-hidden transition-all duration-500 hover:shadow-[0_0_60px_rgba(255,255,255,0.3)] hover:-translate-y-1">
+                                    <span class="relative z-10 flex items-center justify-center gap-3">
+                                        {{ __('Access Live Application') }}
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover/btn:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                        </svg>
+                                    </span>
+                                </a>
+                                <a v-if="selectedProject.github_url" :href="selectedProject.github_url" target="_blank" class="flex items-center justify-center gap-4 px-10 py-6 bg-white/5 hover:bg-white/10 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs border border-white/10 transition-all hover:-translate-y-1">
+                                    <i class="fab fa-github text-2xl"></i>
+                                    View Repository
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </transition>
     </CyberLayout>
 </template>
+
+<style scoped>
+.project-modal-glow {
+    box-shadow: 0 0 100px -30px rgba(236, 72, 153, 0.1), 0 0 120px -40px rgba(6, 182, 212, 0.05);
+}
+.border-tl-2 {
+    border-top: 3px solid;
+    border-left: 3px solid;
+    border-image: linear-gradient(to right bottom, #ec4899, #06b6d4) 1;
+    clip-path: polygon(0 0, 100% 0, 100% 3px, 3px 3px, 3px 100%, 0 100%);
+}
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+    filter: blur(20px);
+    transform: scale(0.95);
+}
+.scrollbar-none::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+</style>
