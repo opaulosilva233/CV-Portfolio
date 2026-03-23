@@ -103,28 +103,32 @@ const timelineItems = computed(() => {
 
     // Add projects
     props.projects.forEach(p => {
+        const endDate = p.completed_at ? new Date(p.completed_at) : null;
         items.push({
             id: `project-${p.id}`,
             type: 'project',
             date: new Date(p.completed_at || p.created_at),
+            displayDate: endDate,
             title: p.title,
             description: p.description,
             image: p.main_image_url,
             tags: p.skills,
             project_url: p.project_url,
             github_url: p.github_url,
-            in_progress: p.in_progress
+            in_progress: p.in_progress,
+            is_current: !!p.in_progress
         });
     });
 
     // Add experiences
     props.experiences.forEach(exp => {
         exp.roles.forEach((role, idx) => {
+            const endDate = role.is_current ? null : new Date(role.end_date);
             items.push({
                 id: `exp-${exp.id}-${idx}`,
                 type: 'experience',
                 date: new Date(role.start_date),
-                endDate: role.is_current ? new Date() : new Date(role.end_date),
+                displayDate: endDate,
                 title: role.role,
                 subtitle: exp.company,
                 description: role.description,
@@ -138,10 +142,12 @@ const timelineItems = computed(() => {
 
     // Add education
     props.educations.forEach(edu => {
+        const endDate = edu.is_current ? null : (edu.end_date ? new Date(edu.end_date) : null);
         items.push({
             id: `edu-${edu.id}`,
             type: 'education',
-            date: new Date(edu.start_date || edu.end_date),
+            date: new Date(edu.end_date || edu.start_date),
+            displayDate: endDate,
             title: edu.degree || edu.institution,
             subtitle: edu.degree ? edu.institution : '',
             description: edu.description,
@@ -300,6 +306,17 @@ const scrollTo = (id) => {
     }
 };
 
+const handleTimelineClick = (item) => {
+    if (item.type === 'project') {
+        const project = props.projects.find(p => `project-${p.id}` === item.id);
+        if (project) openProjectModal(project);
+    } else if (item.type === 'experience') {
+        scrollTo('experience');
+    } else if (item.type === 'education') {
+        scrollTo('education');
+    }
+};
+
 const formatDate = (date) => {
     if (!date) return '';
     return date.toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' });
@@ -326,22 +343,45 @@ const formatDate = (date) => {
 
 .timeline-item {
     opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+    filter: blur(4px);
 }
 
 .timeline-item.is-visible {
     opacity: 1;
-    transform: translateY(0);
+    filter: blur(0);
 }
 
-@media (min-width: 768px) {
-    .timeline-item {
-        transform: translateX(50px);
-    }
-    .timeline-item.is-visible {
-        transform: translateX(0);
-    }
+/* Timeline Card Base */
+.timeline-card {
+    background: rgba(8, 12, 28, 0.75);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.timeline-card:hover {
+    transform: translateY(-8px);
+    background: rgba(14, 20, 45, 0.85);
+}
+
+/* Experience Card - Purple accent */
+.timeline-card--experience:hover {
+    box-shadow: 0 20px 50px -10px rgba(147, 51, 234, 0.3), 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    border-color: rgba(147, 51, 234, 0.2);
+}
+
+/* Education Card - Cyan accent */
+.timeline-card--education:hover {
+    box-shadow: 0 20px 50px -10px rgba(6, 182, 212, 0.3), 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    border-color: rgba(6, 182, 212, 0.2);
+}
+
+/* Project Card - Pink accent */
+.timeline-card--project:hover {
+    box-shadow: 0 20px 50px -10px rgba(236, 72, 153, 0.3), 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    border-color: rgba(236, 72, 153, 0.2);
 }
 </style>
 
@@ -356,10 +396,6 @@ const formatDate = (date) => {
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-24 gap-4 xl:gap-8">
                     <div class="flex items-center gap-5 cursor-pointer group" @click="scrollTo('about')">
-                        <div class="relative">
-                            <img src="/images/Logotipo.png" alt="Logotipo" class="h-12 w-auto transform group-hover:scale-110 group-hover:rotate-[-5deg] transition-all duration-500 drop-shadow-lg" />
-                            <div class="absolute inset-0 bg-white dark:bg-black mix-blend-color opacity-0 group-hover:opacity-20 transition-opacity"></div>
-                        </div>
                         <div class="flex flex-col justify-center translate-y-1">
                             <span class="font-black text-3xl lg:text-4xl tracking-tighter text-transparent bg-clip-text bg-gradient-to-r transition-all duration-700 hidden sm:block whitespace-nowrap drop-shadow-sm group-hover:drop-shadow-lg"
                                   :class="activeColorClass">
@@ -373,13 +409,14 @@ const formatDate = (date) => {
                                 </span>
                                 <div class="w-12 h-[1px] bg-gradient-to-r from-gray-300 to-transparent dark:from-white/20 dark:to-transparent"></div>
                                 <transition name="terminal-fade" mode="out-in">
-                                    <div :key="activeSection" class="flex items-center gap-4">
-                                        <span class="text-[11px] font-bold tracking-[0.2em] uppercase text-gray-400 dark:text-gray-500">
-                                            // CURRENT_LOC: <span class="text-gray-800 dark:text-gray-200">{{ __(activeSection) }}</span>
+                                    <div :key="activeSection" class="flex items-center gap-3 whitespace-nowrap bg-gray-100/80 dark:bg-white/5 py-1 px-3 rounded-lg border border-gray-200 dark:border-white/10 shadow-sm">
+                                        <span class="text-[10px] font-bold tracking-[0.1em] uppercase text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                            <span class="text-[11px] font-black opacity-60">//</span> LOC: 
+                                            <span class="text-gray-900 dark:text-white font-black tracking-widest">{{ __(activeSection) }}</span>
                                         </span>
-                                        <div class="h-4 w-px bg-gray-300 dark:bg-white/10 hidden xl:block"></div>
-                                        <span class="text-[10px] font-mono text-gray-400 hidden xl:block">
-                                            REGION: {{ new Intl.DateTimeFormat().resolvedOptions().timeZone }}
+                                        <div class="h-3 w-px bg-gray-300 dark:bg-white/20 hidden xl:block"></div>
+                                        <span class="text-[10px] font-mono text-gray-500 dark:text-gray-400 hidden xl:flex items-center gap-1.5">
+                                            REG: <span class="text-gray-700 dark:text-gray-300 font-semibold">{{ new Intl.DateTimeFormat().resolvedOptions().timeZone.split('/').pop().replace('_', ' ') }}</span>
                                         </span>
                                     </div>
                                 </transition>
@@ -539,123 +576,213 @@ const formatDate = (date) => {
 
         <!-- Dynamic Timeline Section -->
         <!-- Desktop Horizontal Timeline -->
-        <section id="timeline" ref="timelineContainer" class="relative hidden md:block" :style="{ height: (timelineItems.length * 50) + 'vh' }">
-            <div class="sticky top-0 h-screen flex flex-col justify-center overflow-hidden bg-gray-50/30 dark:bg-[#030712]/30">
-                <div class="max-w-7xl mx-auto w-full px-8 mb-12">
-                    <h2 class="text-5xl lg:text-7xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
-                        {{ __('History') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500">&</span> {{ __('Projects') }}
+        <section id="timeline" ref="timelineContainer" class="relative hidden md:block" :style="{ height: (timelineItems.length * 45) + 'vh' }">
+            <div class="sticky top-0 h-screen flex flex-col overflow-hidden" style="background: linear-gradient(135deg, #060a18 0%, #0a0f22 50%, #06081a 100%)">
+
+                <!-- Subtle grid background -->
+                <div class="absolute inset-0 pointer-events-none" style="background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+                <!-- Corner glow accents -->
+                <div class="absolute top-0 left-0 w-96 h-96 bg-purple-900/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute bottom-0 right-0 w-96 h-96 bg-cyan-900/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- Title block — top portion, centered with significant breathing room -->
+                <div class="flex flex-col items-center justify-center pt-40 pb-12 relative z-10 flex-shrink-0">
+                    <div class="flex items-center gap-6 mb-4">
+                        <div class="w-12 h-[2px] bg-gradient-to-r from-pink-500 to-purple-500"></div>
+                        <span class="text-[11px] font-black uppercase tracking-[0.6em] text-pink-500">{{ __('Timeline') }}</span>
+                        <div class="w-12 h-[2px] bg-gradient-to-r from-purple-500 to-pink-500"></div>
+                    </div>
+                    <h2 class="text-7xl md:text-8xl lg:text-[130px] font-black text-white uppercase tracking-tighter leading-none text-center drop-shadow-2xl">
+                        <span class="opacity-90">{{ __('My') }}</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">{{ __('Journey') }}</span>
                     </h2>
+                    <p class="text-gray-600 text-[11px] font-bold tracking-[0.4em] uppercase mt-6">{{ __('Scroll to explore the legacy') }} →</p>
                 </div>
 
-                <div class="relative flex items-center transition-transform duration-100 ease-out" ref="horizontalTarget" :style="{ transform: `translateX(-${translateX}px)` }">
+                <!-- Cards row — flex-1 so it fills remaining space, cards centered vertically -->
+                <div class="flex-1 relative flex items-center">
+                    <div class="relative flex items-center w-full transition-transform duration-200 ease-out" ref="horizontalTarget" :style="{ transform: `translateX(-${translateX}px)` }">
                     <!-- The Interactive Growing Horizontal Line -->
-                    <div class="absolute top-1/2 left-0 w-full h-[2px] bg-gray-200/50 dark:bg-white/5">
-                        <div class="h-full bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-400 timeline-line-grow rounded-full shadow-[0_0_15px_rgba(236,72,153,0.5)]"></div>
+                    <div class="absolute top-1/2 left-0 w-full h-px bg-white/5">
+                        <div class="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 timeline-line-grow"></div>
                     </div>
 
                     <!-- Timeline Loop -->
                     <div v-for="(item, index) in timelineItems" :key="item.id" 
                          :ref="el => itemRefs[index] = el"
                          :data-id="item.id"
-                         class="timeline-item flex-shrink-0 w-[450px] mx-12 relative"
-                         :class="[
-                             visibleItems.has(item.id) ? 'is-visible' : '',
-                             index % 2 === 0 ? '-translate-y-8' : 'translate-y-8'
-                         ]">
-                        
-                        <!-- Timeline Node -->
-                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center z-10 transition-transform duration-500"
-                             :class="visibleItems.has(item.id) ? 'scale-110' : 'scale-0'">
-                            <div class="w-4 h-4 rounded-full ring-4 ring-white dark:ring-[#030712] shadow-xl"
-                                 :class="{
-                                     'bg-purple-600 shadow-purple-500/50': item.type === 'experience',
-                                     'bg-cyan-500 shadow-cyan-500/50': item.type === 'education',
-                                     'bg-pink-600 shadow-pink-500/50': item.type === 'project'
-                                 }">
-                            </div>
-                        </div>
+                         class="timeline-item flex-shrink-0 w-[320px] mx-8 relative cursor-pointer transition-[opacity,filter] duration-700"
+                         :class="visibleItems.has(item.id) ? 'is-visible' : ''"
+                         :style="{ transform: `translateY(${index % 2 === 0 ? '-90px' : '90px'})` }"
+                         @click="handleTimelineClick(item)">
 
                         <!-- Content Card -->
                         <div class="group">
-                            <div class="bg-white/60 dark:bg-white/5 backdrop-blur-xl p-6 rounded-[2rem] border border-white/20 dark:border-white/10 shadow-xl group-hover:border-current transition-all duration-300 relative overflow-hidden"
+                            <div class="timeline-card rounded-2xl relative overflow-hidden transition-all duration-500 flex"
                                  :class="{
-                                     'hover:shadow-purple-500/20 text-purple-600 dark:text-purple-400': item.type === 'experience',
-                                     'hover:shadow-cyan-500/20 text-cyan-500 dark:text-cyan-400': item.type === 'education',
-                                     'hover:shadow-pink-500/20 text-pink-500 dark:text-pink-400': item.type === 'project'
+                                     'timeline-card--experience': item.type === 'experience',
+                                     'timeline-card--education': item.type === 'education',
+                                     'timeline-card--project': item.type === 'project'
                                  }">
-                                
-                                <div class="absolute -top-12 -right-12 w-24 h-24 bg-current opacity-5 blur-[40px] rounded-full group-hover:opacity-10 transition-opacity"></div>
 
-                                <div class="flex items-start justify-between mb-4">
-                                    <div class="flex items-center gap-3">
-                                        <div v-if="item.image" class="w-10 h-10 rounded-lg overflow-hidden bg-white/80 dark:bg-white/10 border border-current/20 p-1 flex-shrink-0">
-                                            <img :src="item.image" class="w-full h-full object-contain" />
+                                <!-- Left colored border accent -->
+                                <div class="w-1 flex-shrink-0 rounded-l-2xl transition-all duration-500 group-hover:w-1.5"
+                                     :class="{
+                                         'bg-gradient-to-b from-purple-400 to-violet-700': item.type === 'experience',
+                                         'bg-gradient-to-b from-cyan-300 to-blue-600': item.type === 'education',
+                                         'bg-gradient-to-b from-pink-400 to-rose-600': item.type === 'project'
+                                     }"></div>
+
+                                <!-- Card body -->
+                                <div class="flex-1 p-7 relative overflow-hidden">
+
+                                    <!-- Year as large background element -->
+                                    <div class="absolute -bottom-3 -right-2 text-[6rem] font-black leading-none font-mono select-none pointer-events-none opacity-[0.06] group-hover:opacity-[0.1] transition-opacity duration-500"
+                                         :class="{
+                                             'text-purple-400': item.type === 'experience',
+                                             'text-cyan-400': item.type === 'education',
+                                             'text-pink-400': item.type === 'project'
+                                         }">
+                                        <span v-if="item.is_current">NOW</span>
+                                        <span v-else-if="item.displayDate">{{ item.displayDate.getFullYear() }}</span>
+                                        <span v-else>{{ item.date.getFullYear() }}</span>
+                                    </div>
+
+                                    <!-- Category badge -->
+                                    <div class="flex items-center gap-2 mb-5">
+                                        <!-- Icon -->
+                                        <div class="w-6 h-6 flex items-center justify-center">
+                                            <svg v-if="item.type === 'experience'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                            <svg v-else-if="item.type === 'education'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path d="M12 14l9-5-9-5-9 5 9 5z" /><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+                                            </svg>
+                                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                            </svg>
                                         </div>
-                                        <div>
-                                            <span class="text-[9px] font-black uppercase tracking-widest opacity-60 mb-1 block">
-                                                {{ __(item.type) }}
+                                        <span class="text-[10px] font-black uppercase tracking-[0.25em]"
+                                              :class="{
+                                                  'text-purple-400': item.type === 'experience',
+                                                  'text-cyan-400': item.type === 'education',
+                                                  'text-pink-400': item.type === 'project'
+                                              }">{{ __(item.type) }}</span>
+                                    </div>
+
+                                    <!-- Title — dominant element -->
+                                    <h3 class="text-2xl font-black text-white leading-tight tracking-tight mb-4 group-hover:translate-x-1 transition-transform duration-300">
+                                        {{ item.title }}
+                                    </h3>
+
+                                    <!-- Bottom: logo + subtitle + arrow -->
+                                    <div class="flex items-center justify-between relative z-10 mt-2">
+                                        <div class="flex items-center gap-2.5">
+                                            <div v-if="item.image" class="w-6 h-6 rounded-md overflow-hidden bg-white/5 border border-white/10 p-0.5 flex-shrink-0">
+                                                <img :src="item.image" class="w-full h-full object-contain" />
+                                            </div>
+                                            <span class="text-[10px] font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-widest truncate max-w-[180px]">
+                                                {{ item.subtitle || item.location || '' }}
                                             </span>
-                                            <h3 class="text-lg font-black text-gray-900 dark:text-white leading-tight line-clamp-1">
-                                                {{ item.title }}
-                                            </h3>
                                         </div>
-                                    </div>
-                                    <div class="text-right flex-shrink-0">
-                                        <span class="text-[10px] font-black px-2 py-1 bg-current/10 rounded-lg">
-                                            {{ item.date.getFullYear() }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div v-if="item.type === 'project' && item.image" class="mt-4 mb-4 rounded-xl overflow-hidden border border-white/10 aspect-video relative group/img">
-                                    <img :src="item.image" class="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110" />
-                                </div>
-
-                                <p class="text-gray-600 dark:text-gray-400 text-xs leading-relaxed mb-4 line-clamp-3 group-hover:line-clamp-none transition-all duration-300">
-                                    {{ item.description }}
-                                </p>
-
-                                <div class="flex flex-wrap items-center justify-between gap-4 mt-auto">
-                                    <div class="flex gap-4">
-                                        <a v-if="item.project_url" :href="item.project_url" target="_blank" class="text-[9px] font-black uppercase tracking-wider hover:underline transition-all">{{ __('View Live') }}</a>
-                                        <a v-if="item.github_url" :href="item.github_url" target="_blank" class="text-[9px] font-black uppercase tracking-wider opacity-60 hover:opacity-100 transition-all">GitHub</a>
+                                        <!-- Arrow hint -->
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-0 group-hover:opacity-50 transition-all duration-300 group-hover:translate-x-0.5 flex-shrink-0"
+                                             :class="{
+                                                 'text-purple-400': item.type === 'experience',
+                                                 'text-cyan-400': item.type === 'education',
+                                                 'text-pink-400': item.type === 'project'
+                                             }"
+                                             fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                        </svg>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Date Spacer -->
-                        <div class="absolute top-full left-1/2 -translate-x-1/2 mt-8 text-4xl font-black text-gray-200 dark:text-white/5 select-none pointer-events-none transform -rotate-12 transition-all duration-500">
-                            {{ formatDate(item.date) }}
+                        <div class="absolute left-1/2 -translate-x-1/2 font-black select-none pointer-events-none transition-all duration-1000 whitespace-nowrap tracking-wider text-sm"
+                             :class="[
+                                 visibleItems.has(item.id) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-90',
+                                 index % 2 === 0 ? 'top-[108%]' : 'bottom-[108%]'
+                             ]">
+                            <span v-if="item.is_current"
+                                  class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"
+                                  :class="{
+                                      'bg-purple-500/20 text-purple-400 border border-purple-500/30': item.type === 'experience',
+                                      'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30': item.type === 'education',
+                                      'bg-pink-500/20 text-pink-400 border border-pink-500/30': item.type === 'project'
+                                  }">
+                                ● {{ __('Ongoing') }}
+                            </span>
+                            <span v-else class="text-white/20 text-[1.8vw] font-black tracking-tighter">
+                                {{ item.displayDate ? item.displayDate.toLocaleDateString('pt-PT', { month: 'short' }).replace('.', '').toUpperCase() + ' ' + item.displayDate.getFullYear() : item.date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.', '').toUpperCase() + ' ' + item.date.getFullYear() }}
+                            </span>
                         </div>
-                    </div>
-                </div>
-            </div>
+                    </div><!-- end timeline-item -->
+                    
+                    <!-- End Spacer (forces space after last card) -->
+                    <div class="flex-shrink-0 min-w-[150px] md:min-w-[200px] h-10"></div>
+                    
+                    </div><!-- end horizontalTarget inner div -->
+                </div><!-- end flex-1 cards row -->
+            </div><!-- end sticky container -->
         </section>
 
-        <!-- Mobile Vertical Timeline -->
         <section id="timeline-mobile" class="py-24 px-4 relative overflow-hidden md:hidden scroll-mt-24">
-            <h2 class="text-4xl font-black mb-16 text-center text-gray-900 dark:text-white uppercase tracking-tighter">
-                {{ __('History') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-500">&</span> {{ __('Projects') }}
+            <div class="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-white dark:from-[#030712]/50 dark:to-[#030712] pointer-events-none"></div>
+            
+            <h2 class="text-5xl font-black mb-20 text-center text-gray-900 dark:text-white uppercase tracking-tighter relative z-10">
+                {{ __('My') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500">{{ __('Journey') }}</span>
             </h2>
-            <div class="relative">
-                <div class="absolute left-4 top-0 bottom-0 w-[2px] bg-gray-200 dark:bg-white/5"></div>
-                <div v-for="item in timelineItems" :key="item.id" class="pl-10 mb-12 relative">
-                    <div class="absolute left-[13px] top-1.5 w-3 h-3 rounded-full ring-2 ring-white dark:ring-black"
+
+            <div class="relative max-w-lg mx-auto">
+                <div class="absolute left-6 top-0 bottom-0 w-[1px] bg-gradient-to-b from-pink-500 via-purple-500 to-cyan-500 opacity-30"></div>
+                
+                <div v-for="item in timelineItems" :key="item.id" class="pl-14 mb-12 relative group cursor-pointer" @click="handleTimelineClick(item)">
+                    <!-- Timeline Node -->
+                    <div class="absolute left-[19px] top-2 w-3.5 h-3.5 rounded-full ring-4 ring-white dark:ring-[#030712] transition-all duration-500 z-10"
                          :class="{
-                             'bg-purple-600 shadow-purple-500/50': item.type === 'experience',
-                             'bg-cyan-500 shadow-cyan-500/50': item.type === 'education',
-                             'bg-pink-600 shadow-pink-500/50': item.type === 'project'
+                             'bg-purple-600 shadow-[0_0_15px_rgba(147,51,234,0.5)]': item.type === 'experience',
+                             'bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)]': item.type === 'education',
+                             'bg-pink-600 shadow-[0_0_15px_rgba(219,39,119,0.5)]': item.type === 'project'
                          }">
                     </div>
-                    <div class="bg-white/60 dark:bg-white/5 backdrop-blur-xl p-6 rounded-2xl border border-white/20 dark:border-white/10">
-                        <span class="text-[10px] font-black uppercase tracking-widest opacity-60 mb-2 block">{{ item.date.getFullYear() }} // {{ __(item.type) }}</span>
-                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">{{ item.title }}</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-3">{{ item.description }}</p>
-                        <div class="flex gap-4">
-                            <a v-if="item.project_url" :href="item.project_url" target="_blank" class="text-xs font-bold uppercase tracking-wider text-current">{{ __('View Live') }}</a>
-                            <a v-if="item.github_url" :href="item.github_url" target="_blank" class="text-xs font-bold uppercase tracking-wider opacity-60">GitHub</a>
+
+                    <div class="timeline-card p-5 rounded-2xl relative overflow-hidden"
+                         :class="{
+                             'timeline-card--experience': item.type === 'experience',
+                             'timeline-card--education': item.type === 'education',
+                             'timeline-card--project': item.type === 'project'
+                         }">
+                        <!-- Top accent -->
+                        <div class="absolute top-0 left-0 right-0 h-[2px]"
+                             :class="{
+                                 'bg-gradient-to-r from-purple-500 to-violet-600': item.type === 'experience',
+                                 'bg-gradient-to-r from-cyan-400 to-blue-500': item.type === 'education',
+                                 'bg-gradient-to-r from-pink-500 to-rose-500': item.type === 'project'
+                             }"></div>
+
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-[10px] font-black uppercase tracking-[0.2em]"
+                                  :class="{
+                                      'text-purple-500': item.type === 'experience',
+                                      'text-cyan-500': item.type === 'education',
+                                      'text-pink-500': item.type === 'project'
+                                  }">
+                                <template v-if="item.is_current">● {{ __('Ongoing') }}</template>
+                                <template v-else>{{ item.displayDate ? item.displayDate.getFullYear() : item.date.getFullYear() }}</template>
+                                · {{ __(item.type) }}
+                            </span>
+                            <div v-if="item.image" class="w-7 h-7 rounded-lg overflow-hidden bg-white/5 border border-white/10 p-0.5">
+                                <img :src="item.image" class="w-full h-full object-contain" />
+                            </div>
                         </div>
+
+                        <h3 class="text-lg font-black text-gray-900 dark:text-white mb-1.5 leading-tight">{{ item.title }}</h3>
+                        <p class="text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest">
+                            {{ item.subtitle || item.location || '' }}
+                        </p>
                     </div>
                 </div>
             </div>
