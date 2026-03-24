@@ -1,6 +1,7 @@
 <IfModule mod_rewrite.c>
+    # Removido Options -MultiViews -Indexes pois causa erro 500 na InfinityFree
     <IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
+        # Options -MultiViews -Indexes
     </IfModule>
 
     RewriteEngine On
