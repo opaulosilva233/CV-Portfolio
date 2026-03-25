@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Interest extends Model
 {
+    use \App\Traits\ClearsPortfolioCache;
+
     protected $fillable = [
         'name',
         'description',

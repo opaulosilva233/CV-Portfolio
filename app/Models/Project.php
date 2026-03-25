@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Project extends Model
 {
     /** @use HasFactory<\Database\Factories\ProjectFactory> */
-    use HasFactory, \App\Traits\HasTranslations;
+    use HasFactory, \App\Traits\HasTranslations, \App\Traits\ClearsPortfolioCache;
 
     public function getTranslatableFields()
     {

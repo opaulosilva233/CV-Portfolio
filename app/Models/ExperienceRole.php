@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ExperienceRole extends Model
 {
-    use \App\Traits\HasTranslations;
+    use \App\Traits\HasTranslations, \App\Traits\ClearsPortfolioCache;
 
     public function getTranslatableFields()
     {
