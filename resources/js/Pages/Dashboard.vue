@@ -167,6 +167,49 @@ const getIcon = (type) => {
         default: return 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z';
     }
 };
+
+const analyticsSummaryCards = [
+    {
+        key: 'total_views',
+        label: 'Total Views',
+        color: 'text-cyan-400',
+        iconBg: 'bg-cyan-500/20',
+        border: 'border-cyan-500/30',
+        cardGlow: 'from-cyan-500/5 to-transparent',
+        icon: 'M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM8 10h8M8 14h5',
+        format: 'number',
+    },
+    {
+        key: 'unique_visitors',
+        label: 'Unique Visitors',
+        color: 'text-purple-400',
+        iconBg: 'bg-purple-500/20',
+        border: 'border-purple-500/30',
+        cardGlow: 'from-purple-500/5 to-transparent',
+        icon: 'M12 12a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 1114 0H5z',
+        format: 'number',
+    },
+    {
+        key: 'avg_session_duration_seconds',
+        label: 'Avg Session Time',
+        color: 'text-emerald-400',
+        iconBg: 'bg-emerald-500/20',
+        border: 'border-emerald-500/30',
+        cardGlow: 'from-emerald-500/5 to-transparent',
+        icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+        format: 'duration',
+    },
+    {
+        key: 'most_engaged_section',
+        label: 'Most Engaged Section',
+        color: 'text-pink-400',
+        iconBg: 'bg-pink-500/20',
+        border: 'border-pink-500/30',
+        cardGlow: 'from-pink-500/5 to-transparent',
+        icon: 'M12 8v8m-4-4h8',
+        format: 'section',
+    },
+];
 </script>
 
 <template>
@@ -204,6 +247,38 @@ const getIcon = (type) => {
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 {{ __('New Project') }}
                             </Link>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Snapshot -->
+                <div class="mb-8">
+                    <div class="flex items-end justify-between mb-4">
+                        <div>
+                            <h4 class="text-lg font-bold text-white">{{ __('Analytics Snapshot') }}</h4>
+                            <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">{{ __('Top level metrics on the dashboard home') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div v-for="card in analyticsSummaryCards" :key="card.key" class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-br" :class="card.cardGlow"></div>
+                            <div class="relative z-10 flex items-center justify-between gap-4">
+                                <div class="min-w-0">
+                                    <p class="text-sm font-medium text-gray-400 uppercase tracking-wider">{{ __(card.label) }}</p>
+                                    <template v-if="loadingAnalytics">
+                                        <div class="h-8 w-20 mt-2 bg-white/5 animate-pulse rounded"></div>
+                                    </template>
+                                    <template v-else>
+                                        <h4 v-if="card.format === 'number'" class="text-3xl font-bold text-white mt-1">{{ analyticsData[card.key] }}</h4>
+                                        <h4 v-else-if="card.format === 'duration'" class="text-3xl font-bold text-white mt-1">{{ formatDuration(analyticsData[card.key]) }}</h4>
+                                        <h4 v-else class="text-2xl font-bold text-white mt-2 truncate">{{ analyticsData.most_engaged_section?.label || __('N/A') }}</h4>
+                                    </template>
+                                </div>
+                                <div class="w-12 h-12 rounded-xl flex items-center justify-center border" :class="[card.iconBg, card.border, card.color]">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="card.icon"></path></svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -294,27 +369,6 @@ const getIcon = (type) => {
                                 <span class="text-xs text-gray-500 italic">{{ __('Loading matrix...') }}</span>
                             </div>
                             <Line v-else-if="analyticsData" :data="getChartData()" :options="chartOptions" />
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6" v-if="!loadingAnalytics && analyticsData">
-                            <div class="rounded-xl border border-white/10 bg-white/5 p-3">
-                                <p class="text-[10px] text-gray-400 uppercase tracking-widest">{{ __('Most Engaged Section') }}</p>
-                                <p class="mt-1 text-sm font-bold text-cyan-300">
-                                    {{ analyticsData.most_engaged_section?.label || __('N/A') }}
-                                </p>
-                            </div>
-                            <div class="rounded-xl border border-white/10 bg-white/5 p-3">
-                                <p class="text-[10px] text-gray-400 uppercase tracking-widest">{{ __('Avg Time / Visitor') }}</p>
-                                <p class="mt-1 text-sm font-bold text-purple-300">
-                                    {{ formatDuration(analyticsData.avg_engagement_per_visitor_seconds) }}
-                                </p>
-                            </div>
-                            <div class="rounded-xl border border-white/10 bg-white/5 p-3">
-                                <p class="text-[10px] text-gray-400 uppercase tracking-widest">{{ __('Avg Session Time') }}</p>
-                                <p class="mt-1 text-sm font-bold text-emerald-300">
-                                    {{ formatDuration(analyticsData.avg_session_duration_seconds) }}
-                                </p>
-                            </div>
                         </div>
                     </div>
 
