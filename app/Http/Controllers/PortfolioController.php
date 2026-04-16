@@ -15,29 +15,40 @@ class PortfolioController extends Controller
 {
     public function index()
     {
-        // Cache portfolio data for better performance
-        $projects = Cache::remember('portfolio_projects', 3600, function () {
+        // Cache portfolio data for better performance, but refresh stale empty values
+        // when the database already has records.
+        $projects = $this->rememberPortfolioData('portfolio_projects', 3600, function () {
             return Project::with(['translations', 'skills'])->where('is_featured', true)->orderBy('completed_at', 'desc')->get();
+        }, function () {
+            return Project::where('is_featured', true)->exists();
         });
 
-        $skills = Cache::remember('portfolio_skills', 3600, function () {
+        $skills = $this->rememberPortfolioData('portfolio_skills', 3600, function () {
             return Skill::with('translations')->orderBy('sort_order')->get()->groupBy('category');
+        }, function () {
+            return Skill::exists();
         });
 
-        $experiences = Cache::remember('portfolio_experiences', 3600, function () {
+        $experiences = $this->rememberPortfolioData('portfolio_experiences', 3600, function () {
             return Experience::with(['translations', 'skills', 'roles' => function ($q) {
                 $q->with(['translations', 'education.translations'])->orderBy('start_date', 'desc');
             }])->orderBy('sort_order')->get()->sortByDesc(function ($exp) {
                 return $exp->roles->max('start_date');
             })->values();
+        }, function () {
+            return Experience::exists();
         });
 
-        $educations = Cache::remember('portfolio_educations', 3600, function () {
+        $educations = $this->rememberPortfolioData('portfolio_educations', 3600, function () {
             return \App\Models\Education::with(['translations', 'skills'])->orderBy('start_date', 'desc')->get();
+        }, function () {
+            return \App\Models\Education::exists();
         });
 
-        $interests = Cache::remember('portfolio_interests', 3600, function () {
+        $interests = $this->rememberPortfolioData('portfolio_interests', 3600, function () {
             return \App\Models\Interest::where('is_active', true)->orderBy('order')->get()->groupBy('category');
+        }, function () {
+            return \App\Models\Interest::where('is_active', true)->exists();
         });
 
         return Inertia::render('Welcome', [
@@ -69,6 +80,27 @@ class PortfolioController extends Controller
                 'keywords' => SiteSetting::getValue('seo_keywords', ''),
             ]
         ]);
+    }
+
+    private function rememberPortfolioData(string $key, int $ttl, \Closure $resolver, \Closure $hasData)
+    {
+        $data = Cache::remember($key, $ttl, $resolver);
+
+        if ($this->isEmptyPortfolioData($data) && $hasData()) {
+            $data = $resolver();
+            Cache::put($key, $data, $ttl);
+        }
+
+        return $data;
+    }
+
+    private function isEmptyPortfolioData($data): bool
+    {
+        if ($data instanceof \Countable) {
+            return count($data) === 0;
+        }
+
+        return empty($data);
     }
 
     public function storeMessage(Request $request)
