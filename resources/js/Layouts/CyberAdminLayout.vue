@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, onUnmounted } from 'vue';
-import { Link } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import ThemeToggle from '@/Components/ThemeToggle.vue';
 import ApplicationLogo from '@/Components/ApplicationLogo.vue';
 import Dropdown from '@/Components/Dropdown.vue';
@@ -61,6 +61,10 @@ const menuItems = [
 </script>
 
 <template>
+    <Head>
+        <meta name="robots" content="noindex,nofollow" />
+    </Head>
+
     <div 
         ref="containerRef"
         class="min-h-screen relative overflow-hidden bg-gray-100 dark:bg-[#030303] transition-colors duration-500 font-sans text-gray-900 dark:text-gray-100 flex"

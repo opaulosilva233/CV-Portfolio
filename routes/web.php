@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', [\App\Http\Controllers\PortfolioController::class, 'index'])->name('home');
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap');
 
 Route::post('/language', [\App\Http\Controllers\LanguageController::class, 'update'])->name('language.switch');
 Route::post('/contact', [\App\Http\Controllers\PortfolioController::class, 'storeMessage'])->name('contact.store');

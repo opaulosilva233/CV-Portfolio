@@ -22,6 +22,127 @@ const props = defineProps({
     contact_phone: String,
     contact_address: String,
     resume_url: String,
+    locale: {
+        type: String,
+        default: 'en',
+    },
+});
+
+const supportedLocales = ['en', 'pt', 'nl'];
+const defaultLocale = 'en';
+const ogLocaleMap = {
+    en: 'en_US',
+    pt: 'pt_PT',
+    nl: 'nl_NL',
+};
+
+const pageUrl = computed(() => {
+    if (typeof window === 'undefined') {
+        return '/';
+    }
+
+    return `${window.location.origin}${window.location.pathname}`;
+});
+
+const currentLocale = computed(() => {
+    return supportedLocales.includes(props.locale) ? props.locale : defaultLocale;
+});
+
+const canonicalUrl = computed(() => {
+    if (currentLocale.value === defaultLocale) {
+        return pageUrl.value;
+    }
+
+    return `${pageUrl.value}?lang=${currentLocale.value}`;
+});
+
+const alternateLanguageUrls = computed(() => {
+    return supportedLocales.map((locale) => ({
+        locale,
+        url: locale === defaultLocale ? pageUrl.value : `${pageUrl.value}?lang=${locale}`,
+    }));
+});
+
+const metaTitle = computed(() => {
+    if (props.seo?.title) {
+        return props.seo.title;
+    }
+
+    return [props.hero?.name, props.hero?.title].filter(Boolean).join(' | ') || 'Portfolio';
+});
+
+const metaDescription = computed(() => {
+    return props.seo?.description || props.hero?.bio || 'Portfolio website with projects, skills and professional experience.';
+});
+
+const metaKeywords = computed(() => {
+    return props.seo?.keywords || 'portfolio, developer, web developer';
+});
+
+const ogImageUrl = computed(() => {
+    const imageUrl = props.hero?.image || '/images/Logotipo.png';
+
+    if (typeof window === 'undefined') {
+        return imageUrl;
+    }
+
+    try {
+        return new URL(imageUrl, window.location.origin).toString();
+    } catch {
+        return imageUrl;
+    }
+});
+
+const ogLocale = computed(() => {
+    return ogLocaleMap[currentLocale.value] || 'en_US';
+});
+
+const ogAlternateLocales = computed(() => {
+    return supportedLocales
+        .filter((locale) => locale !== currentLocale.value)
+        .map((locale) => ogLocaleMap[locale] || 'en_US');
+});
+
+const twitterHandle = computed(() => {
+    const twitterUrl = props.socials?.Twitter;
+
+    if (!twitterUrl) {
+        return null;
+    }
+
+    const normalized = twitterUrl.match(/(?:twitter\.com|x\.com)\/([A-Za-z0-9_]+)/i);
+
+    return normalized?.[1] ? `@${normalized[1]}` : null;
+});
+
+const structuredData = computed(() => {
+    return JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+            {
+                '@type': 'WebSite',
+                name: props.hero?.name || metaTitle.value,
+                url: pageUrl.value,
+                inLanguage: currentLocale.value,
+            },
+            {
+                '@type': 'Person',
+                name: props.hero?.name || 'Portfolio Owner',
+                jobTitle: props.hero?.title || undefined,
+                description: metaDescription.value,
+                url: canonicalUrl.value,
+                image: ogImageUrl.value,
+                sameAs: Object.values(props.socials || {}).filter(Boolean),
+            },
+            {
+                '@type': 'CollectionPage',
+                name: metaTitle.value,
+                description: metaDescription.value,
+                url: canonicalUrl.value,
+                inLanguage: currentLocale.value,
+            },
+        ],
+    });
 });
 
 const activeSection = ref('about');
@@ -524,9 +645,41 @@ const formatDate = (date) => {
 
 <template>
     <CyberLayout>
-        <Head :title="seo?.title || 'Portfolio'">
-            <meta name="description" :content="seo?.description" v-if="seo?.description" />
-            <meta name="keywords" :content="seo?.keywords" v-if="seo?.keywords" />
+        <Head :title="metaTitle">
+            <meta name="description" :content="metaDescription" />
+            <meta name="keywords" :content="metaKeywords" />
+            <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+            <link rel="canonical" :href="canonicalUrl" />
+            <link rel="alternate" hreflang="x-default" :href="pageUrl" />
+            <link
+                v-for="alternate in alternateLanguageUrls"
+                :key="alternate.locale"
+                rel="alternate"
+                :hreflang="alternate.locale"
+                :href="alternate.url"
+            />
+
+            <meta property="og:type" content="website" />
+            <meta property="og:site_name" :content="hero?.name || 'Portfolio'" />
+            <meta property="og:title" :content="metaTitle" />
+            <meta property="og:description" :content="metaDescription" />
+            <meta property="og:url" :content="canonicalUrl" />
+            <meta property="og:image" :content="ogImageUrl" />
+            <meta property="og:locale" :content="ogLocale" />
+            <meta
+                v-for="alternateLocale in ogAlternateLocales"
+                :key="alternateLocale"
+                property="og:locale:alternate"
+                :content="alternateLocale"
+            />
+
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" :content="metaTitle" />
+            <meta name="twitter:description" :content="metaDescription" />
+            <meta name="twitter:image" :content="ogImageUrl" />
+            <meta name="twitter:creator" :content="twitterHandle" v-if="twitterHandle" />
+
+            <script type="application/ld+json" v-html="structuredData"></script>
         </Head>
         
         <header class="fixed top-0 w-full z-50 bg-white/70 dark:bg-[#030712]/70 backdrop-blur-2xl transition-all duration-300">
@@ -650,7 +803,7 @@ const formatDate = (date) => {
                         <div class="relative w-full h-full rounded-full overflow-hidden border-4 border-white/20 dark:border-white/10 shadow-2xl">
                             <img 
                                 :src="hero.image || 'https://ui-avatars.com/api/?name=' + (hero.name || 'User') + '&background=random'" 
-                                alt="Profile" 
+                                :alt="`Foto de perfil de ${hero.name || 'portfolio owner'}`"
                                 class="w-full h-full object-cover"
                             />
                         </div>
@@ -816,7 +969,7 @@ const formatDate = (date) => {
                                     <div class="flex items-center justify-between relative z-10 mt-2">
                                         <div class="flex items-center gap-2.5">
                                             <div v-if="item.image" class="w-6 h-6 rounded-md overflow-hidden bg-white/5 border border-white/10 p-0.5 flex-shrink-0">
-                                                <img :src="item.image" class="w-full h-full object-contain" />
+                                                <img :src="item.image" :alt="`Imagem de ${item.title}`" class="w-full h-full object-contain" />
                                             </div>
                                             <span class="text-[10px] font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-widest truncate max-w-[180px]">
                                                 {{ item.subtitle || item.location || '' }}
@@ -912,7 +1065,7 @@ const formatDate = (date) => {
                                 · {{ __(item.type) }}
                             </span>
                             <div v-if="item.image" class="w-7 h-7 rounded-lg overflow-hidden bg-white/5 border border-white/10 p-0.5">
-                                <img :src="item.image" class="w-full h-full object-contain" />
+                                <img :src="item.image" :alt="`Imagem de ${item.title}`" class="w-full h-full object-contain" />
                             </div>
                         </div>
 
@@ -1184,7 +1337,7 @@ const formatDate = (date) => {
                                     @click="activeImageIndex = idx"
                                     class="w-24 h-16 flex-shrink-0 rounded-2xl overflow-hidden border-2 transition-all duration-500 transform hover:scale-110"
                                     :class="activeImageIndex === idx ? 'border-pink-500 shadow-lg shadow-pink-500/40 opacity-100' : 'border-white/5 opacity-40 hover:opacity-80 hover:border-white/20'">
-                                    <img :src="img.url" class="w-full h-full object-cover" />
+                                    <img :src="img.url" :alt="`Miniatura ${idx + 1} do projeto ${selectedProject.title}`" class="w-full h-full object-cover" />
                                 </button>
                             </div>
                         </div>
