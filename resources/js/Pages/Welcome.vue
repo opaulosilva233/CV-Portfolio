@@ -623,17 +623,17 @@ const formatDate = (date) => {
             <div class="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center gap-12">
                 <div class="lg:w-1/2 space-y-6">
                     <h2 class="text-sm font-bold text-cyan-600 dark:text-cyan-400 tracking-[0.2em] uppercase animate-pulse">
-                        {{ hero.title || 'Full Stack Developer' }}
+                        {{ hero.title || __('Full Stack Developer') }}
                     </h2>
                     <h1 class="text-5xl lg:text-7xl font-black tracking-tight text-gray-900 dark:text-white">
-                        Hi, I'm <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600">{{ hero.name }}</span>
+                        {{ __('Hi, I\'m') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600">{{ hero.name }}</span>
                     </h1>
                     <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-lg font-medium">
                         {{ hero.bio }}
                     </p>
                     <div class="pt-4 flex gap-4">
                         <a v-for="(link, platform) in socials" :key="platform" :href="link" target="_blank" class="px-6 py-3 bg-gray-900 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md border border-white/10 text-white dark:text-white rounded-xl font-bold uppercase tracking-wide hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-purple-500/30">
-                            {{ platform }}
+                            {{ __(platform) }}
                         </a>
                         <!-- FETCH_RESUME.EXE Button -->
                         <a v-if="resume_url" :href="resume_url" target="_blank" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:scale-105 hover:rotate-1 transition-all duration-300 shadow-xl shadow-emerald-500/20 group/resume flex items-center gap-3">

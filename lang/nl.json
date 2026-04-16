@@ -112,5 +112,19 @@
     "Region": "Regio",
     "FETCH_RESUME.EXE": "CURRICULUM_OPHALEN.EXE",
     "System": "Systeem",
-    "Access": "Toegang"
+    "Access": "Toegang",
+    "Interests": "Interesses",
+    "Timeline": "Tijdlijn",
+    "Professional": "Professioneel",
+    "Journey": "Reis",
+    "Academic": "Academisch",
+    "Background": "Achtergrond",
+    "Official Document": "Officieel Document",
+    "Featured": "Uitgelicht",
+    "In Progress": "Lopend",
+    "Full Stack Developer": "Full Stack Developer",
+    "Hi, I'm": "Hoi, ik ben",
+    "GitHub": "GitHub",
+    "LinkedIn": "LinkedIn",
+    "Web Developer": "Webontwikkelaar"
 }

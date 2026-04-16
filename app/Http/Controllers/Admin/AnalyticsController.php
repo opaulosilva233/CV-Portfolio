@@ -8,6 +8,8 @@ use App\Models\SectionEngagement;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class AnalyticsController extends Controller
 {
@@ -15,70 +17,75 @@ class AnalyticsController extends Controller
     {
         $days = 30;
         $startDate = Carbon::now()->subDays($days);
+        $chartData = $this->buildEmptyChartData($days);
 
-        // Total views last 30 days
-        $totalViews = PageView::where('created_at', '>=', $startDate)->count();
+        $totalViews = 0;
+        $uniqueVisitors = 0;
+        $totalEngagementSeconds = 0;
+        $averageEngagementPerVisitor = 0;
+        $averageSessionDuration = 0;
+        $sectionStats = collect();
 
-        // Unique visitors last 30 days
-        $uniqueVisitors = PageView::where('created_at', '>=', $startDate)
-            ->distinct('session_id')
-            ->count('session_id');
+        try {
+            if (Schema::hasTable('page_views')) {
+                $totalViews = PageView::where('created_at', '>=', $startDate)->count();
 
-        // Views per day for chart
-        $viewsPerDay = PageView::where('created_at', '>=', $startDate)
-            ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->pluck('count', 'date')
-            ->toArray();
+                $uniqueVisitors = PageView::where('created_at', '>=', $startDate)
+                    ->distinct('session_id')
+                    ->count('session_id');
 
-        // Fill missing days with 0
-        $chartData = [];
-        for ($i = $days; $i >= 0; $i--) {
-            $date = Carbon::now()->subDays($i)->format('Y-m-d');
-            $chartData[] = [
-                'date' => Carbon::now()->subDays($i)->format('d/m'),
-                'views' => $viewsPerDay[$date] ?? 0
-            ];
+                $viewsPerDay = PageView::where('created_at', '>=', $startDate)
+                    ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
+                    ->groupBy('date')
+                    ->orderBy('date')
+                    ->get()
+                    ->pluck('count', 'date')
+                    ->toArray();
+
+                $chartData = $this->buildChartDataFromViews($days, $viewsPerDay);
+            }
+
+            if (Schema::hasTable('section_engagements')) {
+                $engagementQuery = SectionEngagement::where('created_at', '>=', $startDate);
+
+                $totalEngagementSeconds = (int) $engagementQuery->sum('duration_seconds');
+
+                $averageEngagementPerVisitor = $uniqueVisitors > 0
+                    ? round($totalEngagementSeconds / $uniqueVisitors)
+                    : 0;
+
+                $averageSessionDuration = (int) SectionEngagement::where('created_at', '>=', $startDate)
+                    ->select('session_id', DB::raw('SUM(duration_seconds) as session_duration'))
+                    ->groupBy('session_id')
+                    ->get()
+                    ->avg('session_duration');
+
+                $sectionStats = SectionEngagement::where('created_at', '>=', $startDate)
+                    ->select(
+                        'section',
+                        DB::raw('SUM(duration_seconds) as total_seconds'),
+                        DB::raw('AVG(duration_seconds) as average_seconds'),
+                        DB::raw('COUNT(*) as interactions'),
+                        DB::raw('COUNT(DISTINCT session_id) as unique_visitors')
+                    )
+                    ->groupBy('section')
+                    ->orderByDesc('total_seconds')
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'section' => $item->section,
+                            'label' => $this->formatSectionLabel($item->section),
+                            'total_seconds' => (int) $item->total_seconds,
+                            'average_seconds' => (int) round($item->average_seconds),
+                            'interactions' => (int) $item->interactions,
+                            'unique_visitors' => (int) $item->unique_visitors,
+                        ];
+                    })
+                    ->values();
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Analytics stats fallback used: ' . $e->getMessage());
         }
-
-        $engagementQuery = SectionEngagement::where('created_at', '>=', $startDate);
-
-        $totalEngagementSeconds = (int) $engagementQuery->sum('duration_seconds');
-
-        $averageEngagementPerVisitor = $uniqueVisitors > 0
-            ? round($totalEngagementSeconds / $uniqueVisitors)
-            : 0;
-
-        $averageSessionDuration = (int) SectionEngagement::where('created_at', '>=', $startDate)
-            ->select('session_id', DB::raw('SUM(duration_seconds) as session_duration'))
-            ->groupBy('session_id')
-            ->get()
-            ->avg('session_duration');
-
-        $sectionStats = SectionEngagement::where('created_at', '>=', $startDate)
-            ->select(
-                'section',
-                DB::raw('SUM(duration_seconds) as total_seconds'),
-                DB::raw('AVG(duration_seconds) as average_seconds'),
-                DB::raw('COUNT(*) as interactions'),
-                DB::raw('COUNT(DISTINCT session_id) as unique_visitors')
-            )
-            ->groupBy('section')
-            ->orderByDesc('total_seconds')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'section' => $item->section,
-                    'label' => $this->formatSectionLabel($item->section),
-                    'total_seconds' => (int) $item->total_seconds,
-                    'average_seconds' => (int) round($item->average_seconds),
-                    'interactions' => (int) $item->interactions,
-                    'unique_visitors' => (int) $item->unique_visitors,
-                ];
-            })
-            ->values();
 
         return response()->json([
             'total_views' => $totalViews,
@@ -94,6 +101,10 @@ class AnalyticsController extends Controller
 
     public function trackSectionEngagement(Request $request)
     {
+        if (!Schema::hasTable('section_engagements')) {
+            return response()->noContent();
+        }
+
         $validated = $request->validate([
             'entries' => ['required', 'array', 'min:1', 'max:30'],
             'entries.*.section' => ['required', 'string', 'max:100'],
@@ -136,5 +147,35 @@ class AnalyticsController extends Controller
     private function formatSectionLabel(string $section): string
     {
         return ucwords(str_replace('-', ' ', $section));
+    }
+
+    private function buildEmptyChartData(int $days): array
+    {
+        $chartData = [];
+
+        for ($i = $days; $i >= 0; $i--) {
+            $chartData[] = [
+                'date' => Carbon::now()->subDays($i)->format('d/m'),
+                'views' => 0,
+            ];
+        }
+
+        return $chartData;
+    }
+
+    private function buildChartDataFromViews(int $days, array $viewsPerDay): array
+    {
+        $chartData = [];
+
+        for ($i = $days; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
+
+            $chartData[] = [
+                'date' => Carbon::now()->subDays($i)->format('d/m'),
+                'views' => $viewsPerDay[$date] ?? 0,
+            ];
+        }
+
+        return $chartData;
     }
 }

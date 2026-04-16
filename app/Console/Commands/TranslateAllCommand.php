@@ -11,7 +11,7 @@ class TranslateAllCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'translate:all';
+    protected $signature = 'translate:all {--force : Recreate translations even when they already exist}';
 
     /**
      * The console command description.
@@ -25,7 +25,11 @@ class TranslateAllCommand extends Command
      */
     public function handle(\App\Services\TranslationService $service)
     {
-        $this->info('Starting translation of all content...');
+        $force = (bool) $this->option('force');
+
+        $this->info($force
+            ? 'Starting forced translation of all content...'
+            : 'Starting translation of all content...');
 
         $models = [
             \App\Models\Project::class,
@@ -45,7 +49,7 @@ class TranslateAllCommand extends Command
             $bar->start();
 
             foreach ($records as $record) {
-                $service->translateModel($record);
+                $service->translateModel($record, $force);
                 $bar->advance();
             }
 

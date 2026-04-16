@@ -17,7 +17,7 @@ class TranslationService
     /**
      * Translate model's specific fields.
      */
-    public function translateModel($model): void
+    public function translateModel($model, bool $force = false): void
     {
         if (!method_exists($model, 'getTranslatableFields')) {
             return;
@@ -35,6 +35,13 @@ class TranslationService
 
             if (empty($originalText)) {
                 continue;
+            }
+
+            if ($force) {
+                Translation::where('translatable_type', get_class($model))
+                    ->where('translatable_id', $model->id)
+                    ->where('field', $field)
+                    ->delete();
             }
 
             foreach ($this->targetLocales as $locale) {
@@ -62,7 +69,7 @@ class TranslationService
 
         // Project specific logic for Gallery Metadata
         if ($model instanceof \App\Models\Project) {
-            $this->translateProjectGallery($model);
+            $this->translateProjectGallery($model, $force);
         }
 
         $this->refreshTranslatedContentCaches($model);
@@ -86,7 +93,7 @@ class TranslationService
     /**
      * Translates project gallery descriptions directly in metadata.json
      */
-    protected function translateProjectGallery(\App\Models\Project $project): void
+    protected function translateProjectGallery(\App\Models\Project $project, bool $force = false): void
     {
         $dir = storage_path('projects/' . $project->id);
         $metadataPath = $dir . '/metadata.json';
@@ -113,10 +120,7 @@ class TranslationService
                     $fullMetadata[$locale] = [];
                 }
 
-                // Translate only if it doesn't exist yet or if we want to force
-                // (To force it we would need to check if the PT source changed, but for now we just translate if missing or different)
-                // Actually, let's just translate if missing. If the user wants to force update, they can delete the key and save.
-                if (!isset($fullMetadata[$locale][$imageKey]) || empty($fullMetadata[$locale][$imageKey])) {
+                if ($force || !isset($fullMetadata[$locale][$imageKey]) || empty($fullMetadata[$locale][$imageKey])) {
                     try {
                         $translatedText = $this->translateText($description, $sourceLocale, $locale);
                         if ($translatedText) {

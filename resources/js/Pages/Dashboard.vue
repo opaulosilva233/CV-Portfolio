@@ -32,15 +32,30 @@ defineProps({
     recentActivity: Array,
 });
 
-const analyticsData = ref(null);
+const defaultAnalyticsData = () => ({
+    total_views: 0,
+    unique_visitors: 0,
+    chart_data: [],
+    total_engagement_seconds: 0,
+    avg_engagement_per_visitor_seconds: 0,
+    avg_session_duration_seconds: 0,
+    most_engaged_section: null,
+    section_stats: [],
+});
+
+const analyticsData = ref(defaultAnalyticsData());
 const loadingAnalytics = ref(true);
 
 const fetchAnalytics = async () => {
     try {
         const response = await axios.get(route('admin.analytics.stats'));
-        analyticsData.value = response.data;
+        analyticsData.value = {
+            ...defaultAnalyticsData(),
+            ...response.data,
+        };
     } catch (error) {
         console.error('Failed to fetch analytics:', error);
+        analyticsData.value = defaultAnalyticsData();
     } finally {
         loadingAnalytics.value = false;
     }
@@ -263,12 +278,12 @@ const getIcon = (type) => {
                             <div class="flex gap-4">
                                 <div class="text-right">
                                     <p class="text-[10px] text-gray-400 uppercase tracking-tighter">{{ __('Total Views') }}</p>
-                                    <p class="text-lg font-bold text-cyan-400" v-if="!loadingAnalytics">{{ analyticsData.total_views }}</p>
+                                    <p class="text-lg font-bold text-cyan-400" v-if="!loadingAnalytics && analyticsData">{{ analyticsData.total_views }}</p>
                                     <div class="h-6 w-12 bg-white/5 animate-pulse rounded mt-1" v-else></div>
                                 </div>
                                 <div class="text-right border-l border-white/10 pl-4">
                                     <p class="text-[10px] text-gray-400 uppercase tracking-tighter">{{ __('Unique Visitors') }}</p>
-                                    <p class="text-lg font-bold text-purple-400" v-if="!loadingAnalytics">{{ analyticsData.unique_visitors }}</p>
+                                    <p class="text-lg font-bold text-purple-400" v-if="!loadingAnalytics && analyticsData">{{ analyticsData.unique_visitors }}</p>
                                     <div class="h-6 w-12 bg-white/5 animate-pulse rounded mt-1" v-else></div>
                                 </div>
                             </div>
