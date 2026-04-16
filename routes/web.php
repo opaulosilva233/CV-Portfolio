@@ -8,6 +8,10 @@ Route::get('/', [\App\Http\Controllers\PortfolioController::class, 'index'])->na
 
 Route::post('/language', [\App\Http\Controllers\LanguageController::class, 'update'])->name('language.switch');
 Route::post('/contact', [\App\Http\Controllers\PortfolioController::class, 'storeMessage'])->name('contact.store');
+Route::post('/analytics/section-engagement', [\App\Http\Controllers\Admin\AnalyticsController::class, 'trackSectionEngagement'])
+    ->middleware('throttle:120,1')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class])
+    ->name('analytics.section-engagement.track');
 
 Route::get('/experiences/{experience}/image', [\App\Http\Controllers\Admin\ExperienceController::class, 'serveImage'])->name('experiences.image');
 Route::get('/projects/{project}/image/{filename?}', [\App\Http\Controllers\Admin\ProjectController::class, 'serveImage'])->name('projects.image');

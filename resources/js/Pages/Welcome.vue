@@ -26,7 +26,7 @@ const props = defineProps({
 
 const activeSection = ref('about');
 const sectionsList = ['about', 'interests', 'skills', 'timeline', 'terminal', 'contact'];
-const allSectionsList = ['about', 'interests', 'skills', 'timeline', 'experience', 'education', 'projects', 'terminal', 'contact'];
+const allSectionsList = ['about', 'interests', 'skills', 'timeline', 'timeline-mobile', 'experience', 'education', 'projects', 'terminal', 'contact'];
 const selectedProject = ref(null);
 const showProjectModal = ref(false);
 const activeImageIndex = ref(0);
@@ -67,6 +67,12 @@ const indicatorLeft = ref(0);
 const indicatorWidth = ref(0);
 const scrollProgress = ref(0);
 let observer = null;
+let engagementObserver = null;
+let engagementTickInterval = null;
+let engagementFlushInterval = null;
+const sectionVisibility = ref({});
+const sectionDurationsMs = ref({});
+const lastEngagementTickAt = ref(Date.now());
 
 const isDragging = ref(false);
 
@@ -214,7 +220,96 @@ const updateScrollProgress = () => {
 const itemRefs = ref([]);
 const visibleItems = ref(new Set());
 
+const normalizeTrackedSection = (id) => id === 'timeline-mobile' ? 'timeline' : id;
+
+const getTopVisibleSection = () => {
+    const entries = Object.entries(sectionVisibility.value)
+        .filter(([, ratio]) => ratio >= 0.2)
+        .sort((a, b) => b[1] - a[1]);
+
+    if (entries.length > 0) {
+        return normalizeTrackedSection(entries[0][0]);
+    }
+
+    return normalizeTrackedSection(activeSection.value);
+};
+
+const registerEngagementSlice = () => {
+    const now = Date.now();
+
+    if (document.hidden) {
+        lastEngagementTickAt.value = now;
+        return;
+    }
+
+    const elapsed = Math.max(0, now - lastEngagementTickAt.value);
+    const section = getTopVisibleSection();
+
+    if (section && elapsed > 0) {
+        sectionDurationsMs.value[section] = (sectionDurationsMs.value[section] || 0) + elapsed;
+    }
+
+    lastEngagementTickAt.value = now;
+};
+
+const buildEngagementPayload = () => {
+    return Object.entries(sectionDurationsMs.value)
+        .filter(([, milliseconds]) => milliseconds >= 1000)
+        .map(([section, milliseconds]) => ({
+            section,
+            duration_seconds: Math.round(milliseconds / 1000),
+            path: window.location.pathname === '/' ? 'home' : window.location.pathname.replace(/^\//, ''),
+        }));
+};
+
+const flushSectionEngagement = (useBeacon = false) => {
+    const entries = buildEngagementPayload();
+
+    if (entries.length === 0) {
+        return;
+    }
+
+    sectionDurationsMs.value = {};
+
+    const payload = JSON.stringify({ entries });
+    const endpoint = route('analytics.section-engagement.track');
+
+    if (useBeacon && navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon(endpoint, blob);
+        return;
+    }
+
+    fetch(endpoint, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+        body: payload,
+        keepalive: true,
+    }).catch(() => {
+        // Ignore telemetry transport failures.
+    });
+};
+
+const handleVisibilityChange = () => {
+    if (document.hidden) {
+        registerEngagementSlice();
+        flushSectionEngagement(true);
+    } else {
+        lastEngagementTickAt.value = Date.now();
+    }
+};
+
+const handlePageHide = () => {
+    registerEngagementSlice();
+    flushSectionEngagement(true);
+};
+
 onMounted(() => {
+    lastEngagementTickAt.value = Date.now();
+
     const itemObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -234,6 +329,8 @@ onMounted(() => {
                     const id = entry.target.id;
                     if (['experience', 'education', 'projects'].includes(id)) {
                         activeSection.value = 'timeline';
+                    } else if (id === 'timeline-mobile') {
+                        activeSection.value = 'timeline';
                     } else {
                         activeSection.value = id;
                     }
@@ -243,10 +340,22 @@ onMounted(() => {
         { rootMargin: '-30% 0px -70% 0px' }
     );
 
+    engagementObserver = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                sectionVisibility.value[entry.target.id] = entry.intersectionRatio;
+            });
+        },
+        {
+            threshold: [0, 0.2, 0.4, 0.6, 0.8, 1],
+        }
+    );
+
     allSectionsList.forEach((id) => {
         const el = document.getElementById(id);
         if (el) {
             observer.observe(el);
+            engagementObserver.observe(el);
         }
     });
 
@@ -254,6 +363,18 @@ onMounted(() => {
     window.addEventListener('scroll', handleTimelineScroll);
     window.addEventListener('resize', updateIndicator);
     window.addEventListener('resize', handleTimelineScroll);
+    window.addEventListener('pagehide', handlePageHide);
+    window.addEventListener('beforeunload', handlePageHide);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    engagementTickInterval = window.setInterval(() => {
+        registerEngagementSlice();
+    }, 3000);
+
+    engagementFlushInterval = window.setInterval(() => {
+        registerEngagementSlice();
+        flushSectionEngagement();
+    }, 15000);
     
     setTimeout(() => {
         updateIndicator();
@@ -264,10 +385,26 @@ onMounted(() => {
 
 onUnmounted(() => {
     if (observer) observer.disconnect();
+    if (engagementObserver) engagementObserver.disconnect();
+
+    registerEngagementSlice();
+    flushSectionEngagement(true);
+
+    if (engagementTickInterval) {
+        clearInterval(engagementTickInterval);
+    }
+
+    if (engagementFlushInterval) {
+        clearInterval(engagementFlushInterval);
+    }
+
     window.removeEventListener('scroll', updateScrollProgress);
     window.removeEventListener('scroll', handleTimelineScroll);
     window.removeEventListener('resize', updateIndicator);
     window.removeEventListener('resize', handleTimelineScroll);
+    window.removeEventListener('pagehide', handlePageHide);
+    window.removeEventListener('beforeunload', handlePageHide);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
 });
 
 const startDrag = (e) => {

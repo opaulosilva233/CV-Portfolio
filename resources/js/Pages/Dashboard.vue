@@ -111,6 +111,26 @@ const getChartData = () => {
     };
 };
 
+const formatDuration = (seconds) => {
+    const value = Number(seconds || 0);
+
+    if (value < 60) {
+        return `${value}s`;
+    }
+
+    const minutes = Math.floor(value / 60);
+    const remainder = value % 60;
+
+    if (minutes < 60) {
+        return remainder > 0 ? `${minutes}m ${remainder}s` : `${minutes}m`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
+};
+
 const formatDate = (dateString) => {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -260,23 +280,59 @@ const getIcon = (type) => {
                             </div>
                             <Line v-else-if="analyticsData" :data="getChartData()" :options="chartOptions" />
                         </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6" v-if="!loadingAnalytics && analyticsData">
+                            <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+                                <p class="text-[10px] text-gray-400 uppercase tracking-widest">{{ __('Most Engaged Section') }}</p>
+                                <p class="mt-1 text-sm font-bold text-cyan-300">
+                                    {{ analyticsData.most_engaged_section?.label || __('N/A') }}
+                                </p>
+                            </div>
+                            <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+                                <p class="text-[10px] text-gray-400 uppercase tracking-widest">{{ __('Avg Time / Visitor') }}</p>
+                                <p class="mt-1 text-sm font-bold text-purple-300">
+                                    {{ formatDuration(analyticsData.avg_engagement_per_visitor_seconds) }}
+                                </p>
+                            </div>
+                            <div class="rounded-xl border border-white/10 bg-white/5 p-3">
+                                <p class="text-[10px] text-gray-400 uppercase tracking-widest">{{ __('Avg Session Time') }}</p>
+                                <p class="mt-1 text-sm font-bold text-emerald-300">
+                                    {{ formatDuration(analyticsData.avg_session_duration_seconds) }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-xl">
-                        <h4 class="text-lg font-bold text-white mb-6">{{ __('Most Viewed Pages') }}</h4>
+                        <h4 class="text-lg font-bold text-white mb-2">{{ __('Section Engagement') }}</h4>
+                        <p class="text-xs text-gray-500 mb-6">{{ __('Single-page friendly insights') }}</p>
                         
                         <div class="space-y-4" v-if="!loadingAnalytics && analyticsData">
-                            <div v-for="page in analyticsData.top_pages" :key="page.path" class="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5 hover:border-cyan-500/30 transition-all group">
+                            <div v-for="section in analyticsData.section_stats" :key="section.section" class="p-3 rounded-xl bg-white/5 border border-white/5 hover:border-cyan-500/30 transition-all group">
                                 <div class="flex items-center gap-3 min-w-0">
                                     <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400 border border-cyan-500/20 group-hover:shadow-[0_0_10px_rgba(34,211,238,0.2)] transition-all">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                                     </div>
-                                    <span class="text-sm text-gray-300 truncate font-mono">/{{ page.path }}</span>
+                                    <div class="min-w-0">
+                                        <p class="text-sm text-gray-300 truncate font-semibold">{{ section.label }}</p>
+                                        <p class="text-[10px] text-gray-500 uppercase tracking-wider">
+                                            {{ section.unique_visitors }} {{ __('visitors') }} • {{ section.interactions }} {{ __('captures') }}
+                                        </p>
+                                    </div>
                                 </div>
-                                <span class="text-sm font-bold text-white bg-white/10 px-2 py-0.5 rounded-md">{{ page.count }}</span>
+                                <div class="mt-3 grid grid-cols-2 gap-2">
+                                    <div class="bg-black/20 rounded-lg px-2 py-1">
+                                        <p class="text-[10px] text-gray-500 uppercase">{{ __('Total Time') }}</p>
+                                        <p class="text-xs font-bold text-white">{{ formatDuration(section.total_seconds) }}</p>
+                                    </div>
+                                    <div class="bg-black/20 rounded-lg px-2 py-1">
+                                        <p class="text-[10px] text-gray-500 uppercase">{{ __('Avg Time') }}</p>
+                                        <p class="text-xs font-bold text-white">{{ formatDuration(section.average_seconds) }}</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div v-if="analyticsData.top_pages.length === 0" class="py-12 text-center text-gray-500 italic text-sm">
-                                {{ __('No tracking data yet.') }}
+                            <div v-if="analyticsData.section_stats.length === 0" class="py-12 text-center text-gray-500 italic text-sm">
+                                {{ __('No section engagement data yet.') }}
                             </div>
                         </div>
                         <div class="space-y-4" v-else>

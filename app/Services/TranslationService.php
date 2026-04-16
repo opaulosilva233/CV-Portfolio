@@ -64,6 +64,23 @@ class TranslationService
         if ($model instanceof \App\Models\Project) {
             $this->translateProjectGallery($model);
         }
+
+        $this->refreshTranslatedContentCaches($model);
+    }
+
+    /**
+     * Refresh caches that can mask freshly created translations.
+     */
+    protected function refreshTranslatedContentCaches(object $model): void
+    {
+        if ($model instanceof \App\Models\SiteSetting) {
+            \App\Models\SiteSetting::clearCache();
+        }
+
+        // Portfolio aggregates are cached for 1 hour and should be invalidated after translating.
+        if (method_exists($model, 'clearPortfolioCache')) {
+            $model::clearPortfolioCache();
+        }
     }
 
     /**
