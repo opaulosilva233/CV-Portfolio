@@ -1,6 +1,5 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import Breadcrumbs from '@/Components/Breadcrumbs.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, watch, computed } from 'vue';
 import { debounce } from '@/Composables/useDebounce';
@@ -12,11 +11,6 @@ const props = defineProps({
 
 const search = ref(props.filters.search);
 const selectedIds = ref([]);
-
-const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Messages', active: true },
-];
 
 watch(search, debounce((value) => {
     router.get(route('admin.messages.index'), { search: value }, {
@@ -64,13 +58,10 @@ const bulkDelete = () => {
 
     <CyberAdminLayout>
         <template #header>
-            <div class="flex items-center justify-between w-full gap-3">
-                <div class="flex flex-col min-w-0 flex-1">
-                    <Breadcrumbs :items="breadcrumbs" />
-                    <h2 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate">
-                        {{ __('Contact Messages') }}
-                    </h2>
-                </div>
+            <div class="flex items-center justify-between w-full">
+                <h2 class="text-lg sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate mr-4">
+                    {{ __('Contact Messages') }}
+                </h2>
             </div>
         </template>
 
