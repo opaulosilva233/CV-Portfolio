@@ -1,6 +1,5 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import Breadcrumbs from '@/Components/Breadcrumbs.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, watch, computed } from 'vue';
 import { debounce } from '@/Composables/useDebounce';
@@ -21,10 +20,6 @@ watch(() => props.projects, (newProjects) => {
     localProjects.value = [...newProjects];
 }, { deep: true });
 
-const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Projects', active: true },
-];
 
 watch(search, debounce((value) => {
     router.get(route('admin.projects.index'), { search: value }, {
@@ -82,17 +77,17 @@ const bulkDelete = () => {
     <CyberAdminLayout>
         <template #header>
             <div class="flex items-center justify-between w-full gap-3">
-                <div class="flex flex-col min-w-0 flex-1">
-                    <Breadcrumbs :items="breadcrumbs" />
-                    <h2 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate">
+                
+                    
+                    <h2 class="text-base sm:text-lg md:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate">
                         {{ __('Projects Management') }}
                     </h2>
-                </div>
+                
                 <Link :href="route('admin.projects.create')" class="flex-shrink-0 px-3 py-2 sm:px-5 sm:py-2.5 bg-blue-600/80 hover:bg-blue-500 border border-blue-500/50 rounded-xl font-semibold text-xs text-white uppercase tracking-wider shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all duration-300">
                     <span class="hidden sm:inline">{{ __('Add New Project') }}</span>
                     <span class="sm:hidden">{{ __('Add New') }}</span>
                 </Link>
-            </div>
+            
         </template>
 
         <div class="py-6">
@@ -105,14 +100,14 @@ const bulkDelete = () => {
                             <svg class="h-5 w-5 text-gray-500 group-focus-within:text-cyan-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
-                        </div>
+                        
                         <input 
                             v-model="search"
                             type="text" 
                             :placeholder="__('Search by title or description...')" 
                             class="block w-full pl-10 pr-3 py-2 border border-white/10 rounded-xl leading-5 bg-white/5 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 focus:border-cyan-500/50 sm:text-sm transition-all backdrop-blur-sm"
                         >
-                    </div>
+                    
 
                     <!-- Bulk Actions -->
                     <div v-if="selectedIds.length > 0" class="flex items-center gap-4 animate-in fade-in slide-in-from-right-4 duration-300">
@@ -125,13 +120,13 @@ const bulkDelete = () => {
                         >
                             {{ __('Delete Selected') }}
                         </button>
-                    </div>
+                    
 
                     <div v-else-if="!search" class="text-xs text-gray-500 italic flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"></path></svg>
                         {{ __('Drag items to reorder') }}
-                    </div>
-                </div>
+                    
+                
 
                 <div class="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl sm:rounded-2xl overflow-hidden">
                     <div class="p-6">
@@ -177,27 +172,27 @@ const bulkDelete = () => {
                                             <td class="px-2 py-4 whitespace-nowrap text-center">
                                                 <div :class="{ 'cursor-grab active:cursor-grabbing text-gray-600 hover:text-cyan-400': !search, 'opacity-20 cursor-not-allowed': search }" class="drag-handle transition-colors">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
-                                                </div>
+                                                
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="flex items-center gap-3">
                                                     <img v-if="project.main_image_url" :src="project.main_image_url" :alt="project.title" class="w-10 h-10 rounded-lg object-contain bg-white/10 border border-white/10 p-0.5 flex-shrink-0 group-hover:border-cyan-500/30 transition-colors" />
                                                     <div v-else class="w-10 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0 group-hover:border-cyan-500/30 transition-colors">
                                                         <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                                    </div>
+                                                    
                                                     <div class="min-w-0">
-                                                        <div class="text-sm font-medium text-white truncate group-hover:text-cyan-400 transition-colors">{{ project.title }}</div>
+                                                        <div class="text-sm font-medium text-white truncate group-hover:text-cyan-400 transition-colors">{{ project.title }}
                                                         <div class="text-[10px] text-cyan-400/70 truncate mt-0.5 font-mono" v-if="project.project_url">
                                                             <a :href="project.project_url" target="_blank" class="hover:underline">{{ project.project_url.replace('https://', '') }}</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                        
+                                                    
+                                                
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
                                                 <div class="text-sm font-mono text-gray-300">
                                                     <span v-if="project.in_progress" class="text-purple-400 font-semibold italic">{{ __('In Progress') }}</span>
                                                     <span v-else>{{ project.completed_at ? new Date(project.completed_at).toLocaleDateString() : 'N/A' }}</span>
-                                                </div>
+                                                
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                                 <div class="flex justify-center gap-2">
@@ -207,13 +202,13 @@ const bulkDelete = () => {
                                                     <span class="px-2 py-0.5 inline-flex text-[10px] font-bold uppercase rounded bg-purple-500/20 text-purple-400 border border-purple-500/30 shadow-[0_0_10px_rgba(168,85,247,0.2)]" v-if="project.in_progress">
                                                         {{ __('Active') }}
                                                     </span>
-                                                </div>
+                                                
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div class="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <Link :href="route('admin.projects.edit', project.id)" class="text-cyan-400 hover:text-cyan-300 transition-colors">{{ __('Edit') }}</Link>
                                                     <Link :href="route('admin.projects.destroy', project.id)" method="delete" as="button" class="text-red-400 hover:text-red-300 transition-colors" onclick="return confirm(__('Are you sure?'))">{{ __('Delete') }}</Link>
-                                                </div>
+                                                
                                             </td>
                                         </tr>
                                     </template>
@@ -226,11 +221,11 @@ const bulkDelete = () => {
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
+                        
 
-                    </div>
-                </div>
-            </div>
-        </div>
+                    
+                
+            
+        
     </CyberAdminLayout>
 </template>
