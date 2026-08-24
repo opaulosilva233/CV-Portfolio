@@ -55,7 +55,7 @@ class AnalyticsController extends Controller
             'total_engagement_seconds' => collect($analyticsData['section_engagement'])->sum('total_seconds'),
             'avg_engagement_per_visitor_seconds' => $analyticsData['overview']['avg_session_duration_seconds'],
             'avg_session_duration_seconds' => $analyticsData['overview']['avg_session_duration_seconds'],
-            'most_engaged_section' => $analyticsData['section_engagement']->first(),
+            'most_engaged_section' => collect($analyticsData['section_engagement'])->first(),
         ]);
     }
 
