@@ -22,8 +22,7 @@ watch(() => props.projects, (newProjects) => {
 }, { deep: true });
 
 const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Projects', active: true },
+    { label: 'Projects Portfolio', active: true },
 ];
 
 watch(search, debounce((value) => {

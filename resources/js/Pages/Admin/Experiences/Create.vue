@@ -30,9 +30,7 @@ const form = useCachedForm('experience_create', {
 });
 
 const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Experiences', href: route('admin.experiences.index') },
-    { label: 'Create', active: true },
+    { label: 'Professional Experiences', active: true },
 ];
 
 const imagePreview = ref(null);

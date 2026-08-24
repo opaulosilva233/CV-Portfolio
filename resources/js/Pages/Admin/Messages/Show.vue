@@ -20,9 +20,7 @@ const formatDate = (dateString) => {
 };
 
 const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Messages', href: route('admin.messages.index') },
-    { label: 'View Message', active: true },
+    { label: 'Contact Messages', active: true },
 ];
 
 const form = useForm({

@@ -27,9 +27,7 @@ const form = useForm({
 });
 
 const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Projects', href: route('admin.projects.index') },
-    { label: 'Edit', active: true },
+    { label: 'Projects Portfolio', active: true },
 ];
 
 const galleryItems = ref([]);

@@ -23,9 +23,7 @@ const form = useCachedForm('education_create', {
 });
 
 const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Education', href: route('admin.education.index') },
-    { label: 'Create', active: true },
+    { label: 'Education & Certificates', active: true },
 ];
 
 const imagePreview = ref(null);

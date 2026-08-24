@@ -26,9 +26,7 @@ const form = useCachedForm(`education_edit_${props.education.id}`, {
 });
 
 const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Education', href: route('admin.education.index') },
-    { label: 'Edit', active: true },
+    { label: 'Education & Certificates', active: true },
 ];
 
 const imagePreview = ref(null);

@@ -22,9 +22,7 @@ const form = useCachedForm('skill_create', {
 });
 
 const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Skills', href: route('admin.skills.index') },
-    { label: 'Create', active: true },
+    { label: 'Skills & Competencies', active: true },
 ];
 
 const setStars = (n) => {

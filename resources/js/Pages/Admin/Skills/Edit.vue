@@ -23,9 +23,7 @@ const form = useCachedForm(`skill_edit_${props.skill.id}`, {
 });
 
 const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Skills', href: route('admin.skills.index') },
-    { label: 'Edit', active: true },
+    { label: 'Skills & Competencies', active: true },
 ];
 
 const setStars = (n) => {

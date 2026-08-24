@@ -35,9 +35,7 @@ const form = useCachedForm(`experience_edit_${props.experience.id}`, {
 });
 
 const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Experiences', href: route('admin.experiences.index') },
-    { label: 'Edit', active: true },
+    { label: 'Professional Experiences', active: true },
 ];
 
 const imagePreview = ref(null);
