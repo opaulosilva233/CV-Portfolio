@@ -158,8 +158,7 @@ const bulkDelete = () => {
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-xs text-gray-400 font-mono">
-                                                {{ new Date(message.created_at).toLocaleDateString() </div>}}
-                                            </div>
+                                                {{ new Date(message.created_at).toLocaleDateString() }}
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
