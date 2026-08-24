@@ -45,6 +45,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('admin/settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
 
     Route::get('admin/analytics/stats', [\App\Http\Controllers\Admin\AnalyticsController::class, 'getStats'])->name('admin.analytics.stats');
+    Route::get('admin/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('admin.analytics.index');
 });
 
 require __DIR__ . '/auth.php';

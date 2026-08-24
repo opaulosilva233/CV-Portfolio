@@ -5,97 +5,57 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\PageView;
 use App\Models\SectionEngagement;
+use App\Services\AnalyticsService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Inertia\Inertia;
 
 class AnalyticsController extends Controller
 {
+    public function __construct(
+        private AnalyticsService $analyticsService
+    ) {}
+
+    /**
+     * Display the analytics dashboard page.
+     */
+    public function index(Request $request)
+    {
+        $days = $request->input('days', 30);
+        $analyticsData = $this->analyticsService->getAnalyticsData((int) $days);
+
+        return Inertia::render('Admin/Analytics/Index', [
+            'analytics' => $analyticsData,
+            'period' => [
+                'days' => (int) $days,
+                'available_periods' => [7, 14, 30, 60, 90],
+            ],
+        ]);
+    }
+
+    /**
+     * Get analytics stats as JSON (for backward compatibility and AJAX calls).
+     */
     public function getStats()
     {
         $days = 30;
-        $startDate = Carbon::now()->subDays($days);
-        $chartData = $this->buildEmptyChartData($days);
-
-        $totalViews = 0;
-        $uniqueVisitors = 0;
-        $totalEngagementSeconds = 0;
-        $averageEngagementPerVisitor = 0;
-        $averageSessionDuration = 0;
-        $sectionStats = collect();
-
-        try {
-            if (Schema::hasTable('page_views')) {
-                $totalViews = PageView::where('created_at', '>=', $startDate)->count();
-
-                $uniqueVisitors = PageView::where('created_at', '>=', $startDate)
-                    ->distinct('session_id')
-                    ->count('session_id');
-
-                $viewsPerDay = PageView::where('created_at', '>=', $startDate)
-                    ->select(DB::raw('DATE(created_at) as date'), DB::raw('count(*) as count'))
-                    ->groupBy('date')
-                    ->orderBy('date')
-                    ->get()
-                    ->pluck('count', 'date')
-                    ->toArray();
-
-                $chartData = $this->buildChartDataFromViews($days, $viewsPerDay);
-            }
-
-            if (Schema::hasTable('section_engagements')) {
-                $engagementQuery = SectionEngagement::where('created_at', '>=', $startDate);
-
-                $totalEngagementSeconds = (int) $engagementQuery->sum('duration_seconds');
-
-                $averageEngagementPerVisitor = $uniqueVisitors > 0
-                    ? round($totalEngagementSeconds / $uniqueVisitors)
-                    : 0;
-
-                $averageSessionDuration = (int) SectionEngagement::where('created_at', '>=', $startDate)
-                    ->select('session_id', DB::raw('SUM(duration_seconds) as session_duration'))
-                    ->groupBy('session_id')
-                    ->get()
-                    ->avg('session_duration');
-
-                $sectionStats = SectionEngagement::where('created_at', '>=', $startDate)
-                    ->select(
-                        'section',
-                        DB::raw('SUM(duration_seconds) as total_seconds'),
-                        DB::raw('AVG(duration_seconds) as average_seconds'),
-                        DB::raw('COUNT(*) as interactions'),
-                        DB::raw('COUNT(DISTINCT session_id) as unique_visitors')
-                    )
-                    ->groupBy('section')
-                    ->orderByDesc('total_seconds')
-                    ->get()
-                    ->map(function ($item) {
-                        return [
-                            'section' => $item->section,
-                            'label' => $this->formatSectionLabel($item->section),
-                            'total_seconds' => (int) $item->total_seconds,
-                            'average_seconds' => (int) round($item->average_seconds),
-                            'interactions' => (int) $item->interactions,
-                            'unique_visitors' => (int) $item->unique_visitors,
-                        ];
-                    })
-                    ->values();
-            }
-        } catch (\Throwable $e) {
-            Log::warning('Analytics stats fallback used: ' . $e->getMessage());
-        }
+        $analyticsData = $this->analyticsService->getAnalyticsData($days);
 
         return response()->json([
-            'total_views' => $totalViews,
-            'unique_visitors' => $uniqueVisitors,
-            'chart_data' => $chartData,
-            'total_engagement_seconds' => $totalEngagementSeconds,
-            'avg_engagement_per_visitor_seconds' => $averageEngagementPerVisitor,
-            'avg_session_duration_seconds' => $averageSessionDuration,
-            'most_engaged_section' => $sectionStats->first(),
-            'section_stats' => $sectionStats,
+            'overview' => $analyticsData['overview'],
+            'traffic_timeline' => $analyticsData['traffic_timeline'],
+            'section_stats' => $analyticsData['section_engagement'],
+            // Backward compatibility fields
+            'total_views' => $analyticsData['overview']['total_views'],
+            'unique_visitors' => $analyticsData['overview']['unique_visitors'],
+            'chart_data' => $analyticsData['traffic_timeline'],
+            'total_engagement_seconds' => collect($analyticsData['section_engagement'])->sum('total_seconds'),
+            'avg_engagement_per_visitor_seconds' => $analyticsData['overview']['avg_session_duration_seconds'],
+            'avg_session_duration_seconds' => $analyticsData['overview']['avg_session_duration_seconds'],
+            'most_engaged_section' => $analyticsData['section_engagement']->first(),
         ]);
     }
 
