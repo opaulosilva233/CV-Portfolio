@@ -1,1 +1,49 @@
-Nothing should be ignored based on the provided file changes. The only modified file is a PHP source code file (`app/Services/AnalyticsService.php`), which should not be added to .gitignore. Since there are no build artifacts, dependencies, temporary files, or other ignorable items in the changes, no .gitignore rules are needed.
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
+
+# Dependencies
+.venv/
+venv/
+node_modules/
+vendor/
+composer.lock
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build and distribution
+dist/
+build/
+target/
+coverage/
+htmlcov/
+.coverage
+.mypy_cache/
+.pytest_cache/
+
+# System files
+.DS_Store
+Thumbs.db

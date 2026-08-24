@@ -291,7 +291,8 @@ class AnalyticsService
                     'unique_visitors' => (int) $item->unique_visitors,
                 ];
             })
-            ->values();
+            ->values()
+            ->toArray();
 
         return $referrers;
     }
