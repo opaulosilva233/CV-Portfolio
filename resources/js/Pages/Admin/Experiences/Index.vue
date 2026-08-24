@@ -1,6 +1,5 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import Breadcrumbs from '@/Components/Breadcrumbs.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, watch, computed } from 'vue';
 import { debounce } from '@/Composables/useDebounce';
@@ -12,11 +11,6 @@ const props = defineProps({
 
 const search = ref(props.filters.search);
 const selectedIds = ref([]);
-
-const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Experiences', active: true },
-];
 
 watch(search, debounce((value) => {
     router.get(route('admin.experiences.index'), { search: value }, {
@@ -58,12 +52,9 @@ const bulkDelete = () => {
     <CyberAdminLayout>
         <template #header>
             <div class="flex items-center justify-between w-full gap-3">
-                <div class="flex flex-col min-w-0 flex-1">
-                    <Breadcrumbs :items="breadcrumbs" />
-                    <h2 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate">
-                        {{ __('Work Experience Management') }}
-                    </h2>
-                </div>
+                <h2 class="text-base sm:text-lg md:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate flex-1">
+                    {{ __('Work Experience Management') }}
+                </h2>
                 <Link :href="route('admin.experiences.create')" class="flex-shrink-0 px-3 py-2 sm:px-5 sm:py-2.5 bg-purple-600/80 hover:bg-purple-500 border border-purple-500/50 rounded-xl font-semibold text-xs text-white uppercase tracking-wider shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all duration-300">
                     <span class="hidden sm:inline">{{ __('Add New') }}</span>
                     <span class="sm:hidden">{{ __('Add') }}</span>
