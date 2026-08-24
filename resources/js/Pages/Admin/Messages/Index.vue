@@ -64,10 +64,10 @@ const bulkDelete = () => {
 
     <CyberAdminLayout>
         <template #header>
-            <div class="flex items-center justify-between w-full">
-                <div class="flex flex-col">
+            <div class="flex items-center justify-between w-full gap-3">
+                <div class="flex flex-col min-w-0 flex-1">
                     <Breadcrumbs :items="breadcrumbs" />
-                    <h2 class="text-lg sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate mr-4">
+                    <h2 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate">
                         {{ __('Contact Messages') }}
                     </h2>
                 </div>

@@ -34,13 +34,14 @@ const categories = [
 
     <CyberAdminLayout>
         <template #header>
-            <div class="flex items-center justify-between w-full">
-                <h2 class="text-lg sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate mr-4">
+            <div class="flex items-center justify-between w-full gap-3">
+                <h2 class="text-base sm:text-lg md:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate flex-1">
                     Edit Interest: {{ interest.name }}
                 </h2>
-                <Link :href="route('admin.interests.index')" class="text-gray-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2">
+                <Link :href="route('admin.interests.index')" class="text-gray-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2 flex-shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Back to List
+                    <span class="hidden sm:inline">Back to List</span>
+                    <span class="sm:hidden">Back</span>
                 </Link>
             </div>
         </template>
