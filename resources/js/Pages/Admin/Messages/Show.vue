@@ -1,11 +1,16 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import Breadcrumbs from '@/Components/Breadcrumbs.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
     message: Object,
 });
+
+const breadcrumbs = [
+    { label: 'Dashboard', href: route('dashboard') },
+    { label: 'Messages', href: route('admin.messages.index') },
+    { label: 'View Message', active: true },
+];
 
 const formatDate = (dateString) => {
     if (!dateString) return '';
@@ -18,12 +23,6 @@ const formatDate = (dateString) => {
         minute: '2-digit'
     });
 };
-
-const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Messages', href: route('admin.messages.index') },
-    { label: 'View Message', active: true },
-];
 
 const form = useForm({
     status: props.message.status,
@@ -50,12 +49,9 @@ const getStatusBadge = (status) => {
 
     <CyberAdminLayout>
         <template #header>
-            <div class="flex flex-col min-w-0 w-full">
-                <Breadcrumbs :items="breadcrumbs" />
-                <h2 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate">
-                    {{ __('Message from') }} {{ message.name }}
-                </h2>
-            </div>
+            <h2 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate">
+                {{ __('Message from') }} {{ message.name }}
+            </h2>
         </template>
 
         <div class="py-6">

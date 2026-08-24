@@ -1,6 +1,5 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import Breadcrumbs from '@/Components/Breadcrumbs.vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
 import { computed, ref, onMounted } from 'vue';
 import RichTextEditor from '@/Components/RichTextEditor.vue';
@@ -25,12 +24,6 @@ const form = useForm({
     image_metadata: '',
     remove_images: [],
 });
-
-const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Projects', href: route('admin.projects.index') },
-    { label: 'Edit', active: true },
-];
 
 const galleryItems = ref([]);
 const nextItemId = ref(1);
@@ -158,12 +151,9 @@ const submit = () => {
     <CyberAdminLayout>
         <template #header>
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="flex flex-col">
-                    <Breadcrumbs :items="breadcrumbs" />
-                    <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-                        {{ __('Edit Project') }}
-                    </h2>
-                </div>
+                <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
+                    {{ __('Edit Project') }}
+                </h2>
                 <Link :href="route('admin.projects.index')" class="text-gray-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     Back to List

@@ -1,6 +1,5 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import Breadcrumbs from '@/Components/Breadcrumbs.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, watch, computed } from 'vue';
 import { debounce } from '@/Composables/useDebounce';
@@ -20,11 +19,6 @@ const selectedIds = ref([]);
 watch(() => props.projects, (newProjects) => {
     localProjects.value = [...newProjects];
 }, { deep: true });
-
-const breadcrumbs = [
-    { label: 'Dashboard', href: route('dashboard') },
-    { label: 'Projects', active: true },
-];
 
 watch(search, debounce((value) => {
     router.get(route('admin.projects.index'), { search: value }, {
@@ -82,12 +76,9 @@ const bulkDelete = () => {
     <CyberAdminLayout>
         <template #header>
             <div class="flex items-center justify-between w-full">
-                <div class="flex flex-col">
-                    <Breadcrumbs :items="breadcrumbs" />
-                    <h2 class="text-lg sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate mr-4">
-                        {{ __('Projects Management') }}
-                    </h2>
-                </div>
+                <h2 class="text-lg sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate mr-4">
+                    {{ __('Projects Management') }}
+                </h2>
                 <Link :href="route('admin.projects.create')" class="flex-shrink-0 px-4 py-2 sm:px-5 sm:py-2.5 bg-blue-600/80 hover:bg-blue-500 border border-blue-500/50 rounded-xl font-semibold text-xs text-white uppercase tracking-wider shadow-[0_0_15px_rgba(59,130,246,0.4)] transition-all duration-300">
                     <span class="hidden sm:inline">{{ __('Add New Project') }}</span>
                     <span class="sm:hidden">{{ __('Add New') }}</span>
