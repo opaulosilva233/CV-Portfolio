@@ -50,9 +50,9 @@ const getStatusBadge = (status) => {
 
     <CyberAdminLayout>
         <template #header>
-            <div class="flex flex-col">
+            <div class="flex flex-col min-w-0 w-full">
                 <Breadcrumbs :items="breadcrumbs" />
-                <h2 class="text-lg sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate mr-4">
+                <h2 class="text-base sm:text-lg md:text-xl lg:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate">
                     {{ __('Message from') }} {{ message.name }}
                 </h2>
             </div>

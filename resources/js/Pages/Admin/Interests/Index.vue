@@ -26,12 +26,13 @@ const getCategoryClasses = (category) => {
 
     <CyberAdminLayout>
         <template #header>
-            <div class="flex items-center justify-between w-full">
-                <h2 class="text-lg sm:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate mr-4">
+            <div class="flex items-center justify-between w-full gap-3">
+                <h2 class="text-base sm:text-lg md:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate flex-1">
                     Interests & Hobbies
                 </h2>
-                <Link :href="route('admin.interests.create')" class="flex-shrink-0 px-4 py-2 sm:px-5 sm:py-2.5 bg-cyan-600/80 hover:bg-cyan-500 border border-cyan-500/50 rounded-xl font-semibold text-xs text-white uppercase tracking-wider shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300">
-                    Add New Interest
+                <Link :href="route('admin.interests.create')" class="flex-shrink-0 px-3 py-2 sm:px-5 sm:py-2.5 bg-cyan-600/80 hover:bg-cyan-500 border border-cyan-500/50 rounded-xl font-semibold text-xs text-white uppercase tracking-wider shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300">
+                    <span class="hidden sm:inline">Add New Interest</span>
+                    <span class="sm:hidden">Add</span>
                 </Link>
             </div>
         </template>

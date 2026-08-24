@@ -23,7 +23,7 @@ const toggleVisibility = (section) => {
 
     <CyberAdminLayout>
         <template #header>
-            <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
+            <h2 class="text-base sm:text-lg md:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400 truncate">
                 Page Sections Configuration
             </h2>
         </template>
