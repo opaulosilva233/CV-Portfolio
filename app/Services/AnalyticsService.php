@@ -231,7 +231,7 @@ class AnalyticsService
             })
             ->values();
 
-        return $companies;
+        return $companies->toArray();
     }
 
     /**

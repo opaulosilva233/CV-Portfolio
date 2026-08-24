@@ -1,35 +1,101 @@
-```
-# Dependencies
-vendor/
-node_modules/
+```gitignore
+# Compiled and build artifacts
+*.pyc
+__pycache__/
+*.o
+*.obj
+dist/
+build/
+*.class
+*.exe
+*.dll
+*.so
+*.a
+*.out
 
-# Build artifacts
-public/build/
-bootstrap/cache/
-storage/logs/laravel.log
-storage/framework/cache/
-storage/framework/sessions/
-storage/framework/views/
+# Dependencies
+.venv/
+venv/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+.bower-cache/
+.bower-registry/
+.npm/
+.yarn/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*.swo
+*.bak
+*.orig
+*.rej
 
 # Environment
 .env
 .env.local
 .env.*
+!.env.example
 
-# IDE
+# Editors
 .vscode/
 .idea/
-
-# OS
-.DS_Store
+*.sublime-project
+*.sublime-workspace
+*.ds_store
 Thumbs.db
+Desktop.ini
 
-# Logs
-*.log
-
-# Compiled PHP (if any)
-*.phpc
-
-# Coverage reports
+# Coverage
+.coverage
 coverage/
+htmlcov/
+.coverage.*
+
+# Python specific
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache/
+.mypy_cache/
+.hypothesis/
+
+# JavaScript/Node specific
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+jspm_packages/
+web_modules/
+*.min.js
+*.min.css
+
+# PHP specific
+vendor/
+composer.lock
+composer.phar
+*.phar
+
+# Build outputs
+/dist
+/build
+/target
+/out
+/*.js.map
+/*.css.map
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 ```
