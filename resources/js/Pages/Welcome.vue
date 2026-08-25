@@ -159,13 +159,28 @@ const sortedDbSections = computed(() => {
 
 const isSectionVisible = (sectionName) => {
     if (!props.sections || props.sections.length === 0) return true;
-    const sec = props.sections.find(s => s.name === sectionName || (sectionName === 'about' && s.name === 'hero'));
+    const mappedSearchName = (name) => {
+        if (name === 'about') return ['hero', 'about'];
+        if (['experience', 'education', 'projects'].includes(name)) return ['timeline', name];
+        return [name];
+    };
+    const targetNames = mappedSearchName(sectionName);
+    const sec = props.sections.find(s => targetNames.includes(s.name));
     return sec ? sec.is_visible : true;
 };
 
 const getSectionSortOrder = (sectionName) => {
     if (!props.sections || props.sections.length === 0) return 0;
-    const index = sortedDbSections.value.findIndex(s => s.name === sectionName || (sectionName === 'about' && s.name === 'hero'));
+
+    // Group timeline-related sections (timeline, experience, education, projects) under the timeline sort order
+    let targetDbName = sectionName;
+    if (sectionName === 'about') {
+        targetDbName = 'hero';
+    } else if (['experience', 'education', 'projects'].includes(sectionName)) {
+        targetDbName = 'timeline';
+    }
+
+    const index = sortedDbSections.value.findIndex(s => s.name === targetDbName || (targetDbName === 'hero' && s.name === 'about'));
     return index !== -1 ? index : 99;
 };
 

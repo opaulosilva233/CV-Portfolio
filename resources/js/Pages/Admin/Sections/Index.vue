@@ -21,7 +21,8 @@ const form = useForm({
 });
 
 const toggleVisibility = (section) => {
-    form.is_visible = !section.is_visible;
+    section.is_visible = !section.is_visible;
+    form.is_visible = section.is_visible;
     form.put(route('admin.sections.update', section.id), {
         preserveScroll: true,
     });
@@ -87,8 +88,8 @@ const handleReorder = async () => {
                                     <template #item="{ element: section, index }">
                                         <tr class="hover:bg-white/5 transition-colors group cursor-default">
                                             <td class="px-2 py-4 whitespace-nowrap text-center">
-                                                <div class="drag-handle cursor-grab active:cursor-grabbing text-gray-600 hover:text-cyan-400 transition-colors">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
+                                                <div class="drag-handle cursor-grab active:cursor-grabbing text-gray-600 hover:text-cyan-400 transition-colors p-2 inline-block">
+                                                    <svg class="w-5 h-5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"></path></svg>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
