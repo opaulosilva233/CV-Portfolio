@@ -148,6 +148,7 @@ const structuredData = computed(() => {
 
 const activeSection = ref('about');
 const defaultNavList = ['about', 'interests', 'skills', 'timeline', 'terminal', 'contact'];
+const validNavItems = ['about', 'interests', 'skills', 'timeline', 'experience', 'education', 'projects', 'terminal', 'contact'];
 const allSectionsList = ['about', 'interests', 'skills', 'timeline', 'timeline-mobile', 'experience', 'education', 'projects', 'terminal', 'contact'];
 
 const sortedDbSections = computed(() => {
@@ -161,7 +162,8 @@ const isSectionVisible = (sectionName) => {
     if (!props.sections || props.sections.length === 0) return true;
     const mappedSearchName = (name) => {
         if (name === 'about') return ['hero', 'about'];
-        if (['experience', 'education', 'projects'].includes(name)) return ['timeline', name];
+        if (name === 'timeline' || name === 'timeline-mobile') return ['timeline', 'experience', 'education', 'projects'];
+        if (['experience', 'education', 'projects'].includes(name)) return [name, 'timeline'];
         return [name];
     };
     const targetNames = mappedSearchName(sectionName);
@@ -172,15 +174,16 @@ const isSectionVisible = (sectionName) => {
 const getSectionSortOrder = (sectionName) => {
     if (!props.sections || props.sections.length === 0) return 0;
 
-    // Group timeline-related sections (timeline, experience, education, projects) under the timeline sort order
-    let targetDbName = sectionName;
+    let targetNames = [sectionName];
     if (sectionName === 'about') {
-        targetDbName = 'hero';
+        targetNames = ['about', 'hero'];
+    } else if (sectionName === 'timeline' || sectionName === 'timeline-mobile') {
+        targetNames = ['timeline', 'experience', 'education', 'projects'];
     } else if (['experience', 'education', 'projects'].includes(sectionName)) {
-        targetDbName = 'timeline';
+        targetNames = [sectionName, 'timeline'];
     }
 
-    const index = sortedDbSections.value.findIndex(s => s.name === targetDbName || (targetDbName === 'hero' && s.name === 'about'));
+    const index = sortedDbSections.value.findIndex(s => targetNames.includes(s.name));
     return index !== -1 ? index : 99;
 };
 
@@ -195,7 +198,7 @@ const sectionsList = computed(() => {
     sortedDbSections.value.forEach(s => {
         if (s.is_visible) {
             const mapped = mapName(s.name);
-            if (defaultNavList.includes(mapped) && !result.includes(mapped)) {
+            if (validNavItems.includes(mapped) && !result.includes(mapped)) {
                 result.push(mapped);
             }
         }
@@ -266,6 +269,7 @@ const activeColorClass = computed(() => {
         case 'timeline': return 'from-pink-500 to-rose-500 shadow-pink-500/50';
         case 'experience': return 'from-purple-500 to-violet-600 shadow-purple-500/50';
         case 'education': return 'from-cyan-500 to-blue-600 shadow-cyan-500/50';
+        case 'projects': return 'from-pink-500 to-amber-500 shadow-pink-500/50';
         case 'terminal': return 'from-emerald-500 to-teal-500 shadow-emerald-500/50';
         case 'contact': return 'from-orange-500 to-red-500 shadow-orange-500/50';
         default: return 'from-purple-600 to-indigo-600';
@@ -280,6 +284,7 @@ const activeTextClass = computed(() => {
         case 'timeline': return 'text-pink-600 dark:text-pink-400';
         case 'experience': return 'text-purple-600 dark:text-purple-400';
         case 'education': return 'text-cyan-600 dark:text-cyan-400';
+        case 'projects': return 'text-pink-600 dark:text-pink-400';
         case 'terminal': return 'text-emerald-600 dark:text-emerald-400';
         case 'contact': return 'text-orange-600 dark:text-orange-400';
         default: return 'text-purple-600 dark:text-purple-400';
@@ -509,9 +514,11 @@ onMounted(() => {
             entries.forEach((entry) => {
                 if (entry.isIntersecting) {
                     const id = entry.target.id;
-                    if (['experience', 'education', 'projects'].includes(id)) {
+                    if (sectionsList.value.includes(id)) {
+                        activeSection.value = id;
+                    } else if (['experience', 'education', 'projects'].includes(id) && sectionsList.value.includes('timeline')) {
                         activeSection.value = 'timeline';
-                    } else if (id === 'timeline-mobile') {
+                    } else if (id === 'timeline-mobile' && sectionsList.value.includes('timeline')) {
                         activeSection.value = 'timeline';
                     } else {
                         activeSection.value = id;
