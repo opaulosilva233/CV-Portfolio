@@ -147,7 +147,7 @@ const structuredData = computed(() => {
 });
 
 const activeSection = ref('about');
-const defaultNavList = ['about', 'interests', 'skills', 'timeline', 'terminal', 'contact'];
+const defaultNavList = ['about', 'timeline', 'interests', 'skills', 'contact'];
 const validNavItems = ['about', 'interests', 'skills', 'timeline', 'experience', 'education', 'projects', 'terminal', 'contact'];
 const allSectionsList = ['about', 'interests', 'skills', 'timeline', 'timeline-mobile', 'experience', 'education', 'projects', 'terminal', 'contact'];
 
