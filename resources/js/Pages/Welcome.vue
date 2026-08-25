@@ -161,9 +161,9 @@ const sortedDbSections = computed(() => {
 const isSectionVisible = (sectionName) => {
     if (!props.sections || props.sections.length === 0) return true;
     const mappedSearchName = (name) => {
-        if (name === 'about') return ['hero', 'about'];
-        if (name === 'timeline' || name === 'timeline-mobile') return ['timeline', 'experience', 'education', 'projects'];
-        if (['experience', 'education', 'projects'].includes(name)) return [name, 'timeline'];
+        if (name === 'about' || name === 'hero') return ['hero', 'about'];
+        if (name === 'timeline' || name === 'timeline-mobile') return ['timeline', 'experience'];
+        if (name === 'education') return ['education', 'experience'];
         return [name];
     };
     const targetNames = mappedSearchName(sectionName);
@@ -175,12 +175,12 @@ const getSectionSortOrder = (sectionName) => {
     if (!props.sections || props.sections.length === 0) return 0;
 
     let targetNames = [sectionName];
-    if (sectionName === 'about') {
+    if (sectionName === 'about' || sectionName === 'hero') {
         targetNames = ['about', 'hero'];
     } else if (sectionName === 'timeline' || sectionName === 'timeline-mobile') {
-        targetNames = ['timeline', 'experience', 'education', 'projects'];
-    } else if (['experience', 'education', 'projects'].includes(sectionName)) {
-        targetNames = [sectionName, 'timeline'];
+        targetNames = ['timeline', 'experience'];
+    } else if (sectionName === 'education') {
+        targetNames = ['education', 'experience'];
     }
 
     const index = sortedDbSections.value.findIndex(s => targetNames.includes(s.name));
@@ -201,12 +201,6 @@ const sectionsList = computed(() => {
             if (validNavItems.includes(mapped) && !result.includes(mapped)) {
                 result.push(mapped);
             }
-        }
-    });
-
-    defaultNavList.forEach(item => {
-        if (!result.includes(item) && isSectionVisible(item)) {
-            result.push(item);
         }
     });
 
@@ -516,12 +510,12 @@ onMounted(() => {
                     const id = entry.target.id;
                     if (sectionsList.value.includes(id)) {
                         activeSection.value = id;
-                    } else if (['experience', 'education', 'projects'].includes(id) && sectionsList.value.includes('timeline')) {
+                    } else if (['timeline', 'timeline-mobile', 'education'].includes(id) && sectionsList.value.includes('experience')) {
+                        activeSection.value = 'experience';
+                    } else if (['timeline', 'timeline-mobile'].includes(id) && sectionsList.value.includes('timeline')) {
                         activeSection.value = 'timeline';
-                    } else if (id === 'timeline-mobile' && sectionsList.value.includes('timeline')) {
-                        activeSection.value = 'timeline';
-                    } else {
-                        activeSection.value = id;
+                    } else if ((id === 'hero' || id === 'about') && sectionsList.value.includes('about')) {
+                        activeSection.value = 'about';
                     }
                 }
             });
