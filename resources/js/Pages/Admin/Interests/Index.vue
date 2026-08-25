@@ -1,10 +1,45 @@
 <script setup>
 import CyberAdminLayout from '@/Layouts/CyberAdminLayout.vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineProps({
     interests: Array,
 });
+
+const draggedIndex = ref(null);
+
+const handleDragStart = (index) => {
+    draggedIndex.value = index;
+};
+
+const handleDragOver = (e) => {
+    e.preventDefault();
+};
+
+const handleDrop = (dropIndex) => {
+    if (draggedIndex.value === null || draggedIndex.value === dropIndex) {
+        return;
+    }
+
+    const newInterests = [...interests];
+    const draggedItem = newInterests[draggedIndex.value];
+    newInterests.splice(draggedIndex.value, 1);
+    newInterests.splice(dropIndex, 0, draggedItem);
+
+    // Update order values
+    newInterests.forEach((interest, index) => {
+        interest.order = index + 1;
+    });
+
+    router.post(route('admin.interests.reorder'), {
+        interests: newInterests.map(i => ({ id: i.id, order: i.order })),
+    }, {
+        preserveScroll: true,
+    });
+
+    draggedIndex.value = null;
+};
 
 const categoryColors = {
     hobby:   { bg: 'bg-purple-500/20',  text: 'text-purple-400',  border: 'border-purple-500/30',  shadow: 'shadow-[0_0_10px_rgba(168,85,247,0.2)]' },
@@ -48,6 +83,7 @@ const getCategoryClasses = (category) => {
                             <table class="min-w-full divide-y divide-white/10">
                                 <thead class="bg-white/5">
                                     <tr>
+                                        <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Order</th>
                                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Interest</th>
                                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Category</th>
                                         <th scope="col" class="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">Status</th>
@@ -55,7 +91,18 @@ const getCategoryClasses = (category) => {
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-white/10 bg-transparent">
-                                    <tr v-for="interest in interests" :key="interest.id" class="hover:bg-white/5 transition-colors">
+                                    <tr 
+                                        v-for="(interest, index) in interests" 
+                                        :key="interest.id" 
+                                        class="hover:bg-white/5 transition-colors cursor-move"
+                                        draggable="true"
+                                        @dragstart="handleDragStart(index)"
+                                        @dragover="handleDragOver"
+                                        @drop="handleDrop(index)"
+                                    >
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="text-gray-400 text-sm">{{ interest.order }}</span>
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="flex items-center gap-3">
                                                 <div v-if="interest.icon" class="w-8 h-8 flex items-center justify-center [&>svg]:w-6 [&>svg]:h-6 text-cyan-400" v-html="interest.icon"></div>
