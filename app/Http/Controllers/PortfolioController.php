@@ -51,7 +51,14 @@ class PortfolioController extends Controller
             return \App\Models\Interest::where('is_active', true)->exists();
         });
 
+        $sections = $this->rememberPortfolioData('portfolio_sections', 3600, function () {
+            return \App\Models\PageSection::orderBy('sort_order')->get();
+        }, function () {
+            return \App\Models\PageSection::exists();
+        });
+
         return Inertia::render('Welcome', [
+            'sections' => $sections,
             'hero' => [
                 'name' => SiteSetting::getValue('name', 'My Name'),
                 'title' => SiteSetting::getValue('job_title', 'Full Stack Developer'),

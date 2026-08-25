@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Page Sections
-        $sections = ['Hero', 'About', 'Experience', 'Skills', 'Projects', 'Contact'];
+        $sections = ['Hero', 'About', 'Interests', 'Experience', 'Skills', 'Projects', 'Contact'];
         foreach ($sections as $index => $section) {
             \App\Models\PageSection::create([
                 'name' => strtolower($section),

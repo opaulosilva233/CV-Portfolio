@@ -14,6 +14,7 @@ const props = defineProps({
     experiences: Array,
     educations: Array,
     interests: Object,
+    sections: Array,
     socials: [Object, Array],
     canLogin: Boolean,
     seo: Object,
@@ -146,8 +147,53 @@ const structuredData = computed(() => {
 });
 
 const activeSection = ref('about');
-const sectionsList = ['about', 'interests', 'skills', 'timeline', 'terminal', 'contact'];
+const defaultNavList = ['about', 'interests', 'skills', 'timeline', 'terminal', 'contact'];
 const allSectionsList = ['about', 'interests', 'skills', 'timeline', 'timeline-mobile', 'experience', 'education', 'projects', 'terminal', 'contact'];
+
+const sortedDbSections = computed(() => {
+    if (!props.sections || props.sections.length === 0) {
+        return [];
+    }
+    return [...props.sections].sort((a, b) => a.sort_order - b.sort_order);
+});
+
+const isSectionVisible = (sectionName) => {
+    if (!props.sections || props.sections.length === 0) return true;
+    const sec = props.sections.find(s => s.name === sectionName || (sectionName === 'about' && s.name === 'hero'));
+    return sec ? sec.is_visible : true;
+};
+
+const getSectionSortOrder = (sectionName) => {
+    if (!props.sections || props.sections.length === 0) return 0;
+    const index = sortedDbSections.value.findIndex(s => s.name === sectionName || (sectionName === 'about' && s.name === 'hero'));
+    return index !== -1 ? index : 99;
+};
+
+const sectionsList = computed(() => {
+    if (!props.sections || props.sections.length === 0) {
+        return defaultNavList;
+    }
+
+    const mapName = (name) => (name === 'hero' ? 'about' : name);
+    const result = [];
+
+    sortedDbSections.value.forEach(s => {
+        if (s.is_visible) {
+            const mapped = mapName(s.name);
+            if (defaultNavList.includes(mapped) && !result.includes(mapped)) {
+                result.push(mapped);
+            }
+        }
+    });
+
+    defaultNavList.forEach(item => {
+        if (!result.includes(item) && isSectionVisible(item)) {
+            result.push(item);
+        }
+    });
+
+    return result;
+});
 const selectedProject = ref(null);
 const showProjectModal = ref(false);
 const activeImageIndex = ref(0);
@@ -323,7 +369,7 @@ const handleTimelineScroll = () => {
 const trackElement = ref(null);
 
 const updateIndicator = () => {
-    const activeIndex = sectionsList.indexOf(activeSection.value);
+    const activeIndex = sectionsList.value.indexOf(activeSection.value);
     if (activeIndex !== -1 && navButtons.value[activeIndex]) {
         const el = navButtons.value[activeIndex];
         indicatorLeft.value = el.offsetLeft;
@@ -771,8 +817,9 @@ const formatDate = (date) => {
             </div>
         </div>
 
+        <main class="flex flex-col">
         <!-- Hero Section -->
-        <section id="about" class="pt-32 pb-20 px-4 min-h-screen flex items-center">
+        <section id="about" class="pt-32 pb-20 px-4 min-h-screen flex items-center" :style="{ order: getSectionSortOrder('about') }" v-if="isSectionVisible('about')">
             <div class="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center gap-12">
                 <div class="lg:w-1/2 space-y-6">
                     <h2 class="text-sm font-bold text-cyan-600 dark:text-cyan-400 tracking-[0.2em] uppercase animate-pulse">
@@ -813,7 +860,7 @@ const formatDate = (date) => {
         </section>
         
         <!-- Interests Section -->
-        <section id="interests" class="py-20 px-4" v-if="interests && Object.keys(interests).length > 0">
+        <section id="interests" class="py-20 px-4" :style="{ order: getSectionSortOrder('interests') }" v-if="isSectionVisible('interests') && interests && Object.keys(interests).length > 0">
             <div class="max-w-7xl mx-auto px-4">
                 <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-pink-500">#</span> {{ __('Beyond the Code') }}</h2>
                 
@@ -848,7 +895,7 @@ const formatDate = (date) => {
         </section>
 
         <!-- Skills Section -->
-        <section id="skills" class="py-20 px-4 scroll-mt-24">
+        <section id="skills" class="py-20 px-4 scroll-mt-24" :style="{ order: getSectionSortOrder('skills') }" v-if="isSectionVisible('skills')">
             <div class="max-w-7xl mx-auto px-4">
                 <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-purple-500">#</span> {{ __('Technical Skills') }}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -866,7 +913,7 @@ const formatDate = (date) => {
 
         <!-- Dynamic Timeline Section -->
         <!-- Desktop Horizontal Timeline -->
-        <section id="timeline" ref="timelineContainer" class="relative hidden md:block" :style="{ height: (timelineItems.length * 45) + 'vh' }">
+        <section id="timeline" ref="timelineContainer" class="relative hidden md:block" :style="{ height: (timelineItems.length * 45) + 'vh', order: getSectionSortOrder('timeline') }" v-if="isSectionVisible('timeline')">
             <div class="sticky top-0 h-screen flex flex-col overflow-hidden" style="background: linear-gradient(135deg, #060a18 0%, #0a0f22 50%, #06081a 100%)">
 
                 <!-- Subtle grid background -->
@@ -1019,7 +1066,7 @@ const formatDate = (date) => {
             </div><!-- end sticky container -->
         </section>
 
-        <section id="timeline-mobile" class="py-24 px-4 relative overflow-hidden md:hidden scroll-mt-24">
+        <section id="timeline-mobile" class="py-24 px-4 relative overflow-hidden md:hidden scroll-mt-24" :style="{ order: getSectionSortOrder('timeline') }" v-if="isSectionVisible('timeline')">
             <div class="absolute inset-0 bg-gradient-to-b from-gray-50/50 to-white dark:from-[#030712]/50 dark:to-[#030712] pointer-events-none"></div>
             
             <h2 class="text-5xl font-black mb-20 text-center text-gray-900 dark:text-white uppercase tracking-tighter relative z-10">
@@ -1079,7 +1126,7 @@ const formatDate = (date) => {
         </section>
 
         <!-- Experience Section -->
-        <section id="experience" class="py-24 px-4 scroll-mt-24 bg-gray-50/30 dark:bg-white/[0.02]">
+        <section id="experience" class="py-24 px-4 scroll-mt-24 bg-gray-50/30 dark:bg-white/[0.02]" :style="{ order: getSectionSortOrder('experience') }" v-if="isSectionVisible('experience')">
             <div class="max-w-7xl mx-auto">
                 <div class="mb-16">
                     <h2 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
@@ -1148,7 +1195,7 @@ const formatDate = (date) => {
         </section>
 
         <!-- Education Section -->
-        <section id="education" class="py-24 px-4 scroll-mt-24">
+        <section id="education" class="py-24 px-4 scroll-mt-24" :style="{ order: getSectionSortOrder('education') }" v-if="isSectionVisible('education')">
             <div class="max-w-7xl mx-auto">
                 <div class="mb-16 text-right">
                     <h2 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
@@ -1212,7 +1259,7 @@ const formatDate = (date) => {
         </section>
 
         <!-- Projects Section -->
-        <section id="projects" class="py-24 px-4 scroll-mt-24 bg-gray-50/50 dark:bg-black/20">
+        <section id="projects" class="py-24 px-4 scroll-mt-24 bg-gray-50/50 dark:bg-black/20" :style="{ order: getSectionSortOrder('projects') }" v-if="isSectionVisible('projects')">
             <div class="max-w-7xl mx-auto">
                 <div class="mb-16">
                     <h2 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
@@ -1267,7 +1314,7 @@ const formatDate = (date) => {
         </section>
 
         <!-- Interactive Terminal Section -->
-        <section id="terminal" class="py-24 px-4 scroll-mt-24 bg-gray-50/50 dark:bg-gray-950/20">
+        <section id="terminal" class="py-24 px-4 scroll-mt-24 bg-gray-50/50 dark:bg-gray-950/20" :style="{ order: getSectionSortOrder('terminal') }" v-if="isSectionVisible('terminal')">
             <div class="max-w-7xl mx-auto">
                 <div class="flex flex-col md:flex-row gap-12 items-center">
                     <div class="md:w-1/3 space-y-4">
@@ -1288,9 +1335,10 @@ const formatDate = (date) => {
         </section>
 
         <!-- Contact Section -->
-        <section id="contact" class="scroll-mt-24">
+        <section id="contact" class="scroll-mt-24" :style="{ order: getSectionSortOrder('contact') }" v-if="isSectionVisible('contact')">
             <ContactSection :email="contact_email" :phone="contact_phone" :address="contact_address" />
         </section>
+        </main>
 
         <footer class="py-10 text-center text-gray-500 dark:text-gray-400 text-sm font-medium border-t border-white/10">
             &copy; {{ new Date().getFullYear() }} {{ hero.name }}. <span class="opacity-50" v-if="footer_text">{{ footer_text }}</span>

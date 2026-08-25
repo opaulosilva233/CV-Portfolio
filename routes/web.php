@@ -35,6 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('admin/projects/bulk-delete', [\App\Http\Controllers\Admin\ProjectController::class, 'bulkDelete'])->name('admin.projects.bulk-delete');
     Route::post('admin/projects/reorder', [\App\Http\Controllers\Admin\ProjectController::class, 'reorder'])->name('admin.projects.reorder');
     Route::resource('admin/projects', \App\Http\Controllers\Admin\ProjectController::class)->names('admin.projects');
+    Route::post('admin/sections/reorder', [\App\Http\Controllers\Admin\PageSectionController::class, 'reorder'])->name('admin.sections.reorder');
     Route::resource('admin/sections', \App\Http\Controllers\Admin\PageSectionController::class)->names('admin.sections');
     Route::post('admin/messages/bulk-delete', [\App\Http\Controllers\Admin\MessageController::class, 'bulkDelete'])->name('admin.messages.bulk-delete');
     Route::resource('admin/messages', \App\Http\Controllers\Admin\MessageController::class)->only(['index', 'show', 'update', 'destroy'])->names('admin.messages');

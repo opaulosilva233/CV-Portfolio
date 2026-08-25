@@ -28,4 +28,18 @@ class PageSectionController extends Controller
 
         return redirect()->back();
     }
+
+    public function reorder(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:page_sections,id',
+        ]);
+
+        foreach ($validated['ids'] as $index => $id) {
+            PageSection::where('id', $id)->update(['sort_order' => $index]);
+        }
+
+        return response()->json(['success' => true]);
+    }
 }
