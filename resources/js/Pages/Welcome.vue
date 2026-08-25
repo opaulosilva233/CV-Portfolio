@@ -359,6 +359,19 @@ const horizontalTarget = ref(null);
 const translateX = ref(0);
 const scrollProgressTimeline = ref(0);
 
+const checkTimelineItemsVisibility = () => {
+    if (!horizontalTarget.value) return;
+    const windowWidth = window.innerWidth;
+    itemRefs.value.forEach((el) => {
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.right > -100 && rect.left < windowWidth + 100) {
+            const id = el.dataset.id;
+            if (id) visibleItems.value.add(id);
+        }
+    });
+};
+
 const handleTimelineScroll = () => {
     if (!timelineContainer.value) return;
 
@@ -384,6 +397,8 @@ const handleTimelineScroll = () => {
         const maxTranslate = totalWidth - viewportWidth;
         translateX.value = progress * maxTranslate;
     }
+
+    checkTimelineItemsVisibility();
 };
 
 const trackElement = ref(null);
@@ -503,11 +518,12 @@ onMounted(() => {
                 visibleItems.value.add(entry.target.dataset.id);
             }
         });
-    }, { threshold: 0.2, rootMargin: '0px 0px -100px 0px' });
+    }, { threshold: 0.1, rootMargin: '50px' });
 
     itemRefs.value.forEach(el => {
         if (el) itemObserver.observe(el);
     });
+    checkTimelineItemsVisibility();
 
     observer = new IntersectionObserver(
         (entries) => {
@@ -668,14 +684,49 @@ const formatDate = (date) => {
 }
 
 .timeline-item {
-    opacity: 0;
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
-    filter: blur(4px);
+    opacity: 0.35;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease, transform 0.4s ease;
+    filter: blur(2px);
 }
 
 .timeline-item.is-visible {
     opacity: 1;
     filter: blur(0);
+}
+
+.timeline-item--even {
+    transform: translateY(-50px);
+}
+
+.timeline-item--odd {
+    transform: translateY(50px);
+}
+
+@media (min-height: 900px) {
+    .timeline-item--even {
+        transform: translateY(-65px);
+    }
+    .timeline-item--odd {
+        transform: translateY(65px);
+    }
+}
+
+@media (max-height: 750px) {
+    .timeline-item--even {
+        transform: translateY(-38px);
+    }
+    .timeline-item--odd {
+        transform: translateY(38px);
+    }
+}
+
+@media (max-height: 650px) {
+    .timeline-item--even {
+        transform: translateY(-24px);
+    }
+    .timeline-item--odd {
+        transform: translateY(24px);
+    }
 }
 
 /* Timeline Card Base */
@@ -688,7 +739,7 @@ const formatDate = (date) => {
 }
 
 .timeline-card:hover {
-    transform: translateY(-8px);
+    transform: translateY(-6px);
     background: rgba(14, 20, 45, 0.85);
 }
 
@@ -936,7 +987,7 @@ const formatDate = (date) => {
         <!-- Dynamic Timeline Section -->
         <!-- Desktop Horizontal Timeline -->
         <section id="timeline" ref="timelineContainer" class="relative hidden md:block" :style="{ height: (timelineItems.length * 45) + 'vh', order: getSectionSortOrder('timeline') }" v-if="isSectionVisible('timeline')">
-            <div class="sticky top-0 h-screen flex flex-col overflow-hidden" style="background: linear-gradient(135deg, #060a18 0%, #0a0f22 50%, #06081a 100%)">
+            <div class="sticky top-0 h-screen flex flex-col justify-between overflow-hidden" style="background: linear-gradient(135deg, #060a18 0%, #0a0f22 50%, #06081a 100%)">
 
                 <!-- Subtle grid background -->
                 <div class="absolute inset-0 pointer-events-none" style="background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 60px 60px;"></div>
@@ -945,22 +996,25 @@ const formatDate = (date) => {
                 <div class="absolute top-0 left-0 w-96 h-96 bg-purple-900/10 rounded-full blur-3xl pointer-events-none"></div>
                 <div class="absolute bottom-0 right-0 w-96 h-96 bg-cyan-900/10 rounded-full blur-3xl pointer-events-none"></div>
 
-                <!-- Title block — top portion, centered with significant breathing room -->
-                <div class="flex flex-col items-center justify-center pt-40 pb-12 relative z-10 flex-shrink-0">
-                    <div class="flex items-center gap-6 mb-4">
-                        <div class="w-12 h-[2px] bg-gradient-to-r from-pink-500 to-purple-500"></div>
-                        <span class="text-[11px] font-black uppercase tracking-[0.6em] text-pink-500">{{ __('Timeline') }}</span>
-                        <div class="w-12 h-[2px] bg-gradient-to-r from-purple-500 to-pink-500"></div>
+                <!-- Title block — responsive height & spacing -->
+                <div class="flex flex-col items-center justify-center pt-14 md:pt-16 lg:pt-20 xl:pt-24 pb-2 md:pb-4 relative z-10 flex-shrink-0">
+                    <div class="flex items-center gap-4 md:gap-6 mb-2 md:mb-3">
+                        <div class="w-8 md:w-12 h-[2px] bg-gradient-to-r from-pink-500 to-purple-500"></div>
+                        <span class="text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] md:tracking-[0.6em] text-pink-500">{{ __('Timeline') }}</span>
+                        <div class="w-8 md:w-12 h-[2px] bg-gradient-to-r from-purple-500 to-pink-500"></div>
                     </div>
-                    <h2 class="text-7xl md:text-8xl lg:text-[130px] font-black text-white uppercase tracking-tighter leading-none text-center drop-shadow-2xl">
+                    <h2 class="text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-black text-white uppercase tracking-tighter leading-none text-center drop-shadow-2xl">
                         <span class="opacity-90">{{ __('My') }}</span> <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400">{{ __('Journey') }}</span>
                     </h2>
-                    <p class="text-gray-600 text-[11px] font-bold tracking-[0.4em] uppercase mt-6">{{ __('Scroll to explore the legacy') }} →</p>
+                    <p class="text-gray-500 text-[10px] md:text-[11px] font-bold tracking-[0.3em] md:tracking-[0.4em] uppercase mt-2 md:mt-3">{{ __('Scroll to explore the legacy') }} →</p>
                 </div>
 
                 <!-- Cards row — flex-1 so it fills remaining space, cards centered vertically -->
-                <div class="flex-1 relative flex items-center">
+                <div class="flex-1 relative flex items-center min-h-0">
                     <div class="relative flex items-center w-full transition-transform duration-200 ease-out" ref="horizontalTarget" :style="{ transform: `translateX(-${translateX}px)` }">
+                    <!-- Start Spacer -->
+                    <div class="flex-shrink-0 min-w-[32px] md:min-w-[64px] lg:min-w-[96px] h-10"></div>
+
                     <!-- The Interactive Growing Horizontal Line -->
                     <div class="absolute top-1/2 left-0 w-full h-px bg-white/5">
                         <div class="h-full bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-400 timeline-line-grow"></div>
@@ -970,14 +1024,16 @@ const formatDate = (date) => {
                     <div v-for="(item, index) in timelineItems" :key="item.id" 
                          :ref="el => itemRefs[index] = el"
                          :data-id="item.id"
-                         class="timeline-item flex-shrink-0 w-[320px] mx-8 relative cursor-pointer transition-[opacity,filter] duration-700"
-                         :class="visibleItems.has(item.id) ? 'is-visible' : ''"
-                         :style="{ transform: `translateY(${index % 2 === 0 ? '-90px' : '90px'})` }"
+                         class="timeline-item flex-shrink-0 w-[270px] sm:w-[290px] md:w-[310px] lg:w-[320px] mx-4 md:mx-6 lg:mx-8 relative cursor-pointer transition-[opacity,filter,transform] duration-500"
+                         :class="[
+                             visibleItems.has(item.id) ? 'is-visible' : '',
+                             index % 2 === 0 ? 'timeline-item--even' : 'timeline-item--odd'
+                         ]"
                          @click="handleTimelineClick(item)">
 
                         <!-- Content Card -->
                         <div class="group">
-                            <div class="timeline-card rounded-2xl relative overflow-hidden transition-all duration-500 flex"
+                            <div class="timeline-card rounded-2xl relative overflow-hidden transition-all duration-300 flex"
                                  :class="{
                                      'timeline-card--experience': item.type === 'experience',
                                      'timeline-card--education': item.type === 'education',
@@ -985,7 +1041,7 @@ const formatDate = (date) => {
                                  }">
 
                                 <!-- Left colored border accent -->
-                                <div class="w-1 flex-shrink-0 rounded-l-2xl transition-all duration-500 group-hover:w-1.5"
+                                <div class="w-1 flex-shrink-0 rounded-l-2xl transition-all duration-300 group-hover:w-1.5"
                                      :class="{
                                          'bg-gradient-to-b from-purple-400 to-violet-700': item.type === 'experience',
                                          'bg-gradient-to-b from-cyan-300 to-blue-600': item.type === 'education',
@@ -993,10 +1049,10 @@ const formatDate = (date) => {
                                      }"></div>
 
                                 <!-- Card body -->
-                                <div class="flex-1 p-7 relative overflow-hidden">
+                                <div class="flex-1 p-5 md:p-6 relative overflow-hidden">
 
                                     <!-- Year as large background element -->
-                                    <div class="absolute -bottom-3 -right-2 text-[6rem] font-black leading-none font-mono select-none pointer-events-none opacity-[0.06] group-hover:opacity-[0.1] transition-opacity duration-500"
+                                    <div class="absolute -bottom-2 -right-1 text-5xl md:text-6xl font-black leading-none font-mono select-none pointer-events-none opacity-[0.06] group-hover:opacity-[0.1] transition-opacity duration-500"
                                          :class="{
                                              'text-purple-400': item.type === 'experience',
                                              'text-cyan-400': item.type === 'education',
@@ -1008,9 +1064,9 @@ const formatDate = (date) => {
                                     </div>
 
                                     <!-- Category badge -->
-                                    <div class="flex items-center gap-2 mb-5">
+                                    <div class="flex items-center gap-2 mb-3 md:mb-4">
                                         <!-- Icon -->
-                                        <div class="w-6 h-6 flex items-center justify-center">
+                                        <div class="w-5 h-5 flex items-center justify-center">
                                             <svg v-if="item.type === 'experience'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                             </svg>
@@ -1030,22 +1086,22 @@ const formatDate = (date) => {
                                     </div>
 
                                     <!-- Title — dominant element -->
-                                    <h3 class="text-2xl font-black text-white leading-tight tracking-tight mb-4 group-hover:translate-x-1 transition-transform duration-300">
+                                    <h3 class="text-lg md:text-xl font-black text-white leading-tight tracking-tight mb-3 group-hover:translate-x-1 transition-transform duration-300">
                                         {{ item.title }}
                                     </h3>
 
                                     <!-- Bottom: logo + subtitle + arrow -->
-                                    <div class="flex items-center justify-between relative z-10 mt-2">
-                                        <div class="flex items-center gap-2.5">
-                                            <div v-if="item.image" class="w-6 h-6 rounded-md overflow-hidden bg-white/5 border border-white/10 p-0.5 flex-shrink-0">
+                                    <div class="flex items-center justify-between relative z-10 mt-1">
+                                        <div class="flex items-center gap-2">
+                                            <div v-if="item.image" class="w-5 h-5 md:w-6 md:h-6 rounded-md overflow-hidden bg-white/5 border border-white/10 p-0.5 flex-shrink-0">
                                                 <img :src="item.image" :alt="`Imagem de ${item.title}`" class="w-full h-full object-contain" />
                                             </div>
-                                            <span class="text-[10px] font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-widest truncate max-w-[180px]">
+                                            <span class="text-[9px] md:text-[10px] font-semibold text-gray-400 uppercase tracking-wider truncate max-w-[160px] md:max-w-[180px]">
                                                 {{ item.subtitle || item.location || '' }}
                                             </span>
                                         </div>
                                         <!-- Arrow hint -->
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-0 group-hover:opacity-50 transition-all duration-300 group-hover:translate-x-0.5 flex-shrink-0"
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 opacity-0 group-hover:opacity-60 transition-all duration-300 group-hover:translate-x-0.5 flex-shrink-0"
                                              :class="{
                                                  'text-purple-400': item.type === 'experience',
                                                  'text-cyan-400': item.type === 'education',
@@ -1060,13 +1116,13 @@ const formatDate = (date) => {
                         </div>
 
                         <!-- Date Spacer -->
-                        <div class="absolute left-1/2 -translate-x-1/2 font-black select-none pointer-events-none transition-all duration-1000 whitespace-nowrap tracking-wider text-sm"
+                        <div class="absolute left-1/2 -translate-x-1/2 font-black select-none pointer-events-none transition-all duration-700 whitespace-nowrap tracking-wider text-xs md:text-sm"
                              :class="[
-                                 visibleItems.has(item.id) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-10 scale-90',
-                                 index % 2 === 0 ? 'top-[108%]' : 'bottom-[108%]'
+                                 visibleItems.has(item.id) ? 'opacity-100 translate-y-0 scale-100' : 'opacity-30 translate-y-2 scale-95',
+                                 index % 2 === 0 ? 'top-[calc(100%+8px)]' : 'bottom-[calc(100%+8px)]'
                              ]">
                             <span v-if="item.is_current"
-                                  class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest"
+                                  class="px-2.5 py-0.5 md:px-3 md:py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest"
                                   :class="{
                                       'bg-purple-500/20 text-purple-400 border border-purple-500/30': item.type === 'experience',
                                       'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30': item.type === 'education',
@@ -1074,7 +1130,7 @@ const formatDate = (date) => {
                                   }">
                                 ● {{ __('Ongoing') }}
                             </span>
-                            <span v-else class="text-white/20 text-[1.8vw] font-black tracking-tighter">
+                            <span v-else class="text-white/30 text-xs md:text-sm font-black tracking-widest font-mono">
                                 {{ item.displayDate ? item.displayDate.toLocaleDateString('pt-PT', { month: 'short' }).replace('.', '').toUpperCase() + ' ' + item.displayDate.getFullYear() : item.date.toLocaleDateString('pt-PT', { month: 'short' }).replace('.', '').toUpperCase() + ' ' + item.date.getFullYear() }}
                             </span>
                         </div>
