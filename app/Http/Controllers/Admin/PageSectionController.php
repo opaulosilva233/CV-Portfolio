@@ -25,6 +25,11 @@ class PageSectionController extends Controller
         ]);
 
         $section->update($validated);
+        PageSection::clearPortfolioCache();
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'section' => $section]);
+        }
 
         return redirect()->back();
     }
