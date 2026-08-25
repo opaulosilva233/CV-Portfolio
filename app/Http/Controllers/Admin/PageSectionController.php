@@ -40,6 +40,8 @@ class PageSectionController extends Controller
             PageSection::where('id', $id)->update(['sort_order' => $index]);
         }
 
+        PageSection::clearPortfolioCache();
+
         return response()->json(['success' => true]);
     }
 }

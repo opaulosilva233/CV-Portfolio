@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PageSection extends Model
 {
     /** @use HasFactory<\Database\Factories\PageSectionFactory> */
-    use HasFactory, \App\Traits\HasTranslations;
+    use HasFactory, \App\Traits\HasTranslations, \App\Traits\ClearsPortfolioCache;
 
     public function getTranslatableFields()
     {
