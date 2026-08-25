@@ -40,4 +40,28 @@ class PageSectionTest extends TestCase
         $response = $this->get('/');
         $response->assertStatus(200);
     }
+
+    public function test_homepage_sections_passed_in_reordered_sort_order(): void
+    {
+        $user = User::factory()->create();
+
+        PageSection::query()->delete();
+
+        $sec1 = PageSection::create(['name' => 'hero', 'title' => 'Hero', 'is_visible' => true, 'sort_order' => 0]);
+        $sec2 = PageSection::create(['name' => 'projects', 'title' => 'Projects', 'is_visible' => true, 'sort_order' => 1]);
+        $sec3 = PageSection::create(['name' => 'skills', 'title' => 'Skills', 'is_visible' => true, 'sort_order' => 2]);
+
+        $reorderResponse = $this->actingAs($user)->post('/admin/sections/reorder', [
+            'ids' => [$sec3->id, $sec2->id, $sec1->id]
+        ]);
+        $reorderResponse->assertStatus(200);
+
+        $response = $this->get('/');
+        $response->assertStatus(200);
+
+        $sections = $response->viewData('page')['props']['sections'];
+        $sectionNames = array_column($sections, 'name');
+
+        $this::assertEquals(['skills', 'projects', 'hero'], $sectionNames);
+    }
 }
