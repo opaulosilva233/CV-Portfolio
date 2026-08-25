@@ -6,6 +6,7 @@ import LanguageSwitcher from '@/Components/LanguageSwitcher.vue';
 import ThemeToggle from '@/Components/ThemeToggle.vue';
 import ContactSection from '@/Components/ContactSection.vue';
 import CyberTerminal from '@/Components/CyberTerminal.vue';
+import CyberHeroBoot from '@/Components/CyberHeroBoot.vue';
 
 const props = defineProps({
     hero: Object,
@@ -887,43 +888,12 @@ const formatDate = (date) => {
         <main class="flex flex-col">
         <!-- Hero Section -->
         <section id="about" class="pt-32 pb-20 px-4 min-h-screen flex items-center" :style="{ order: getSectionSortOrder('about') }" v-if="isSectionVisible('about')">
-            <div class="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row items-center gap-12">
-                <div class="lg:w-1/2 space-y-6">
-                    <h2 class="text-sm font-bold text-cyan-600 dark:text-cyan-400 tracking-[0.2em] uppercase animate-pulse">
-                        {{ hero.title || __('Full Stack Developer') }}
-                    </h2>
-                    <h1 class="text-5xl lg:text-7xl font-black tracking-tight text-gray-900 dark:text-white">
-                        {{ __('Hi, I\'m') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-cyan-600">{{ hero.name }}</span>
-                    </h1>
-                    <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-lg font-medium">
-                        {{ hero.bio }}
-                    </p>
-                    <div class="pt-4 flex gap-4">
-                        <a v-for="(link, platform) in socials" :key="platform" :href="link" target="_blank" class="px-6 py-3 bg-gray-900 dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md border border-white/10 text-white dark:text-white rounded-xl font-bold uppercase tracking-wide hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-purple-500/30">
-                            {{ __(platform) }}
-                        </a>
-                        <!-- FETCH_RESUME.EXE Button -->
-                        <a v-if="resume_url" :href="resume_url" target="_blank" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-cyan-500 text-white rounded-xl font-black uppercase tracking-widest text-xs hover:scale-105 hover:rotate-1 transition-all duration-300 shadow-xl shadow-emerald-500/20 group/resume flex items-center gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            {{ __('FETCH_RESUME.EXE') }}
-                        </a>
-                    </div>
-                </div>
-                <div class="lg:w-1/2 flex justify-center">
-                    <div class="relative w-72 h-72 lg:w-96 lg:h-96">
-                        <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-cyan-600 rounded-full blur-2xl opacity-50 animate-pulse"></div>
-                        <div class="relative w-full h-full rounded-full overflow-hidden border-4 border-white/20 dark:border-white/10 shadow-2xl">
-                            <img 
-                                :src="hero.image || 'https://ui-avatars.com/api/?name=' + (hero.name || 'User') + '&background=random'" 
-                                :alt="`Foto de perfil de ${hero.name || 'portfolio owner'}`"
-                                class="w-full h-full object-cover"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <CyberHeroBoot 
+                :hero="hero" 
+                :socials="socials" 
+                :resume-url="resume_url" 
+                :enabled="hero?.enable_animation !== false" 
+            />
         </section>
         
         <!-- Interests Section -->
