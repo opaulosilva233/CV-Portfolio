@@ -1,8 +1,11 @@
 ```
 # Dependencies
 node_modules/
+vendor/
 
-# Vite build artifacts
+# Vite dev/build artifacts
+public/hot
+public/build/
 node_modules/.vite/
 
 # Environment
