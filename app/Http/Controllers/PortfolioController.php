@@ -64,6 +64,7 @@ class PortfolioController extends Controller
                 'title' => SiteSetting::getValue('job_title', 'Full Stack Developer'),
                 'bio' => SiteSetting::getValue('bio', 'Welcome to my portfolio.'),
                 'image' => SiteSetting::getValue('hero_image'),
+                'enable_animation' => SiteSetting::getValue('enable_hero_animation', '1') === '1',
             ],
             'projects' => $projects,
             'skills' => $skills,

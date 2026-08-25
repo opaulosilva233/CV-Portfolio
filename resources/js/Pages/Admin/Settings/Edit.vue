@@ -14,6 +14,7 @@ const form = useCachedForm('settings_edit', {
     hero_image: props.settings.hero_image?.value || '',
     hero_image_file: null,
     remove_hero_image: false,
+    enable_hero_animation: props.settings.enable_hero_animation ? props.settings.enable_hero_animation.value : '1',
     contact_email: props.settings.contact_email?.value || '',
     footer_text: props.settings.footer_text?.value || '',
     seo_title: props.settings.seo_title?.value || '',
@@ -156,6 +157,31 @@ const submit = () => {
                                     </label>
                                 </div>
                                 <div v-if="form.errors.hero_image_file" class="text-red-400 text-xs mt-2">{{ form.errors.hero_image_file }}</div>
+                            </div>
+
+                            <!-- Cyber Boot & Decrypt Animation Toggle -->
+                            <div class="p-4 rounded-xl bg-gray-900/60 border border-purple-500/20 flex items-center justify-between gap-4">
+                                <div class="space-y-1">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+                                        <label for="enable_hero_animation" class="text-sm font-bold text-white tracking-wide">
+                                            Cyber Boot & Decrypt Animation
+                                        </label>
+                                    </div>
+                                    <p class="text-xs text-gray-400 max-w-xl">
+                                        Enable/disable the holographic boot sequence, text decrypter, laser scan and 3D interactive avatar effects on the homepage hero.
+                                    </p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+                                    <input 
+                                        type="checkbox" 
+                                        id="enable_hero_animation"
+                                        :checked="form.enable_hero_animation === '1' || form.enable_hero_animation === true"
+                                        @change="form.enable_hero_animation = $event.target.checked ? '1' : '0'"
+                                        class="sr-only peer"
+                                    >
+                                    <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-purple-600 peer-checked:to-cyan-500 shadow-inner"></div>
+                                </label>
                             </div>
                         </div>
                     </div>
