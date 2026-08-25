@@ -1,20 +1,45 @@
+@php
+    $siteName = rescue(fn() => \App\Models\SiteSetting::getValue('name'), 'Paulo Silva') ?: 'Paulo Silva';
+    $jobTitle = rescue(fn() => \App\Models\SiteSetting::getValue('job_title'), 'Full Stack Developer') ?: 'Full Stack Developer';
+    $customSeoTitle = rescue(fn() => \App\Models\SiteSetting::getValue('seo_title'), null);
+    $seoTitle = $customSeoTitle ?: "{$siteName} | {$jobTitle}";
+    
+    $customDescription = rescue(fn() => \App\Models\SiteSetting::getValue('seo_description') ?: \App\Models\SiteSetting::getValue('bio'), null);
+    $seoDescription = $customDescription ?: 'Professional portfolio with projects, skills and experience.';
+
+    $customKeywords = rescue(fn() => \App\Models\SiteSetting::getValue('seo_keywords'), null);
+
+    $heroImage = rescue(fn() => \App\Models\SiteSetting::getValue('hero_image'), null);
+    $ogImage = $heroImage ? (str_starts_with($heroImage, 'http') ? $heroImage : url($heroImage)) : asset('images/Logotipo.png');
+@endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Professional portfolio with projects, skills and experience.">
+    <meta name="description" content="{{ $seoDescription }}">
+    @if(!empty($customKeywords))
+    <meta name="keywords" content="{{ $customKeywords }}">
+    @endif
     <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+
+    <!-- Open Graph / Facebook / LinkedIn / WhatsApp -->
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="{{ config('app.name', 'Laravel') }}">
-    <meta property="og:title" content="{{ config('app.name', 'Laravel') }}">
-    <meta property="og:description" content="Professional portfolio with projects, skills and experience.">
+    <meta property="og:site_name" content="{{ $siteName }}">
+    <meta property="og:title" content="{{ $seoTitle }}">
+    <meta property="og:description" content="{{ $seoDescription }}">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:image" content="{{ asset('images/Logotipo.png') }}">
+    <meta property="og:image" content="{{ $ogImage }}">
     <link rel="canonical" href="{{ url()->current() }}">
 
-    <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $seoTitle }}">
+    <meta name="twitter:description" content="{{ $seoDescription }}">
+    <meta name="twitter:image" content="{{ $ogImage }}">
+
+    <title inertia>{{ $seoTitle }}</title>
 
     <!-- Favicon -->
     <link rel="icon" href="/images/Logotipo.png" type="image/png">
