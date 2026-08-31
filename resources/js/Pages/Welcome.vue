@@ -1172,7 +1172,7 @@ const formatDate = (date) => {
             <div class="max-w-7xl mx-auto">
                 <div class="mb-16">
                     <h2 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
-                        {{ __('Professional') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-violet-500">{{ __('Journey') }}</span>
+                        {{ __('Journey Prefix') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-violet-500">{{ __('Journey Highlight') }}</span>
                     </h2>
                     <div class="w-24 h-2 bg-purple-500 mt-4 rounded-full"></div>
                 </div>
@@ -1241,7 +1241,7 @@ const formatDate = (date) => {
             <div class="max-w-7xl mx-auto">
                 <div class="mb-16 text-right">
                     <h2 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
-                        {{ __('Academic') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-500">{{ __('Background') }}</span>
+                        {{ __('Academic Prefix') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-500">{{ __('Academic Highlight') }}</span>
                     </h2>
                     <div class="w-24 h-2 bg-cyan-500 mt-4 rounded-full ml-auto"></div>
                 </div>
@@ -1262,7 +1262,7 @@ const formatDate = (date) => {
                                     <p class="text-sm font-bold text-gray-600 dark:text-gray-400 opacity-80 truncate">{{ edu.institution }}</p>
                                 </div>
                                 <div class="text-cyan-600 dark:text-cyan-400 text-2xl font-black tracking-tighter opacity-20 group-hover:opacity-100 transition-all duration-700 whitespace-nowrap">
-                                    {{ edu.end_date ? new Date(edu.end_date).getFullYear() : (edu.is_current ? 'Present' : '') }}
+                                    {{ edu.end_date ? new Date(edu.end_date).getFullYear() : (edu.is_current ? __('Present') : '') }}
                                 </div>
                             </div>
                             
@@ -1305,7 +1305,7 @@ const formatDate = (date) => {
             <div class="max-w-7xl mx-auto">
                 <div class="mb-16">
                     <h2 class="text-4xl md:text-6xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">
-                        {{ __('Featured') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-amber-500">{{ __('Projects') }}</span>
+                        {{ __('Projects Prefix') }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-amber-500">{{ __('Projects Highlight') }}</span>
                     </h2>
                     <div class="w-24 h-2 bg-pink-500 mt-4 rounded-full"></div>
                 </div>
@@ -1364,7 +1364,7 @@ const formatDate = (date) => {
                              <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                              <span class="text-[10px] font-black tracking-widest text-emerald-500 uppercase">{{ __('Interactive Override') }}</span>
                         </div>
-                        <h2 class="text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tighter uppercase whitespace-pre-wrap">{{ __('System') }}<br/><span class="text-emerald-500">{{ __('Access') }}</span></h2>
+                        <h2 class="text-4xl lg:text-5xl font-black text-gray-900 dark:text-white tracking-tighter uppercase whitespace-pre-wrap">{{ __('Terminal Prefix') }}<br/><span class="text-emerald-500">{{ __('Terminal Highlight') }}</span></h2>
                         <p class="text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
                             {{ __("Interact directly with the system core via this terminal. Type 'help' to begin exploration.") }}
                         </p>

@@ -47,6 +47,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('admin/analytics/stats', [\App\Http\Controllers\Admin\AnalyticsController::class, 'getStats'])->name('admin.analytics.stats');
     Route::get('admin/analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('admin.analytics.index');
+
+    Route::get('admin/translations', [\App\Http\Controllers\Admin\TranslationController::class, 'index'])->name('admin.translations.index');
+    Route::post('admin/translations/translate-all', [\App\Http\Controllers\Admin\TranslationController::class, 'translateAll'])->name('admin.translations.translate-all');
+    Route::post('admin/translations/translate-item', [\App\Http\Controllers\Admin\TranslationController::class, 'translateItem'])->name('admin.translations.translate-item');
+    Route::post('admin/translations/translate-text', [\App\Http\Controllers\Admin\TranslationController::class, 'translateText'])->name('admin.translations.translate-text');
+    Route::put('admin/translations/update', [\App\Http\Controllers\Admin\TranslationController::class, 'update'])->name('admin.translations.update');
 });
 
 require __DIR__ . '/auth.php';

@@ -2,6 +2,13 @@
 
 namespace App\Services;
 
+use App\Models\Education;
+use App\Models\ExperienceRole;
+use App\Models\Interest;
+use App\Models\PageSection;
+use App\Models\Project;
+use App\Models\SiteSetting;
+use App\Models\Skill;
 use App\Models\Translation;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 use Illuminate\Support\Facades\Log;
@@ -13,9 +20,20 @@ class TranslationService
      * Original is 'pt'.
      */
     protected array $targetLocales = ['en', 'nl'];
+    protected string $sourceLocale = 'pt';
+
+    public function getTargetLocales(): array
+    {
+        return $this->targetLocales;
+    }
+
+    public function getSourceLocale(): string
+    {
+        return $this->sourceLocale;
+    }
 
     /**
-     * Translate model's specific fields.
+     * Translate model's specific fields or all translatable fields.
      */
     public function translateModel($model, bool $force = false): void
     {
@@ -30,6 +48,24 @@ class TranslationService
             return;
         }
 
+        $this->translateSpecificFields($model, $fields, $this->targetLocales, $force);
+
+        // Project specific logic for Gallery Metadata
+        if ($model instanceof \App\Models\Project) {
+            $this->translateProjectGallery($model, $force);
+        }
+
+        $this->refreshTranslatedContentCaches($model);
+    }
+
+    /**
+     * Translate only specific fields of a model to specific target locales.
+     */
+    public function translateSpecificFields($model, array $fields, array $locales = [], bool $force = false): array
+    {
+        $locales = empty($locales) ? $this->targetLocales : $locales;
+        $results = ['success' => 0, 'errors' => 0];
+
         foreach ($fields as $field) {
             $originalText = $model->$field;
 
@@ -37,18 +73,24 @@ class TranslationService
                 continue;
             }
 
-            if ($force) {
-                Translation::where('translatable_type', get_class($model))
-                    ->where('translatable_id', $model->id)
-                    ->where('field', $field)
-                    ->delete();
-            }
+            foreach ($locales as $locale) {
+                // If not forcing, skip if translation already exists and is not empty
+                if (!$force) {
+                    $existing = Translation::where('translatable_type', get_class($model))
+                        ->where('translatable_id', $model->id)
+                        ->where('field', $field)
+                        ->where('locale', $locale)
+                        ->first();
 
-            foreach ($this->targetLocales as $locale) {
+                    if ($existing && !empty(trim($existing->value))) {
+                        continue;
+                    }
+                }
+
                 try {
-                    $translatedText = $this->translateText($originalText, 'pt', $locale);
+                    $translatedText = $this->translateText($originalText, $this->sourceLocale, $locale);
                     
-                    if ($translatedText) {
+                    if ($translatedText !== null) {
                         Translation::updateOrCreate(
                             [
                                 'translatable_type' => get_class($model),
@@ -60,25 +102,79 @@ class TranslationService
                                 'value' => $translatedText,
                             ]
                         );
+                        $results['success']++;
+                    } else {
+                        $results['errors']++;
                     }
                 } catch (\Exception $e) {
                     Log::error("Translation failed for {$locale} on " . get_class($model) . " (ID: {$model->id}): " . $e->getMessage());
+                    $results['errors']++;
                 }
             }
         }
 
-        // Project specific logic for Gallery Metadata
-        if ($model instanceof \App\Models\Project) {
-            $this->translateProjectGallery($model, $force);
+        $this->refreshTranslatedContentCaches($model);
+
+        return $results;
+    }
+
+    /**
+     * Translate all translatable models in the entire application.
+     */
+    public function translateAll(bool $force = false): array
+    {
+        $summary = [
+            'total_models' => 0,
+            'success' => 0,
+            'errors' => 0,
+        ];
+
+        $modelsToTranslate = [
+            SiteSetting::class => SiteSetting::all(),
+            PageSection::class => PageSection::all(),
+            ExperienceRole::class => ExperienceRole::all(),
+            Education::class => Education::all(),
+            Skill::class => Skill::all(),
+            Project::class => Project::all(),
+            Interest::class => Interest::all(),
+        ];
+
+        foreach ($modelsToTranslate as $modelClass => $records) {
+            foreach ($records as $record) {
+                $summary['total_models']++;
+                try {
+                    $this->translateModel($record, $force);
+                    $summary['success']++;
+                } catch (\Exception $e) {
+                    Log::error("Bulk translation error on {$modelClass} ID {$record->id}: " . $e->getMessage());
+                    $summary['errors']++;
+                }
+            }
         }
 
-        $this->refreshTranslatedContentCaches($model);
+        $this->clearAllPortfolioCaches();
+
+        return $summary;
+    }
+
+    /**
+     * Clear all portfolio-related caches.
+     */
+    public function clearAllPortfolioCaches(): void
+    {
+        \App\Models\SiteSetting::clearCache();
+        \App\Models\Project::clearPortfolioCache();
+        \App\Models\Skill::clearPortfolioCache();
+        \App\Models\Experience::clearPortfolioCache();
+        \App\Models\Education::clearPortfolioCache();
+        \App\Models\Interest::clearPortfolioCache();
+        \App\Models\PageSection::clearPortfolioCache();
     }
 
     /**
      * Refresh caches that can mask freshly created translations.
      */
-    protected function refreshTranslatedContentCaches(object $model): void
+    public function refreshTranslatedContentCaches(object $model): void
     {
         if ($model instanceof \App\Models\SiteSetting) {
             \App\Models\SiteSetting::clearCache();
@@ -93,7 +189,7 @@ class TranslationService
     /**
      * Translates project gallery descriptions directly in metadata.json
      */
-    protected function translateProjectGallery(\App\Models\Project $project, bool $force = false): void
+    public function translateProjectGallery(\App\Models\Project $project, bool $force = false): void
     {
         $dir = storage_path('projects/' . $project->id);
         $metadataPath = $dir . '/metadata.json';
@@ -145,6 +241,10 @@ class TranslationService
     public function translateText(string $text, string $source, string $target): ?string
     {
         try {
+            if (trim($text) === '') {
+                return '';
+            }
+
             $tr = new GoogleTranslate();
             $tr->setSource($source);
             $tr->setTarget($target);

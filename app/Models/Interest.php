@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class Interest extends Model
 {
-    use \App\Traits\ClearsPortfolioCache;
+    use \App\Traits\HasTranslations, \App\Traits\ClearsPortfolioCache;
+
+    public function getTranslatableFields()
+    {
+        return ['name', 'description', 'category'];
+    }
 
     protected $fillable = [
         'name',

@@ -46,13 +46,13 @@ class PortfolioController extends Controller
         });
 
         $interests = $this->rememberPortfolioData('portfolio_interests', 3600, function () {
-            return \App\Models\Interest::where('is_active', true)->orderBy('order')->get()->groupBy('category');
+            return \App\Models\Interest::with('translations')->where('is_active', true)->orderBy('order')->get()->groupBy('category');
         }, function () {
             return \App\Models\Interest::where('is_active', true)->exists();
         });
 
         $sections = $this->rememberPortfolioData('portfolio_sections', 3600, function () {
-            return \App\Models\PageSection::orderBy('sort_order')->get();
+            return \App\Models\PageSection::with('translations')->orderBy('sort_order')->get();
         }, function () {
             return \App\Models\PageSection::exists();
         });
