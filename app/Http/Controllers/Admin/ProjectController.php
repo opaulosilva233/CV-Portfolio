@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Project;
+use App\Models\ProjectImage;
 use App\Models\Skill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -151,24 +152,22 @@ class ProjectController extends Controller
      */
     public function serveImage(Project $project, ?string $filename = null)
     {
-        $image = null;
+        $query = ProjectImage::where('project_id', $project->id);
 
         if (!$filename || $filename === 'principal' || str_starts_with($filename, 'principal.')) {
-            $image = $project->images()->where('is_principal', true)->first() ?? $project->images()->first();
+            $image = (clone $query)->where('is_principal', true)->first() ?? $query->first();
         } else {
             $nameWithoutExt = pathinfo($filename, PATHINFO_FILENAME);
-            $image = $project->images()
-                ->where(function ($q) use ($filename, $nameWithoutExt) {
+            $image = $query->where(function ($q) use ($filename, $nameWithoutExt) {
+                if (is_numeric($filename)) {
+                    $q->where('id', (int)$filename);
+                } elseif (is_numeric($nameWithoutExt)) {
+                    $q->where('id', (int)$nameWithoutExt);
+                } else {
                     $q->where('filename', $filename)
                       ->orWhere('filename', 'like', $nameWithoutExt . '.%');
-                    if (is_numeric($filename)) {
-                        $q->orWhere('id', (int)$filename);
-                    }
-                    if (is_numeric($nameWithoutExt)) {
-                        $q->orWhere('id', (int)$nameWithoutExt);
-                    }
-                })
-                ->first();
+                }
+            })->first();
         }
 
         if (!$image || empty($image->image_data)) {

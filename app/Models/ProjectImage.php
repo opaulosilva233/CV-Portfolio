@@ -41,7 +41,7 @@ class ProjectImage extends Model
     {
         return route('projects.image', [
             'project' => $this->project_id,
-            'filename' => $this->filename ?: $this->id,
+            'filename' => $this->id,
         ]) . '?v=' . ($this->updated_at ? $this->updated_at->timestamp : time());
     }
 
