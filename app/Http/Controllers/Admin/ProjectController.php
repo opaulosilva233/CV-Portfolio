@@ -160,9 +160,13 @@ class ProjectController extends Controller
             $image = $project->images()
                 ->where(function ($q) use ($filename, $nameWithoutExt) {
                     $q->where('filename', $filename)
-                      ->orWhere('filename', 'like', $nameWithoutExt . '.%')
-                      ->orWhere('id', $filename)
-                      ->orWhere('id', $nameWithoutExt);
+                      ->orWhere('filename', 'like', $nameWithoutExt . '.%');
+                    if (is_numeric($filename)) {
+                        $q->orWhere('id', (int)$filename);
+                    }
+                    if (is_numeric($nameWithoutExt)) {
+                        $q->orWhere('id', (int)$nameWithoutExt);
+                    }
                 })
                 ->first();
         }
@@ -189,9 +193,13 @@ class ProjectController extends Controller
                 $project->images()
                     ->where(function ($q) use ($identifier, $nameWithoutExt) {
                         $q->where('filename', $identifier)
-                          ->orWhere('filename', 'like', $nameWithoutExt . '.%')
-                          ->orWhere('id', $identifier)
-                          ->orWhere('id', $nameWithoutExt);
+                          ->orWhere('filename', 'like', $nameWithoutExt . '.%');
+                        if (is_numeric($identifier)) {
+                            $q->orWhere('id', (int)$identifier);
+                        }
+                        if (is_numeric($nameWithoutExt)) {
+                            $q->orWhere('id', (int)$nameWithoutExt);
+                        }
                     })
                     ->delete();
             }
@@ -204,9 +212,13 @@ class ProjectController extends Controller
             $target = $project->images()
                 ->where(function ($q) use ($principalExisting, $nameWithoutExt) {
                     $q->where('filename', $principalExisting)
-                      ->orWhere('filename', 'like', $nameWithoutExt . '.%')
-                      ->orWhere('id', $principalExisting)
-                      ->orWhere('id', $nameWithoutExt);
+                      ->orWhere('filename', 'like', $nameWithoutExt . '.%');
+                    if (is_numeric($principalExisting)) {
+                        $q->orWhere('id', (int)$principalExisting);
+                    }
+                    if (is_numeric($nameWithoutExt)) {
+                        $q->orWhere('id', (int)$nameWithoutExt);
+                    }
                 })
                 ->first();
 
@@ -225,9 +237,13 @@ class ProjectController extends Controller
                 $target = $project->images()
                     ->where(function ($q) use ($key, $nameWithoutExt) {
                         $q->where('filename', $key)
-                          ->orWhere('filename', 'like', $nameWithoutExt . '.%')
-                          ->orWhere('id', $key)
-                          ->orWhere('id', $nameWithoutExt);
+                          ->orWhere('filename', 'like', $nameWithoutExt . '.%');
+                        if (is_numeric($key)) {
+                            $q->orWhere('id', (int)$key);
+                        }
+                        if (is_numeric($nameWithoutExt)) {
+                            $q->orWhere('id', (int)$nameWithoutExt);
+                        }
                     })
                     ->first();
 
