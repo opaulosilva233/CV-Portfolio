@@ -921,7 +921,7 @@ const formatDate = (date) => {
                                     <div class="mt-1 w-6 h-6 shrink-0 [&>svg]:w-full [&>svg]:h-full text-pink-500" v-if="interest.icon" v-html="interest.icon"></div>
                                     <div>
                                         <h4 class="font-bold text-gray-900 dark:text-white leading-tight">{{ interest.name }}</h4>
-                                        <p v-if="interest.description" class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2 transition-all group-hover/item:line-clamp-none">{{ interest.description }}</p>
+                                        <div v-if="interest.description" class="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2 transition-all group-hover/item:line-clamp-none prose prose-sm dark:prose-invert max-w-none" v-html="interest.description"></div>
                                     </div>
                                 </div>
                             </div>
@@ -1226,7 +1226,7 @@ const formatDate = (date) => {
                                                 <span v-else>{{ new Date(role.end_date).toLocaleDateString('pt-PT', { month: 'short', year: 'numeric' }) }}</span>
                                             </div>
                                         </div>
-                                        <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed whitespace-pre-wrap">{{ role.description }}</p>
+                                        <div class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none [&_p]:mb-2 [&_p:last-child]:mb-0" v-html="role.description"></div>
                                     </div>
                                 </div>
                             </div>
@@ -1268,7 +1268,7 @@ const formatDate = (date) => {
                             
                             <!-- Description -->
                             <div class="relative pl-6 border-l-2 border-cyan-500/20 mb-8 flex-1">
-                                <p class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed whitespace-pre-line line-clamp-4">{{ edu.description }}</p>
+                                <div class="text-gray-600 dark:text-gray-400 text-sm leading-relaxed prose prose-sm dark:prose-invert max-w-none line-clamp-4 [&_p]:mb-1 [&_p:last-child]:mb-0" v-html="edu.description"></div>
                             </div>
 
                             <div class="flex flex-col gap-6">
@@ -1329,7 +1329,7 @@ const formatDate = (date) => {
                             <!-- Project Info -->
                             <div class="p-8 flex-1 flex flex-col relative z-10">
                                 <h3 class="text-2xl font-black text-gray-800 dark:text-white mb-3 group-hover:text-pink-500 transition-colors">{{ project.title }}</h3>
-                                <p class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 transition-all duration-300">{{ project.description }}</p>
+                                <div class="text-gray-500 dark:text-gray-400 text-sm leading-relaxed mb-6 line-clamp-3 transition-all duration-300 prose prose-sm dark:prose-invert max-w-none [&_p]:mb-1 [&_p:last-child]:mb-0" v-html="project.description"></div>
 
                                 <!-- Skills/Tags -->
                                 <div class="flex flex-wrap gap-2 mb-8">
@@ -1462,7 +1462,7 @@ const formatDate = (date) => {
 
                             <div class="space-y-12 mb-16 flex-1">
                                 <div class="text-gray-400 text-lg md:text-xl leading-relaxed font-medium">
-                                    <div class="whitespace-pre-line border-l-4 border-pink-500/30 pl-10 leading-loose tracking-wide">{{ selectedProject.description }}</div>
+                                    <div class="border-l-4 border-pink-500/30 pl-10 leading-loose tracking-wide prose prose-lg dark:prose-invert max-w-none [&_p]:mb-4 [&_p:last-child]:mb-0 text-gray-300" v-html="selectedProject.description"></div>
                                 </div>
                             </div>
 

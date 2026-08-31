@@ -271,6 +271,12 @@ const translateSingleGalleryOnDemand = async (galleryItem, locale) => {
     }
 };
 
+// Strip HTML tags for previews
+const stripHtml = (html) => {
+    if (!html) return '';
+    return html.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+};
+
 // Save all modal edits
 const saveModalTranslations = () => {
     if (!activeItem.value) return;
@@ -560,7 +566,7 @@ const getBadgeClass = (color) => {
                                             class="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-black/40 text-gray-300 border border-white/5"
                                         >
                                             <span class="font-mono text-cyan-400 mr-1">{{ f.label }}:</span>
-                                            <span class="truncate max-w-[180px]">{{ f.original_value || '—' }}</span>
+                                            <span class="truncate max-w-[180px]">{{ stripHtml(f.original_value) || '—' }}</span>
                                         </span>
                                         <span v-if="item.gallery_items && item.gallery_items.length > 0" class="inline-flex items-center px-2 py-0.5 rounded text-[11px] bg-purple-500/10 text-purple-300 border border-purple-500/20">
                                             {{ item.gallery_items.length }} {{ __('Gallery Images') }}
@@ -756,7 +762,7 @@ const getBadgeClass = (color) => {
                             <div class="flex items-center justify-between text-xs text-gray-400 mb-1">
                                 <span class="font-semibold text-gray-300 uppercase">Português (Origem):</span>
                             </div>
-                            <p class="text-sm text-gray-200 whitespace-pre-wrap">{{ field.original_value || '—' }}</p>
+                            <div class="text-sm text-gray-200 prose prose-sm dark:prose-invert max-w-none [&_p]:mb-1 [&_p:last-child]:mb-0" v-html="field.original_value || '—'"></div>
                         </div>
 
                         <!-- Translation Target Inputs -->

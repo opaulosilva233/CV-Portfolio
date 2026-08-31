@@ -285,7 +285,7 @@ class TranslationService
                         }
                     }
                     if (!empty(trim($translated))) {
-                        return trim($translated);
+                        return $this->cleanTranslatedHtml(trim($translated));
                     }
                 }
             }
@@ -306,7 +306,7 @@ class TranslationService
             ]);
             $translated = $tr->translate($text);
             if (!empty(trim($translated))) {
-                return trim($translated);
+                return $this->cleanTranslatedHtml(trim($translated));
             }
         } catch (\Exception $e) {
             Log::warning("Stichoza GoogleTranslate failed for ({$source}->{$target}): " . $e->getMessage());
@@ -325,7 +325,7 @@ class TranslationService
                 $json = $response->json();
                 $translated = $json['responseData']['translatedText'] ?? null;
                 if (!empty(trim($translated)) && !str_starts_with(strtoupper($translated), 'MYMEMORY WARNING')) {
-                    return trim($translated);
+                    return $this->cleanTranslatedHtml(trim($translated));
                 }
             }
         } catch (\Exception $e) {
@@ -334,5 +334,22 @@ class TranslationService
 
         Log::error("All translation engines failed for text: '{$text}' ({$source}->{$target})");
         return null;
+    }
+
+    /**
+     * Clean and normalize HTML tags that may have been mangled during translation.
+     */
+    protected function cleanTranslatedHtml(string $text): string
+    {
+        // Fix spaces in closing tags: </ p> -> </p>
+        $text = preg_replace('/<\s*\/\s*([a-zA-Z0-9]+)\s*>/', '</$1>', $text);
+
+        // Fix spaces in opening tags: < p > -> <p>
+        $text = preg_replace('/<\s*([a-zA-Z0-9]+)\s*>/', '<$1>', $text);
+
+        // Fix line breaks: < br > or <br / > -> <br>
+        $text = preg_replace('/<\s*br\s*\/?\s*>/i', '<br>', $text);
+
+        return $text;
     }
 }
