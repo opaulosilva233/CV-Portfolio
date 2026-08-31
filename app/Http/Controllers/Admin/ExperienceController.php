@@ -93,7 +93,11 @@ class ExperienceController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $this->saveImage($experience, $request->file('image'));
+            $file = $request->file('image');
+            $experience->update([
+                'image_data' => file_get_contents($file->getRealPath()),
+                'image_mime_type' => $file->getClientMimeType() ?: 'image/png',
+            ]);
         }
 
         return redirect()->route('admin.experiences.index')->with('success', 'Experience created successfully.');
@@ -134,13 +138,19 @@ class ExperienceController extends Controller
 
         // Handle image removal
         if ($request->boolean('remove_image')) {
-            $this->deleteImage($experience);
+            $experience->update([
+                'image_data' => null,
+                'image_mime_type' => null,
+            ]);
         }
 
         // Handle image upload (overrides removal if both sent)
         if ($request->hasFile('image')) {
-            $this->deleteImage($experience);
-            $this->saveImage($experience, $request->file('image'));
+            $file = $request->file('image');
+            $experience->update([
+                'image_data' => file_get_contents($file->getRealPath()),
+                'image_mime_type' => $file->getClientMimeType() ?: 'image/png',
+            ]);
         }
 
         return redirect()->route('admin.experiences.index')->with('success', 'Experience updated successfully.');
@@ -148,9 +158,6 @@ class ExperienceController extends Controller
 
     public function destroy(Experience $experience)
     {
-        // Delete image folder
-        $this->deleteImage($experience);
-
         $experience->delete();
         return redirect()->back();
     }
@@ -158,54 +165,23 @@ class ExperienceController extends Controller
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
-        $experiences = Experience::whereIn('id', $ids)->get();
-
-        foreach ($experiences as $experience) {
-            $this->deleteImage($experience);
-            $experience->delete();
-        }
+        Experience::whereIn('id', $ids)->delete();
 
         return redirect()->back()->with('success', 'Selected experiences deleted successfully.');
     }
 
     /**
-     * Serve the experience image from storage (public route).
+     * Serve the experience image from database (public route).
      */
     public function serveImage(Experience $experience)
     {
-        $path = $experience->getImagePath();
-
-        if (!$path) {
+        if (empty($experience->image_data)) {
             abort(404);
         }
 
-        return response()->file($path);
-    }
-
-    /**
-     * Save an uploaded image to storage/experiences/{id}/logo.{ext}
-     */
-    private function saveImage(Experience $experience, $file): void
-    {
-        $dir = storage_path('experiences/' . $experience->id);
-
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-
-        $extension = $file->getClientOriginalExtension();
-        $file->move($dir, 'logo.' . $extension);
-    }
-
-    /**
-     * Delete the image directory for an experience.
-     */
-    private function deleteImage(Experience $experience): void
-    {
-        $dir = storage_path('experiences/' . $experience->id);
-
-        if (is_dir($dir)) {
-            File::deleteDirectory($dir);
-        }
+        return response($experience->image_data, 200, [
+            'Content-Type' => $experience->image_mime_type ?: 'image/png',
+            'Cache-Control' => 'public, max-age=31536000, immutable',
+        ]);
     }
 }

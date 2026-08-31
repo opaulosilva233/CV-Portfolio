@@ -36,45 +36,29 @@ class Project extends Model
 
     protected $appends = ['main_image_url', 'gallery'];
 
+    public function images()
+    {
+        return $this->hasMany(ProjectImage::class)->orderBy('is_principal', 'desc')->orderBy('sort_order', 'asc');
+    }
+
     /**
-     * Get the gallery of images for the project.
-     * Returns an array of objects: { url: string, description: string, is_principal: boolean, filename: string }
+     * Get the gallery of images for the project from the database.
+     * Returns an array of objects: { id: int, url: string, description: string, is_principal: boolean, filename: string, sort_order: int }
      */
     public function getGalleryAttribute(): array
     {
-        $dir = storage_path('projects/' . $this->id);
-        if (!is_dir($dir)) {
-            return [];
-        }
+        $images = $this->relationLoaded('images') ? $this->images : $this->images()->with('translations')->get();
 
-        $allFiles = glob($dir . '/*.*');
-        $metadata = [];
-        if (file_exists($dir . '/metadata.json')) {
-            $json = json_decode(file_get_contents($dir . '/metadata.json'), true);
-            $locale = \Illuminate\Support\Facades\App::getLocale();
-            $metadata = $json[$locale] ?? $json['en'] ?? $json['pt'] ?? [];
-        }
-
-        $gallery = [];
-        foreach ($allFiles as $filePath) {
-            $filename = basename($filePath);
-            if ($filename === 'metadata.json') continue;
-
-            $nameWithoutExt = pathinfo($filename, PATHINFO_FILENAME);
-            $isPrincipal = $nameWithoutExt === 'principal';
-            
-            $gallery[] = [
-                'filename' => $filename,
-                'url' => route('projects.image', ['project' => $this->id, 'filename' => $filename]),
-                'description' => $metadata[$nameWithoutExt] ?? '',
-                'is_principal' => $isPrincipal,
-                'sort_order' => $isPrincipal ? -1 : (is_numeric($nameWithoutExt) ? (int)$nameWithoutExt : 999),
+        return $images->map(function ($img) {
+            return [
+                'id' => $img->id,
+                'filename' => $img->filename ?: ($img->is_principal ? 'principal.png' : $img->id . '.png'),
+                'url' => $img->url,
+                'description' => $img->translated('description') ?: ($img->description ?: ''),
+                'is_principal' => (bool)$img->is_principal,
+                'sort_order' => (int)$img->sort_order,
             ];
-        }
-
-        usort($gallery, fn($a, $b) => $a['sort_order'] <=> $b['sort_order']);
-
-        return $gallery;
+        })->sortBy('sort_order')->values()->toArray();
     }
 
     /**
@@ -82,15 +66,10 @@ class Project extends Model
      */
     public function getMainImageUrlAttribute(): ?string
     {
-        $dir = storage_path('projects/' . $this->id);
-        $files = glob($dir . '/principal.*');
+        $images = $this->relationLoaded('images') ? $this->images : $this->images()->get();
+        $principal = $images->firstWhere('is_principal', true) ?? $images->first();
 
-        if (empty($files)) {
-            return null;
-        }
-
-        $filename = basename($files[0]);
-        return route('projects.image', ['project' => $this->id, 'filename' => $filename]) . '?v=' . filemtime($files[0]);
+        return $principal ? $principal->url : null;
     }
 
     public function skills()

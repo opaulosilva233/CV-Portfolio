@@ -18,6 +18,12 @@ class Experience extends Model
     protected $fillable = [
         'company',
         'location',
+        'image_data',
+        'image_mime_type',
+    ];
+
+    protected $hidden = [
+        'image_data',
     ];
 
     protected $casts = [
@@ -35,33 +41,15 @@ class Experience extends Model
     }
 
     /**
-     * Get the path to the experience image file, if it exists.
-     */
-    public function getImagePath(): ?string
-    {
-        $dir = storage_path('experiences/' . $this->id);
-
-        if (!is_dir($dir)) {
-            return null;
-        }
-
-        $files = glob($dir . '/logo.*');
-
-        return !empty($files) ? $files[0] : null;
-    }
-
-    /**
      * Accessor: image_url
      */
     public function getImageUrlAttribute(): ?string
     {
-        $path = $this->getImagePath();
-
-        if (!$path) {
+        if (empty($this->image_data)) {
             return null;
         }
 
-        return route('experiences.image', $this->id) . '?v=' . filemtime($path);
+        return route('experiences.image', $this->id) . '?v=' . ($this->updated_at ? $this->updated_at->timestamp : time());
     }
 
     public function roles()

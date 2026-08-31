@@ -18,7 +18,7 @@ class PortfolioController extends Controller
         // Cache portfolio data for better performance, but refresh stale empty values
         // when the database already has records.
         $projects = $this->rememberPortfolioData('portfolio_projects', 3600, function () {
-            return Project::with(['translations', 'skills'])->where('is_featured', true)->orderBy('completed_at', 'desc')->get();
+            return Project::with(['translations', 'skills', 'images.translations'])->where('is_featured', true)->orderBy('completed_at', 'desc')->get();
         }, function () {
             return Project::where('is_featured', true)->exists();
         });

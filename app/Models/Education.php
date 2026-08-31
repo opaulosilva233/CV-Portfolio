@@ -24,6 +24,12 @@ class Education extends Model
         'type',
         'url',
         'description',
+        'image_data',
+        'image_mime_type',
+    ];
+
+    protected $hidden = [
+        'image_data',
     ];
 
     protected $casts = [
@@ -43,33 +49,15 @@ class Education extends Model
     protected $appends = ['image_url'];
 
     /**
-     * Get the path to the education image file, if it exists.
-     */
-    public function getImagePath(): ?string
-    {
-        $dir = storage_path('educations/' . $this->id);
-
-        if (!is_dir($dir)) {
-            return null;
-        }
-
-        $files = glob($dir . '/logo.*');
-
-        return !empty($files) ? $files[0] : null;
-    }
-
-    /**
      * Accessor: image_url
      */
     public function getImageUrlAttribute(): ?string
     {
-        $path = $this->getImagePath();
-
-        if (!$path) {
+        if (empty($this->image_data)) {
             return null;
         }
 
-        return route('educations.image', $this->id) . '?v=' . filemtime($path);
+        return route('educations.image', $this->id) . '?v=' . ($this->updated_at ? $this->updated_at->timestamp : time());
     }
 
     public function skills()

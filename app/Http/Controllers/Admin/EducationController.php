@@ -72,7 +72,11 @@ class EducationController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $this->saveImage($education, $request->file('image'));
+            $file = $request->file('image');
+            $education->update([
+                'image_data' => file_get_contents($file->getRealPath()),
+                'image_mime_type' => $file->getClientMimeType() ?: 'image/png',
+            ]);
         }
 
         return redirect()->route('admin.education.index')->with('success', 'Education/Certificate created successfully.');
@@ -127,13 +131,19 @@ class EducationController extends Controller
 
         // Handle image removal
         if ($request->boolean('remove_image')) {
-            $this->deleteImage($education);
+            $education->update([
+                'image_data' => null,
+                'image_mime_type' => null,
+            ]);
         }
 
         // Handle image upload (overrides removal if both sent)
         if ($request->hasFile('image')) {
-            $this->deleteImage($education);
-            $this->saveImage($education, $request->file('image'));
+            $file = $request->file('image');
+            $education->update([
+                'image_data' => file_get_contents($file->getRealPath()),
+                'image_mime_type' => $file->getClientMimeType() ?: 'image/png',
+            ]);
         }
 
         return redirect()->route('admin.education.index')->with('success', 'Education/Certificate updated successfully.');
@@ -144,9 +154,6 @@ class EducationController extends Controller
      */
     public function destroy(Education $education)
     {
-        // Delete image folder
-        $this->deleteImage($education);
-
         $education->delete();
         return redirect()->back()->with('success', 'Education deleted successfully.');
     }
@@ -154,54 +161,23 @@ class EducationController extends Controller
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
-        $educations = Education::whereIn('id', $ids)->get();
-
-        foreach ($educations as $education) {
-            $this->deleteImage($education);
-            $education->delete();
-        }
+        Education::whereIn('id', $ids)->delete();
 
         return redirect()->back()->with('success', 'Selected records deleted successfully.');
     }
 
     /**
-     * Serve the education image from storage (public route).
+     * Serve the education image from database (public route).
      */
     public function serveImage(Education $education)
     {
-        $path = $education->getImagePath();
-
-        if (!$path) {
+        if (empty($education->image_data)) {
             abort(404);
         }
 
-        return response()->file($path);
-    }
-
-    /**
-     * Save an uploaded image to storage/educations/{id}/logo.{ext}
-     */
-    private function saveImage(Education $education, $file): void
-    {
-        $dir = storage_path('educations/' . $education->id);
-
-        if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
-        }
-
-        $extension = $file->getClientOriginalExtension();
-        $file->move($dir, 'logo.' . $extension);
-    }
-
-    /**
-     * Delete the image directory for an education.
-     */
-    private function deleteImage(Education $education): void
-    {
-        $dir = storage_path('educations/' . $education->id);
-
-        if (is_dir($dir)) {
-            File::deleteDirectory($dir);
-        }
+        return response($education->image_data, 200, [
+            'Content-Type' => $education->image_mime_type ?: 'image/png',
+            'Cache-Control' => 'public, max-age=31536000, immutable',
+        ]);
     }
 }

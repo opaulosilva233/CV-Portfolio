@@ -16,7 +16,7 @@ class ProjectController extends Controller
     {
         $search = $request->input('search');
 
-        $query = Project::query()->with('skills');
+        $query = Project::query()->with(['skills', 'images']);
 
         if ($search) {
             $query->where('title', 'like', "%{$search}%")
@@ -44,7 +44,7 @@ class ProjectController extends Controller
 
     public function edit(Project $project)
     {
-        $project->load('skills');
+        $project->load(['skills', 'images.translations']);
 
         return Inertia::render('Admin/Projects/Edit', [
             'project' => $project,
@@ -123,11 +123,6 @@ class ProjectController extends Controller
 
     public function destroy(Project $project)
     {
-        $dir = storage_path('projects/' . $project->id);
-        if (is_dir($dir)) {
-            File::deleteDirectory($dir);
-        }
-
         $project->delete();
         return redirect()->back();
     }
@@ -146,134 +141,130 @@ class ProjectController extends Controller
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('ids');
-        $projects = Project::whereIn('id', $ids)->get();
-
-        foreach ($projects as $project) {
-            $dir = storage_path('projects/' . $project->id);
-            if (is_dir($dir)) {
-                File::deleteDirectory($dir);
-            }
-            $project->delete();
-        }
+        Project::whereIn('id', $ids)->delete();
 
         return redirect()->back()->with('success', 'Selected projects deleted successfully.');
     }
 
     /**
-     * Serve a specific project image from storage.
+     * Serve a specific project image from database.
      */
-    public function serveImage(Project $project, string $filename = null)
+    public function serveImage(Project $project, ?string $filename = null)
     {
-        if (!$filename) {
-            // Fallback for old routes or if filename omitted
-            $files = glob(storage_path('projects/' . $project->id . '/principal.*'));
-            if (empty($files)) abort(404);
-            $path = $files[0];
+        $image = null;
+
+        if (!$filename || $filename === 'principal' || str_starts_with($filename, 'principal.')) {
+            $image = $project->images()->where('is_principal', true)->first() ?? $project->images()->first();
         } else {
-            $path = storage_path('projects/' . $project->id . '/' . $filename);
+            $nameWithoutExt = pathinfo($filename, PATHINFO_FILENAME);
+            $image = $project->images()
+                ->where(function ($q) use ($filename, $nameWithoutExt) {
+                    $q->where('filename', $filename)
+                      ->orWhere('filename', 'like', $nameWithoutExt . '.%')
+                      ->orWhere('id', $filename)
+                      ->orWhere('id', $nameWithoutExt);
+                })
+                ->first();
         }
 
-        if (!File::exists($path) || is_dir($path) || $filename === 'metadata.json') {
+        if (!$image || empty($image->image_data)) {
             abort(404);
         }
 
-        return response()->file($path);
+        return response($image->image_data, 200, [
+            'Content-Type' => $image->mime_type ?: 'image/png',
+            'Cache-Control' => 'public, max-age=31536000, immutable',
+        ]);
     }
 
     /**
-     * Update the project gallery.
+     * Update the project gallery in the database.
      */
     private function updateGallery(Project $project, array $newFiles, array $metadata, array $removeFilenames = []): void
     {
-        $dir = storage_path('projects/' . $project->id);
-        if (!is_dir($dir)) mkdir($dir, 0755, true);
-
         // 1. Handle removals
-        foreach ($removeFilenames as $filename) {
-            $path = $dir . '/' . $filename;
-            if (File::exists($path)) File::delete($path);
-        }
-
-        // 2. Handle switching principal if it's an existing file
-        $principalExisting = $metadata['is_principal_existing'] ?? null;
-        if ($principalExisting && $principalExisting !== 'principal') {
-            $oldPrincipals = glob($dir . '/principal.*');
-            $targetFiles = glob($dir . '/' . $principalExisting . '.*');
-
-            if (!empty($targetFiles)) {
-                $targetFile = $targetFiles[0];
-                $targetExt = pathinfo($targetFile, PATHINFO_EXTENSION);
-                
-                if (!empty($oldPrincipals)) {
-                    $oldPrincipal = $oldPrincipals[0];
-                    $oldExt = pathinfo($oldPrincipal, PATHINFO_EXTENSION);
-                    
-                    // Find next number for old principal
-                    $existingNums = array_map(fn($f) => pathinfo($f, PATHINFO_FILENAME), glob($dir . '/*.*'));
-                    $nextNum = 1;
-                    while (in_array((string)$nextNum, $existingNums)) $nextNum++;
-                    
-                    rename($oldPrincipal, $dir . '/' . $nextNum . '.' . $oldExt);
-                }
-                
-                rename($targetFile, $dir . '/principal.' . $targetExt);
+        if (!empty($removeFilenames)) {
+            foreach ($removeFilenames as $identifier) {
+                $nameWithoutExt = pathinfo($identifier, PATHINFO_FILENAME);
+                $project->images()
+                    ->where(function ($q) use ($identifier, $nameWithoutExt) {
+                        $q->where('filename', $identifier)
+                          ->orWhere('filename', 'like', $nameWithoutExt . '.%')
+                          ->orWhere('id', $identifier)
+                          ->orWhere('id', $nameWithoutExt);
+                    })
+                    ->delete();
             }
         }
 
-        // 3. Save new files
-        $existingFiles = glob($dir . '/*.*');
-        $existingNums = array_filter(array_map(fn($f) => pathinfo($f, PATHINFO_FILENAME), $existingFiles), 'is_numeric');
-        $nextNumber = empty($existingNums) ? 1 : max(array_map('intval', $existingNums)) + 1;
+        // 2. Handle switching principal if an existing item was selected
+        $principalExisting = $metadata['is_principal_existing'] ?? null;
+        if ($principalExisting) {
+            $nameWithoutExt = pathinfo($principalExisting, PATHINFO_FILENAME);
+            $target = $project->images()
+                ->where(function ($q) use ($principalExisting, $nameWithoutExt) {
+                    $q->where('filename', $principalExisting)
+                      ->orWhere('filename', 'like', $nameWithoutExt . '.%')
+                      ->orWhere('id', $principalExisting)
+                      ->orWhere('id', $nameWithoutExt);
+                })
+                ->first();
+
+            if ($target) {
+                $project->images()->where('id', '!=', $target->id)->update(['is_principal' => false]);
+                $target->update(['is_principal' => true]);
+            }
+        }
+
+        // 3. Update descriptions on existing images
+        if (!empty($metadata['descriptions'])) {
+            foreach ($metadata['descriptions'] as $key => $desc) {
+                if (str_starts_with($key, 'new_')) continue;
+
+                $nameWithoutExt = pathinfo($key, PATHINFO_FILENAME);
+                $target = $project->images()
+                    ->where(function ($q) use ($key, $nameWithoutExt) {
+                        $q->where('filename', $key)
+                          ->orWhere('filename', 'like', $nameWithoutExt . '.%')
+                          ->orWhere('id', $key)
+                          ->orWhere('id', $nameWithoutExt);
+                    })
+                    ->first();
+
+                if ($target) {
+                    $target->update(['description' => $desc]);
+                }
+            }
+        }
+
+        // 4. Save new files
+        $maxSortOrder = (int)($project->images()->max('sort_order') ?? 0);
 
         foreach ($newFiles as $index => $file) {
-            $isPrincipal = ($metadata['new_' . $index]['is_principal'] ?? false);
-            
+            $isPrincipal = (bool)($metadata['new_' . $index]['is_principal'] ?? false);
+
             if ($isPrincipal) {
-                // Move old principal to a number first
-                $oldPrincipals = glob($dir . '/principal.*');
-                if (!empty($oldPrincipals)) {
-                    $oldPrincipal = $oldPrincipals[0];
-                    $oldExt = pathinfo($oldPrincipal, PATHINFO_EXTENSION);
-                    rename($oldPrincipal, $dir . '/' . $nextNumber++ . '.' . $oldExt);
-                }
-                $name = 'principal';
-            } else {
-                $name = (string)$nextNumber++;
+                $project->images()->update(['is_principal' => false]);
             }
 
-            $extension = $file->getClientOriginalExtension();
-            $file->move($dir, $name . '.' . $extension);
+            $description = $metadata['descriptions']['new_' . $index] ?? null;
+
+            $project->images()->create([
+                'filename' => $file->getClientOriginalName(),
+                'image_data' => file_get_contents($file->getRealPath()),
+                'mime_type' => $file->getClientMimeType() ?: 'image/png',
+                'description' => $description,
+                'is_principal' => $isPrincipal,
+                'sort_order' => ++$maxSortOrder,
+            ]);
         }
 
-        // 4. Update metadata.json (descriptions)
-        $currentLocale = \Illuminate\Support\Facades\App::getLocale();
-        $metadataPath = $dir . '/metadata.json';
-        $fullMetadata = file_exists($metadataPath) ? json_decode(file_get_contents($metadataPath), true) : [];
-        
-        if (isset($metadata['descriptions'])) {
-            if (!isset($fullMetadata[$currentLocale])) $fullMetadata[$currentLocale] = [];
-            
-            // Clean up old descriptions for current locale if they don't exist anymore in disco
-            $remainingFiles = array_map(fn($f) => pathinfo($f, PATHINFO_FILENAME), glob($dir . '/*.*'));
-            $newLocaleMetadata = [];
-            
-            foreach ($metadata['descriptions'] as $key => $desc) {
-                // If it's a new file, we don't know its final name yet easily here, 
-                // but we can map 'new_0' to 'principal' or $nextNumber.
-                // Actually, let's keep it simple: the frontend should ideally refresh 
-                // or we accept that names change.
-                // For now, let's just save what we got.
-                if (str_starts_with($key, 'new_')) {
-                    $idx = (int)str_replace('new_', '', $key);
-                    $finalName = ($metadata['new_' . $idx]['is_principal'] ?? false) ? 'principal' : (string)($nextNumber - count($newFiles) + $idx);
-                    $newLocaleMetadata[$finalName] = $desc;
-                } else {
-                    $newLocaleMetadata[$key] = $desc;
-                }
+        // 5. Ensure at least one principal image exists
+        if ($project->images()->count() > 0 && !$project->images()->where('is_principal', true)->exists()) {
+            $first = $project->images()->orderBy('sort_order', 'asc')->first();
+            if ($first) {
+                $first->update(['is_principal' => true]);
             }
-            $fullMetadata[$currentLocale] = $newLocaleMetadata;
         }
-
-        File::put($metadataPath, json_encode($fullMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     }
 }

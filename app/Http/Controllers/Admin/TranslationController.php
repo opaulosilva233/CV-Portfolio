@@ -235,22 +235,34 @@ class TranslationController extends Controller
             }
         }
 
-        // Update Project gallery metadata.json if provided
+        // Update Project gallery translations if provided
         if ($model instanceof Project && !empty($validated['gallery_translations'])) {
-            $dir = storage_path('projects/' . $model->id);
-            $metadataPath = $dir . '/metadata.json';
+            $images = $model->images()->with('translations')->get();
+            foreach ($validated['gallery_translations'] as $loc => $imgMap) {
+                foreach ($imgMap as $imgKey => $desc) {
+                    $nameWithoutExt = pathinfo($imgKey, PATHINFO_FILENAME);
+                    $targetImg = $images->first(function ($img) use ($imgKey, $nameWithoutExt) {
+                        return (string)$img->id === (string)$imgKey || $img->filename === $imgKey || pathinfo($img->filename, PATHINFO_FILENAME) === $nameWithoutExt;
+                    });
 
-            if (file_exists($metadataPath)) {
-                $fullMetadata = json_decode(file_get_contents($metadataPath), true) ?: [];
-                foreach ($validated['gallery_translations'] as $loc => $imgMap) {
-                    if (!isset($fullMetadata[$loc])) {
-                        $fullMetadata[$loc] = [];
-                    }
-                    foreach ($imgMap as $imgKey => $desc) {
-                        $fullMetadata[$loc][$imgKey] = $desc;
+                    if ($targetImg) {
+                        if ($loc === 'pt') {
+                            $targetImg->update(['description' => $desc]);
+                        } else {
+                            Translation::updateOrCreate(
+                                [
+                                    'translatable_type' => \App\Models\ProjectImage::class,
+                                    'translatable_id' => $targetImg->id,
+                                    'field' => 'description',
+                                    'locale' => $loc,
+                                ],
+                                [
+                                    'value' => $desc,
+                                ]
+                            );
+                        }
                     }
                 }
-                File::put($metadataPath, json_encode($fullMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
             }
         }
 
@@ -455,32 +467,29 @@ class TranslationController extends Controller
     }
 
     /**
-     * Build project gallery metadata structure.
+     * Build project gallery metadata structure from database.
      */
     protected function buildProjectGalleryData(Project $project, array $targetLocales): array
     {
-        $dir = storage_path('projects/' . $project->id);
-        $metadataPath = $dir . '/metadata.json';
-
-        if (!file_exists($metadataPath)) {
-            return [];
-        }
-
-        $json = json_decode(file_get_contents($metadataPath), true) ?: [];
-        $ptDescriptions = $json['pt'] ?? [];
+        $images = $project->images()->with('translations')->orderBy('is_principal', 'desc')->orderBy('sort_order', 'asc')->get();
 
         $gallery = [];
-        foreach ($ptDescriptions as $imgKey => $origDesc) {
+        foreach ($images as $img) {
+            $origDesc = $img->getRawOriginal('description') ?: '';
             if (empty($origDesc)) continue;
+
+            $imgKey = $img->filename ? pathinfo($img->filename, PATHINFO_FILENAME) : (string)$img->id;
 
             $localeMap = [];
             foreach ($targetLocales as $loc) {
-                $localeMap[$loc] = $json[$loc][$imgKey] ?? '';
+                $localeMap[$loc] = $img->translations->where('field', 'description')->where('locale', $loc)->first()?->value ?? '';
             }
+
+            $label = $img->is_principal ? 'Principal Image Description' : ('Image ' . $imgKey . ' Description');
 
             $gallery[] = [
                 'image_key' => $imgKey,
-                'label' => 'Image ' . $imgKey . ' Description',
+                'label' => $label,
                 'original_value' => $origDesc,
                 'translations' => $localeMap,
             ];

@@ -20,7 +20,9 @@ class SiteSetting extends Model
         return in_array($this->key, ['job_title', 'bio', 'footer_text', 'seo_title', 'seo_description', 'seo_keywords']);
     }
 
-    protected $fillable = ['key', 'value', 'type', 'group'];
+    protected $fillable = ['key', 'value', 'type', 'group', 'image_data', 'image_mime_type'];
+
+    protected $hidden = ['image_data'];
 
     /**
      * Get all settings from cache or database

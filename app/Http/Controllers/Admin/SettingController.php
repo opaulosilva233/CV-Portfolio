@@ -21,27 +21,30 @@ class SettingController extends Controller
     {
         $data = $request->except(['_token', '_method', 'hero_image_file', 'remove_hero_image']);
 
-        // Handle hero image upload
+        // Handle hero image upload/removal
         if ($request->boolean('remove_hero_image')) {
-            $this->deleteHeroImage();
-            SiteSetting::updateOrCreate(['key' => 'hero_image'], ['value' => null]);
+            SiteSetting::updateOrCreate(
+                ['key' => 'hero_image'],
+                [
+                    'value' => null,
+                    'image_data' => null,
+                    'image_mime_type' => null,
+                ]
+            );
             unset($data['hero_image']); // Don't override it with the text field later
         }
 
         if ($request->hasFile('hero_image_file')) {
-            $this->deleteHeroImage();
             $file = $request->file('hero_image_file');
-            
-            $dir = storage_path('settings');
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-            
-            $extension = $file->getClientOriginalExtension();
-            $file->move($dir, 'hero_image.' . $extension);
-            
-            // Set the URL to the new route
-            $data['hero_image'] = route('settings.hero-image') . '?v=' . time(); 
+            SiteSetting::updateOrCreate(
+                ['key' => 'hero_image'],
+                [
+                    'value' => route('settings.hero-image') . '?v=' . time(),
+                    'image_data' => file_get_contents($file->getRealPath()),
+                    'image_mime_type' => $file->getClientMimeType() ?: 'image/jpeg',
+                ]
+            );
+            unset($data['hero_image']);
         }
 
         foreach ($data as $key => $value) {
@@ -56,26 +59,15 @@ class SettingController extends Controller
 
     public function serveHeroImage()
     {
-        $dir = storage_path('settings');
-        $files = glob($dir . '/hero_image.*');
+        $setting = SiteSetting::where('key', 'hero_image')->first();
 
-        if (empty($files)) {
+        if (!$setting || empty($setting->image_data)) {
             abort(404);
         }
 
-        return response()->file($files[0]);
-    }
-
-    private function deleteHeroImage(): void
-    {
-        $dir = storage_path('settings');
-        if (is_dir($dir)) {
-            $files = glob($dir . '/hero_image.*');
-            foreach ($files as $file) {
-                if (is_file($file)) {
-                    unlink($file);
-                }
-            }
-        }
+        return response($setting->image_data, 200, [
+            'Content-Type' => $setting->image_mime_type ?: 'image/jpeg',
+            'Cache-Control' => 'public, max-age=31536000, immutable',
+        ]);
     }
 }
