@@ -53,7 +53,7 @@ const handleCardMouseLeave = () => {
 
 <template>
     <CyberLayout>
-        <Head title="Log in" />
+        <Head :title="__('Log in')" />
 
         <div class="min-h-screen grid items-center justify-center" @mousemove="handleCardMouseMove" @mouseleave="handleCardMouseLeave">
             <!-- 3D Glassmorphism Card -->
@@ -74,12 +74,12 @@ const handleCardMouseLeave = () => {
                         </Link>
                         
                         <!-- Glitch Text Effect -->
-                        <h2 class="mt-6 text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-purple-800 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white text-center glitch-wrapper relative" data-text="WELCOME BACK">
-                            WELCOME BACK
+                        <h2 class="mt-6 text-4xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-purple-800 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white text-center glitch-wrapper relative" :data-text="__('WELCOME BACK')">
+                            {{ __('WELCOME BACK') }}
                         </h2>
                         
                         <p class="text-sm text-gray-500 dark:text-gray-400 text-center font-bold tracking-widest uppercase mt-2 opacity-80">
-                            System Access Required
+                            {{ __('System Access Required') }}
                         </p>
                     </div>
 
@@ -90,7 +90,7 @@ const handleCardMouseLeave = () => {
                     <form @submit.prevent="submit" class="space-y-6">
                         <!-- Email -->
                         <div class="group relative">
-                            <label for="email" class="block text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]">Email Address</label>
+                            <label for="email" class="block text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]">{{ __('Email Address') }}</label>
                             <div class="relative">
                                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 group-focus-within:text-purple-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,7 +112,7 @@ const handleCardMouseLeave = () => {
 
                         <!-- Password -->
                         <div class="group relative">
-                            <label for="password" class="block text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]">Password</label>
+                            <label for="password" class="block text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]">{{ __('Password') }}</label>
                              <div class="relative">
                                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400 group-focus-within:text-purple-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -138,11 +138,11 @@ const handleCardMouseLeave = () => {
                                     <span class="relative z-10 flex items-center gap-1.5 drop-shadow-md">
                                         <template v-if="!showPassword">
                                             <i class="fa-solid fa-user-secret text-sm"></i>
-                                            HACK
+                                            {{ __('HACK') }}
                                         </template>
                                         <template v-else>
                                             <i class="fa-solid fa-eye text-sm"></i>
-                                            NUDE
+                                            {{ __('NUDE') }}
                                         </template>
                                     </span>
                                 </button>
@@ -153,7 +153,7 @@ const handleCardMouseLeave = () => {
                         <div class="flex items-center justify-between text-sm">
                             <label class="flex items-center text-gray-600 dark:text-gray-300 cursor-pointer select-none group">
                                 <Checkbox name="remember" v-model:checked="form.remember" class="rounded border-gray-300 text-purple-600 shadow-sm focus:ring-purple-500 bg-white/50 dark:bg-black/50 dark:border-gray-600 group-hover:border-purple-500 transition-colors" />
-                                <span class="ms-2 font-medium group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">Remember me</span>
+                                <span class="ms-2 font-medium group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">{{ __('Remember me') }}</span>
                             </label>
 
                             <Link
@@ -161,7 +161,7 @@ const handleCardMouseLeave = () => {
                                 :href="route('password.request')"
                                 class="text-purple-600 dark:text-purple-400 hover:text-cyan-500 dark:hover:text-cyan-400 font-bold hover:underline transition-colors tracking-wide text-xs uppercase"
                             >
-                                Forgot password?
+                                {{ __('Forgot password?') }}
                             </Link>
                         </div>
 
@@ -172,14 +172,14 @@ const handleCardMouseLeave = () => {
                             :disabled="form.processing"
                         >
                             <span class="relative z-10 flex items-center justify-center gap-2 group-hover:text-white dark:group-hover:text-white transition-colors duration-300">
-                                Initialize Session
+                                {{ __('Initialize Session') }}
                             </span>
                             <!-- Stronger Animated Gradient on Hover -->
                             <div class="absolute inset-0 h-full w-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                         </button>
                         
                         <div class="text-center">
-                            <span class="text-[10px] text-gray-400 dark:text-gray-600 font-mono">SECURE CONNECTION ESTABLISHED</span>
+                            <span class="text-[10px] text-gray-400 dark:text-gray-600 font-mono">{{ __('SECURE CONNECTION ESTABLISHED') }}</span>
                         </div>
                     </form>
                 </div>

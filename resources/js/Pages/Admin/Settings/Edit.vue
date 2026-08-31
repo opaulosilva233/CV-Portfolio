@@ -61,12 +61,12 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Site Settings" />
+    <Head :title="__('Site Settings')" />
 
     <CyberAdminLayout>
         <template #header>
             <h2 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-                Global Site Settings
+                {{ __('Global Site Settings') }}
             </h2>
         </template>
 
@@ -76,10 +76,10 @@ const submit = () => {
                     
                     <!-- General Settings -->
                     <div class="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl sm:rounded-2xl overflow-hidden p-6">
-                        <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">General Settings</h3>
+                        <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">{{ __('General Settings') }}</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="name" class="block text-sm font-medium text-gray-300">Site/Owner Name</label>
+                                <label for="name" class="block text-sm font-medium text-gray-300">{{ __('Site/Owner Name') }}</label>
                                 <input
                                     id="name"
                                     v-model="form.name"
@@ -89,7 +89,7 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <label for="contact_email" class="block text-sm font-medium text-gray-300">Contact Email</label>
+                                <label for="contact_email" class="block text-sm font-medium text-gray-300">{{ __('Contact Email') }}</label>
                                 <input
                                     id="contact_email"
                                     v-model="form.contact_email"
@@ -99,12 +99,12 @@ const submit = () => {
                             </div>
 
                             <div class="md:col-span-2">
-                                <label for="footer_text" class="block text-sm font-medium text-gray-300">Footer Text</label>
+                                <label for="footer_text" class="block text-sm font-medium text-gray-300">{{ __('Footer Text') }}</label>
                                 <input
                                     id="footer_text"
                                     v-model="form.footer_text"
                                     type="text"
-                                    placeholder="System Online."
+                                    :placeholder="__('System Online.')"
                                     class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors"
                                 />
                             </div>
@@ -113,10 +113,10 @@ const submit = () => {
 
                     <!-- Hero Section -->
                     <div class="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl sm:rounded-2xl overflow-hidden p-6">
-                        <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">Hero Section</h3>
+                        <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">{{ __('Hero Section') }}</h3>
                         <div class="space-y-6">
                             <div>
-                                <label for="job_title" class="block text-sm font-medium text-gray-300">Hero Title / Job Title</label>
+                                <label for="job_title" class="block text-sm font-medium text-gray-300">{{ __('Hero Title / Job Title') }}</label>
                                 <input
                                     id="job_title"
                                     v-model="form.job_title"
@@ -126,7 +126,7 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <label for="bio" class="block text-sm font-medium text-gray-300">Hero Bio</label>
+                                <label for="bio" class="block text-sm font-medium text-gray-300">{{ __('Hero Bio') }}</label>
                                 <textarea
                                     id="bio"
                                     v-model="form.bio"
@@ -137,7 +137,7 @@ const submit = () => {
                             
                             <!-- Hero Image Upload -->
                             <div class="pb-2">
-                                <label class="block text-sm font-medium text-gray-300 mb-3">Hero Image</label>
+                                <label class="block text-sm font-medium text-gray-300 mb-3">{{ __('Hero Image') }}</label>
                                 <div class="flex items-start gap-6">
                                     <!-- Preview -->
                                     <div v-if="imagePreview" class="relative flex-shrink-0">
@@ -151,8 +151,8 @@ const submit = () => {
                                         <svg class="w-8 h-8 text-gray-500 group-hover:text-purple-400 transition-colors mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                         </svg>
-                                        <span class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">Click to upload hero image</span>
-                                        <span class="text-xs text-gray-500 mt-1">PNG, JPG, GIF, WEBP, SVG (max 2MB)</span>
+                                        <span class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">{{ __('Click to upload hero image') }}</span>
+                                        <span class="text-xs text-gray-500 mt-1">{{ __('PNG, JPG, GIF, WEBP, SVG (max 2MB)') }}</span>
                                         <input type="file" accept="image/*" @change="handleImageChange" class="hidden" />
                                     </label>
                                 </div>
@@ -165,11 +165,11 @@ const submit = () => {
                                     <div class="flex items-center gap-2">
                                         <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
                                         <label for="enable_hero_animation" class="text-sm font-bold text-white tracking-wide">
-                                            Cyber Boot & Decrypt Animation
+                                            {{ __('Cyber Boot & Decrypt Animation') }}
                                         </label>
                                     </div>
                                     <p class="text-xs text-gray-400 max-w-xl">
-                                        Enable/disable the holographic boot sequence, text decrypter, laser scan and 3D interactive avatar effects on the homepage hero.
+                                        {{ __('Enable/disable the holographic boot sequence, text decrypter, laser scan and 3D interactive avatar effects on the homepage hero.') }}
                                     </p>
                                 </div>
                                 <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
@@ -188,21 +188,21 @@ const submit = () => {
 
                     <!-- SEO & Metadata -->
                     <div class="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl sm:rounded-2xl overflow-hidden p-6">
-                        <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">SEO & Metadata</h3>
+                        <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">{{ __('SEO & Metadata') }}</h3>
                         <div class="space-y-6">
                             <div>
-                                <label for="seo_title" class="block text-sm font-medium text-gray-300">Meta Title</label>
+                                <label for="seo_title" class="block text-sm font-medium text-gray-300">{{ __('Meta Title') }}</label>
                                 <input
                                     id="seo_title"
                                     v-model="form.seo_title"
                                     type="text"
                                     class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors"
-                                    placeholder="Portfolio"
+                                    :placeholder="__('Portfolio')"
                                 />
                             </div>
 
                             <div>
-                                <label for="seo_description" class="block text-sm font-medium text-gray-300">Meta Description</label>
+                                <label for="seo_description" class="block text-sm font-medium text-gray-300">{{ __('Meta Description') }}</label>
                                 <textarea
                                     id="seo_description"
                                     v-model="form.seo_description"
@@ -212,7 +212,7 @@ const submit = () => {
                             </div>
                             
                             <div>
-                                <label for="seo_keywords" class="block text-sm font-medium text-gray-300">Meta Keywords (comma-separated)</label>
+                                <label for="seo_keywords" class="block text-sm font-medium text-gray-300">{{ __('Meta Keywords (comma-separated)') }}</label>
                                 <input
                                     id="seo_keywords"
                                     v-model="form.seo_keywords"
@@ -226,10 +226,10 @@ const submit = () => {
 
                     <!-- Social Links -->
                     <div class="bg-white/5 backdrop-blur-md border border-white/10 shadow-xl sm:rounded-2xl overflow-hidden p-6">
-                        <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">Social Links</h3>
+                        <h3 class="text-lg font-bold text-white mb-4 border-b border-white/10 pb-2">{{ __('Social Links') }}</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="social_github" class="block text-sm font-medium text-gray-300">GitHub URL</label>
+                                <label for="social_github" class="block text-sm font-medium text-gray-300">{{ __('GitHub URL') }}</label>
                                 <div class="mt-2 flex rounded-xl shadow-inner bg-gray-900/50 border border-white/10 overflow-hidden">
                                     <span class="inline-flex items-center px-3 border-r border-white/10 text-gray-400 sm:text-sm">
                                         <i class="fa-brands fa-github"></i>
@@ -245,7 +245,7 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <label for="social_linkedin" class="block text-sm font-medium text-gray-300">LinkedIn URL</label>
+                                <label for="social_linkedin" class="block text-sm font-medium text-gray-300">{{ __('LinkedIn URL') }}</label>
                                 <div class="mt-2 flex rounded-xl shadow-inner bg-gray-900/50 border border-white/10 overflow-hidden">
                                     <span class="inline-flex items-center px-3 border-r border-white/10 text-gray-400 sm:text-sm">
                                         <i class="fa-brands fa-linkedin"></i>
@@ -261,7 +261,7 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <label for="social_twitter" class="block text-sm font-medium text-gray-300">Twitter/X URL</label>
+                                <label for="social_twitter" class="block text-sm font-medium text-gray-300">{{ __('Twitter/X URL') }}</label>
                                 <div class="mt-2 flex rounded-xl shadow-inner bg-gray-900/50 border border-white/10 overflow-hidden">
                                     <span class="inline-flex items-center px-3 border-r border-white/10 text-gray-400 sm:text-sm">
                                         <i class="fa-brands fa-x-twitter"></i>
@@ -277,7 +277,7 @@ const submit = () => {
                             </div>
 
                             <div>
-                                <label for="social_instagram" class="block text-sm font-medium text-gray-300">Instagram URL</label>
+                                <label for="social_instagram" class="block text-sm font-medium text-gray-300">{{ __('Instagram URL') }}</label>
                                 <div class="mt-2 flex rounded-xl shadow-inner bg-gray-900/50 border border-white/10 overflow-hidden">
                                     <span class="inline-flex items-center px-3 border-r border-white/10 text-gray-400 sm:text-sm">
                                         <i class="fa-brands fa-instagram"></i>
@@ -301,8 +301,8 @@ const submit = () => {
                             :disabled="form.processing"
                             class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-xl font-bold text-white shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50"
                         >
-                            <span v-if="form.processing">Saving...</span>
-                            <span v-else>Save All Settings</span>
+                            <span v-if="form.processing">{{ __('Saving...') }}</span>
+                            <span v-else>{{ __('Save All Settings') }}</span>
                         </button>
 
                         <transition
@@ -314,7 +314,7 @@ const submit = () => {
                             leave-to-class="opacity-0 -translate-y-2"
                         >
                             <p v-if="form.recentlySuccessful" class="text-sm font-medium text-green-400 bg-green-500/10 px-3 py-1 rounded-lg border border-green-500/20">
-                                Settings saved successfully.
+                                {{ __('Settings saved successfully.') }}
                             </p>
                         </transition>
                     </div>

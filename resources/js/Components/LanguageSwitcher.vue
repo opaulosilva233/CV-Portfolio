@@ -85,9 +85,9 @@ const switchLanguage = (locale) => {
                          
                          <!-- Text -->
                          <h2 class="text-2xl font-black tracking-[0.2em] uppercase bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 animate-pulse">
-                             Translating System
+                             {{ __('Translating System') }}
                          </h2>
-                         <p class="text-gray-400 font-mono text-sm mt-2 opacity-80">Loading language module...</p>
+                         <p class="text-gray-400 font-mono text-sm mt-2 opacity-80">{{ __('Loading language module...') }}</p>
                     </div>
                 </div>
             </Transition>

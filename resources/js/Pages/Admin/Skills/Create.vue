@@ -48,7 +48,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Create Skill" />
+    <Head :title="__('Add New Skill')" />
 
     <CyberAdminLayout>
         <template #header>
@@ -61,7 +61,7 @@ const submit = () => {
                 </div>
                 <Link :href="route('admin.skills.index')" class="text-gray-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Back to List
+                    {{ __('Back to List') }}
                 </Link>
             </div>
         </template>
@@ -72,27 +72,27 @@ const submit = () => {
                     <form @submit.prevent="submit" class="space-y-6">
                         
                         <div>
-                            <label for="name" class="block text-sm font-medium text-gray-300">Skill Name (e.g. Vue.js, Laravel)</label>
+                            <label for="name" class="block text-sm font-medium text-gray-300">{{ __('Skill Name (e.g. Vue.js, Laravel)') }}</label>
                             <input id="name" v-model="form.name" type="text" required class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-cyan-500 focus:ring-cyan-500 transition-colors" />
                             <div v-if="form.errors.name" class="text-red-400 text-xs mt-1">{{ form.errors.name }}</div>
                         </div>
 
                         <div>
-                            <label for="category" class="block text-sm font-medium text-gray-300">Category</label>
+                            <label for="category" class="block text-sm font-medium text-gray-300">{{ __('Category') }}</label>
                             <select id="category" v-model="form.category" required class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-cyan-500 focus:ring-cyan-500 transition-colors [&>option]:bg-gray-900">
-                                <option value="" disabled>Select a category</option>
-                                <option value="frontend">Frontend</option>
-                                <option value="backend">Backend</option>
-                                <option value="database">Database</option>
-                                <option value="tools">Tools & DevOps</option>
-                                <option value="soft">Soft Skills</option>
-                                <option value="other">Other</option>
+                                <option value="" disabled>{{ __('Select a category') }}</option>
+                                <option value="frontend">{{ __('Frontend') }}</option>
+                                <option value="backend">{{ __('Backend') }}</option>
+                                <option value="database">{{ __('Database') }}</option>
+                                <option value="tools">{{ __('Tools & DevOps') }}</option>
+                                <option value="soft">{{ __('Soft Skills') }}</option>
+                                <option value="other">{{ __('Other') }}</option>
                             </select>
                             <div v-if="form.errors.category" class="text-red-400 text-xs mt-1">{{ form.errors.category }}</div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">Proficiency</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">{{ __('Proficiency') }}</label>
                             <div class="flex items-center gap-1">
                                 <button
                                     v-for="star in 5"
@@ -112,18 +112,18 @@ const submit = () => {
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="col-span-1 md:col-span-2">
-                                <label for="icon" class="block text-sm font-medium text-gray-300 mb-2">Icon</label>
+                                <label for="icon" class="block text-sm font-medium text-gray-300 mb-2">{{ __('Icon') }}</label>
                                 <IconPicker id="icon" v-model="form.icon" :category="form.category" />
                             </div>
                         </div>
 
                         <!-- Associations -->
                         <div class="pt-4 border-t border-white/10 space-y-5">
-                            <h3 class="text-lg font-semibold text-white">Associate with</h3>
+                            <h3 class="text-lg font-semibold text-white">{{ __('Associate with') }}</h3>
 
                             <!-- Projects -->
                             <div>
-                                <label class="block text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">Projects</label>
+                                <label class="block text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2">{{ __('Projects') }}</label>
                                 <div v-if="availableProjects && availableProjects.length > 0" class="flex flex-wrap gap-2">
                                     <button
                                         v-for="project in availableProjects"
@@ -140,12 +140,12 @@ const submit = () => {
                                         {{ project.title }}
                                     </button>
                                 </div>
-                                <p v-else class="text-gray-500 text-sm italic">No projects created yet.</p>
+                                <p v-else class="text-gray-500 text-sm italic">{{ __('No projects created yet.') }}</p>
                             </div>
 
                             <!-- Education -->
                             <div>
-                                <label class="block text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">Education / Certificates</label>
+                                <label class="block text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">{{ __('Education / Certificates') }}</label>
                                 <div v-if="availableEducations && availableEducations.length > 0" class="flex flex-wrap gap-2">
                                     <button
                                         v-for="edu in availableEducations"
@@ -162,12 +162,12 @@ const submit = () => {
                                         {{ edu.institution }} {{ edu.degree ? '— ' + edu.degree : '' }}
                                     </button>
                                 </div>
-                                <p v-else class="text-gray-500 text-sm italic">No education records created yet.</p>
+                                <p v-else class="text-gray-500 text-sm italic">{{ __('No education records created yet.') }}</p>
                             </div>
 
                             <!-- Experiences -->
                             <div>
-                                <label class="block text-xs font-semibold text-green-400 uppercase tracking-wider mb-2">Experiences</label>
+                                <label class="block text-xs font-semibold text-green-400 uppercase tracking-wider mb-2">{{ __('Experiences') }}</label>
                                 <div v-if="availableExperiences && availableExperiences.length > 0" class="flex flex-wrap gap-2">
                                     <button
                                         v-for="exp in availableExperiences"
@@ -184,14 +184,14 @@ const submit = () => {
                                         {{ exp.company }} {{ exp.roles && exp.roles.length > 0 ? '— ' + exp.roles.map(r => r.role).join(', ') : '' }}
                                     </button>
                                 </div>
-                                <p v-else class="text-gray-500 text-sm italic">No experiences created yet.</p>
+                                <p v-else class="text-gray-500 text-sm italic">{{ __('No experiences created yet.') }}</p>
                             </div>
                         </div>
 
                         <div class="flex items-center gap-4 pt-4 border-t border-white/10">
                             <button type="submit" :disabled="form.processing" class="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-500 rounded-xl font-bold text-white shadow-[0_0_15px_rgba(6,182,212,0.4)] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50">
-                                <span v-if="form.processing">Creating...</span>
-                                <span v-else>Create Skill</span>
+                                <span v-if="form.processing">{{ __('Creating...') }}</span>
+                                <span v-else>{{ __('Create Skill') }}</span>
                             </button>
                         </div>
                     </form>

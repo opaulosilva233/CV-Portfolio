@@ -937,7 +937,7 @@ const formatDate = (date) => {
                 <h2 class="text-3xl font-black mb-12 text-center text-gray-900 dark:text-white uppercase tracking-widest"><span class="text-purple-500">#</span> {{ __('Technical Skills') }}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <div v-for="(categorySkills, category) in skills" :key="category" class="bg-white/50 dark:bg-black/40 backdrop-blur-xl p-6 rounded-2xl shadow-lg border border-white/20 dark:border-white/5 hover:border-purple-500/50 transition-colors duration-300 group">
-                        <h3 class="text-xl font-bold mb-6 capitalize border-b-2 border-purple-500/30 pb-2 w-max group-hover:border-purple-500 transition-colors text-gray-800 dark:text-gray-100">{{ category }}</h3>
+                        <h3 class="text-xl font-bold mb-6 capitalize border-b-2 border-purple-500/30 pb-2 w-max group-hover:border-purple-500 transition-colors text-gray-800 dark:text-gray-100">{{ __(category) }}</h3>
                         <div class="flex flex-wrap gap-2">
                             <span v-for="skill in categorySkills" :key="skill.id" class="px-3 py-1 bg-white/60 dark:bg-white/10 rounded-lg text-sm font-bold text-gray-700 dark:text-gray-200 border border-transparent hover:border-cyan-500/50 transition-all">
                                 {{ skill.name }}
@@ -1217,7 +1217,7 @@ const formatDate = (date) => {
                                             <div>
                                                 <h4 class="text-lg font-black text-gray-800 dark:text-gray-100 group-hover:translate-x-1 transition-transform">{{ role.role }}</h4>
                                                 <span class="inline-block px-3 py-1 bg-purple-500/10 text-purple-600 dark:text-purple-400 text-[10px] font-black uppercase tracking-widest rounded-full mt-1">
-                                                    {{ role.employment_type }}
+                                                    {{ __(role.employment_type) }}
                                                 </span>
                                             </div>
                                             <div class="text-[11px] font-black font-mono text-gray-500 dark:text-gray-400 bg-gray-100/50 dark:bg-black/20 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-white/5">
@@ -1257,7 +1257,7 @@ const formatDate = (date) => {
                                     <div v-else class="text-cyan-500/10 text-3xl font-black uppercase select-none">{{ edu.institution.substring(0, 2) }}</div>
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <div class="text-cyan-600 dark:text-cyan-400 text-xs font-black uppercase tracking-widest mb-1">{{ edu.type || 'Academic' }}</div>
+                                    <div class="text-cyan-600 dark:text-cyan-400 text-xs font-black uppercase tracking-widest mb-1">{{ __(edu.type || 'Academic') }}</div>
                                     <h3 class="text-2xl font-black text-gray-950 dark:text-white leading-tight mb-1 truncate group-hover:text-cyan-500 transition-colors">{{ edu.degree }}</h3>
                                     <p class="text-sm font-bold text-gray-600 dark:text-gray-400 opacity-80 truncate">{{ edu.institution }}</p>
                                 </div>
@@ -1281,7 +1281,7 @@ const formatDate = (date) => {
 
                                 <div class="flex items-center justify-between">
                                     <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest">
-                                        {{ edu.is_current ? 'IN PROGRESS' : 'GRADUATED' }}
+                                        {{ edu.is_current ? __('IN PROGRESS') : __('GRADUATED') }}
                                     </div>
                                     <a v-if="edu.url" :href="edu.url" target="_blank" class="group/btn text-[9px] font-black uppercase tracking-widest text-cyan-600 dark:text-cyan-400 flex items-center gap-2 hover:gap-3 transition-all">
                                         {{ __('Official Document') }}
@@ -1478,7 +1478,7 @@ const formatDate = (date) => {
                                 </a>
                                 <a v-if="selectedProject.github_url" :href="selectedProject.github_url" target="_blank" class="flex items-center justify-center gap-4 px-10 py-6 bg-white/5 hover:bg-white/10 text-white rounded-[2rem] font-black uppercase tracking-[0.2em] text-xs border border-white/10 transition-all hover:-translate-y-1">
                                     <i class="fab fa-github text-2xl"></i>
-                                    View Repository
+                                    {{ __('View Repository') }}
                                 </a>
                             </div>
                         </div>

@@ -109,7 +109,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Create Project" />
+    <Head :title="__('Create New Project')" />
 
     <CyberAdminLayout>
         <template #header>
@@ -119,7 +119,7 @@ const submit = () => {
                 </h2>
                 <Link :href="route('admin.projects.index')" class="text-gray-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Back to List
+                    {{ __('Back to List') }}
                 </Link>
             </div>
         </template>
@@ -132,17 +132,17 @@ const submit = () => {
                         <!-- Gallery Manager -->
                         <div>
                             <div class="flex items-center justify-between mb-4">
-                                <label class="block text-sm font-medium text-gray-300">Project Gallery (Screenshots)</label>
+                                <label class="block text-sm font-medium text-gray-300">{{ __('Project Gallery (Screenshots)') }}</label>
                                 <label class="px-4 py-2 bg-purple-600 hover:bg-purple-500 rounded-xl text-xs font-bold text-white cursor-pointer transition-colors flex items-center gap-2">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                                    Add Images
+                                    {{ __('Add Images') }}
                                     <input type="file" multiple accept="image/*" @change="addGalleryItem" class="hidden" />
                                 </label>
                             </div>
 
                             <div v-if="galleryItems.length === 0" class="flex flex-col items-center justify-center py-12 px-6 rounded-2xl bg-gray-900/50 border-2 border-dashed border-white/10">
                                 <svg class="w-12 h-12 text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                <p class="text-gray-500 text-sm">No images added yet. Add prints of your work!</p>
+                                <p class="text-gray-500 text-sm">{{ __('No images added yet. Add prints of your work!') }}</p>
                             </div>
 
                             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -160,14 +160,14 @@ const submit = () => {
                                                     'px-2 py-1 rounded-md text-[10px] uppercase font-bold transition-all shadow-lg',
                                                     item.is_principal ? 'bg-cyan-500 text-white' : 'bg-gray-800/80 text-gray-400 hover:text-white'
                                                 ]">
-                                                {{ item.is_principal ? 'Principal' : 'Set Principal' }}
+                                                {{ item.is_principal ? __('Principal') : __('Set Principal') }}
                                             </button>
                                         </div>
                                     </div>
                                     <div class="p-3">
                                         <textarea 
                                             v-model="item.description" 
-                                            placeholder="Image description..."
+                                            :placeholder="__('Image description...')"
                                             rows="2"
                                             class="w-full text-xs bg-gray-900/50 border border-white/5 rounded-lg text-gray-300 focus:border-purple-500 focus:ring-purple-500 transition-colors"
                                         ></textarea>
@@ -179,7 +179,7 @@ const submit = () => {
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="md:col-span-2">
-                                <label for="title" class="block text-sm font-medium text-gray-300">Project Title</label>
+                                <label for="title" class="block text-sm font-medium text-gray-300">{{ __('Project Title') }}</label>
                                 <input id="title" v-model="form.title" type="text" required class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                 <div v-if="form.errors.title" class="text-red-400 text-xs mt-1">{{ form.errors.title }}</div>
                             </div>
@@ -187,20 +187,20 @@ const submit = () => {
                             <div class="md:col-span-2">
                                 <RichTextEditor 
                                     v-model="form.description" 
-                                    label="Description" 
-                                    placeholder="Enter project details..."
+                                    :label="__('Description')" 
+                                    :placeholder="__('Enter project details...')"
                                 />
                                 <div v-if="form.errors.description" class="text-red-400 text-xs mt-1">{{ form.errors.description }}</div>
                             </div>
 
                             <div>
-                                <label for="project_url" class="block text-sm font-medium text-gray-300">Project URL (Live Demo)</label>
+                                <label for="project_url" class="block text-sm font-medium text-gray-300">{{ __('Project URL (Live Demo)') }}</label>
                                 <input id="project_url" v-model="form.project_url" type="url" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                 <div v-if="form.errors.project_url" class="text-red-400 text-xs mt-1">{{ form.errors.project_url }}</div>
                             </div>
 
                             <div>
-                                <label for="github_url" class="block text-sm font-medium text-gray-300">GitHub URL</label>
+                                <label for="github_url" class="block text-sm font-medium text-gray-300">{{ __('GitHub URL') }}</label>
                                 <input id="github_url" v-model="form.github_url" type="url" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                 <div v-if="form.errors.github_url" class="text-red-400 text-xs mt-1">{{ form.errors.github_url }}</div>
                             </div>
@@ -208,16 +208,16 @@ const submit = () => {
                             <div class="flex items-center gap-6">
                                 <div class="flex items-center">
                                     <input id="is_featured" v-model="form.is_featured" type="checkbox" class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50" />
-                                    <label for="is_featured" class="ml-2 block text-sm font-medium text-gray-300">Featured Project</label>
+                                    <label for="is_featured" class="ml-2 block text-sm font-medium text-gray-300">{{ __('Featured Project') }}</label>
                                 </div>
 
                                 <div class="flex items-center">
                                     <input id="in_progress" v-model="form.in_progress" type="checkbox" class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50" />
-                                    <label for="in_progress" class="ml-2 block text-sm font-medium text-gray-300">Em Andamento</label>
+                                    <label for="in_progress" class="ml-2 block text-sm font-medium text-gray-300">{{ __('In Progress') }}</label>
                                 </div>
                                 
                                 <div class="flex-1" v-if="!form.in_progress">
-                                    <label for="completed_at" class="block text-sm font-medium text-gray-300">Completion Date</label>
+                                    <label for="completed_at" class="block text-sm font-medium text-gray-300">{{ __('Completion Date') }}</label>
                                     <input id="completed_at" v-model="form.completed_at" type="date" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                     <div v-if="form.errors.completed_at" class="text-red-400 text-xs mt-1">{{ form.errors.completed_at }}</div>
                                 </div>
@@ -226,9 +226,9 @@ const submit = () => {
 
                         <!-- Skills Selection -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-3">Associated Skills</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">{{ __('Associated Skills') }}</label>
                             <div v-for="(skills, category) in groupedSkills" :key="category" class="mb-4">
-                                <p class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">{{ category }}</p>
+                                <p class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">{{ __(category) }}</p>
                                 <div class="flex flex-wrap gap-2">
                                     <button
                                         v-for="skill in skills"
@@ -251,8 +251,8 @@ const submit = () => {
 
                         <div class="flex items-center gap-4 pt-6 border-t border-white/10">
                             <button type="submit" :disabled="form.processing" class="px-8 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-xl font-bold text-white shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50">
-                                <span v-if="form.processing">Creating...</span>
-                                <span v-else>Create Project</span>
+                                <span v-if="form.processing">{{ __('Creating...') }}</span>
+                                <span v-else>{{ __('Create Project') }}</span>
                             </button>
                         </div>
                     </form>

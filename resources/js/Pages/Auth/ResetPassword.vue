@@ -56,7 +56,7 @@ const handleCardMouseLeave = () => {
 
 <template>
     <CyberLayout>
-        <Head title="Reset Password" />
+        <Head :title="__('Reset Password')" />
 
         <div class="min-h-screen grid items-center justify-center p-4" @mousemove="handleCardMouseMove" @mouseleave="handleCardMouseLeave">
             <!-- 3D Glassmorphism Card -->
@@ -143,11 +143,11 @@ const handleCardMouseLeave = () => {
                                     <span class="relative z-10 flex items-center gap-1.5 drop-shadow-md">
                                         <template v-if="!showPassword">
                                             <i class="fa-solid fa-user-secret text-sm"></i>
-                                            HACK
+                                            {{ __('HACK') }}
                                         </template>
                                         <template v-else>
                                             <i class="fa-solid fa-eye text-sm"></i>
-                                            NUDE
+                                            {{ __('NUDE') }}
                                         </template>
                                     </span>
                                 </button>
@@ -186,11 +186,11 @@ const handleCardMouseLeave = () => {
                                     <span class="relative z-10 flex items-center gap-1.5 drop-shadow-md">
                                         <template v-if="!showPasswordConfirmation">
                                             <i class="fa-solid fa-user-secret text-sm"></i>
-                                            HACK
+                                            {{ __('HACK') }}
                                         </template>
                                         <template v-else>
                                             <i class="fa-solid fa-eye text-sm"></i>
-                                            NUDE
+                                            {{ __('NUDE') }}
                                         </template>
                                     </span>
                                 </button>

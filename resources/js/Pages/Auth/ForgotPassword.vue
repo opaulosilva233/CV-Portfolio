@@ -43,7 +43,7 @@ const handleCardMouseLeave = () => {
 
 <template>
     <CyberLayout>
-        <Head title="Forgot Password" />
+        <Head :title="__('Forgot Password')" />
 
         <div class="min-h-screen grid items-center justify-center p-4" @mousemove="handleCardMouseMove" @mouseleave="handleCardMouseLeave">
             <!-- 3D Glassmorphism Card -->

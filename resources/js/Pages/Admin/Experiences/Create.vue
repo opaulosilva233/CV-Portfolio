@@ -119,7 +119,7 @@ const submit = () => {
                         
                         <!-- Company Logo Upload -->
                         <div class="pb-6 border-b border-white/10">
-                            <label class="block text-sm font-medium text-gray-300 mb-3">Company Logo</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">{{ __('Company Logo') }}</label>
                             <div class="flex items-start gap-6">
                                 <!-- Preview -->
                                 <div v-if="imagePreview" class="relative flex-shrink-0">
@@ -133,8 +133,8 @@ const submit = () => {
                                     <svg class="w-8 h-8 text-gray-500 group-hover:text-purple-400 transition-colors mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">Click to upload logo</span>
-                                    <span class="text-xs text-gray-500 mt-1">PNG, JPG, GIF, WEBP, SVG (max 2MB)</span>
+                                    <span class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">{{ __('Click to upload logo') }}</span>
+                                    <span class="text-xs text-gray-500 mt-1">{{ __('PNG, JPG, GIF, WEBP, SVG (max 2MB)') }}</span>
                                     <input type="file" accept="image/*" @change="handleImageChange" class="hidden" />
                                 </label>
                             </div>
@@ -143,13 +143,13 @@ const submit = () => {
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6 border-b border-white/10">
                             <div>
-                                <label for="company" class="block text-sm font-medium text-gray-300">Company</label>
+                                <label for="company" class="block text-sm font-medium text-gray-300">{{ __('Company') }}</label>
                                 <input id="company" v-model="form.company" type="text" required class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                 <div v-if="form.errors.company" class="text-red-400 text-xs mt-1">{{ form.errors.company }}</div>
                             </div>
 
                             <div class="md:col-span-2">
-                                <label for="location" class="block text-sm font-medium text-gray-300">Location</label>
+                                <label for="location" class="block text-sm font-medium text-gray-300">{{ __('Location') }}</label>
                                 <input id="location" v-model="form.location" type="text" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                 <div v-if="form.errors.location" class="text-red-400 text-xs mt-1">{{ form.errors.location }}</div>
                             </div>
@@ -157,9 +157,9 @@ const submit = () => {
 
                         <div>
                             <div class="flex items-center justify-between mb-4">
-                                <h3 class="text-lg font-semibold text-white">Roles</h3>
+                                <h3 class="text-lg font-semibold text-white">{{ __('Roles') }}</h3>
                                 <button type="button" @click="addRole" class="text-xs font-medium bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 px-3 py-1.5 rounded-lg border border-purple-500/30 transition-colors">
-                                    + Add Role
+                                    {{ __('+ Add Role') }}
                                 </button>
                             </div>
 
@@ -170,27 +170,27 @@ const submit = () => {
                                 
                                 <div class="grid grid-cols-1 gap-4">
                                     <div>
-                                        <label :for="'role_' + index" class="block text-sm font-medium text-gray-300">Role / Job Title</label>
+                                        <label :for="'role_' + index" class="block text-sm font-medium text-gray-300">{{ __('Role / Job Title') }}</label>
                                         <input :id="'role_' + index" v-model="role.role" type="text" required class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                         <div v-if="form.errors[`roles.${index}.role`]" class="text-red-400 text-xs mt-1">{{ form.errors[`roles.${index}.role`] }}</div>
                                     </div>
 
                                     <div>
-                                        <label :for="'employment_type_' + index" class="block text-sm font-medium text-gray-300">Employment Type</label>
+                                        <label :for="'employment_type_' + index" class="block text-sm font-medium text-gray-300">{{ __('Employment Type') }}</label>
                                         <select :id="'employment_type_' + index" v-model="role.employment_type" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors">
-                                            <option value="">Select type...</option>
-                                            <option value="full_time">Full Time</option>
-                                            <option value="part_time">Part Time</option>
-                                            <option value="temporary">Trabalho Temporário</option>
-                                            <option value="internship">Estágio</option>
+                                            <option value="">{{ __('Select type...') }}</option>
+                                            <option value="full_time">{{ __('Full Time') }}</option>
+                                            <option value="part_time">{{ __('Part Time') }}</option>
+                                            <option value="temporary">{{ __('Temporary Work') }}</option>
+                                            <option value="internship">{{ __('Internship') }}</option>
                                         </select>
                                         <div v-if="form.errors[`roles.${index}.employment_type`]" class="text-red-400 text-xs mt-1">{{ form.errors[`roles.${index}.employment_type`] }}</div>
                                     </div>
 
                                     <div v-if="role.employment_type === 'internship'">
-                                        <label :for="'education_id_' + index" class="block text-sm font-medium text-gray-300">Associated Education</label>
+                                        <label :for="'education_id_' + index" class="block text-sm font-medium text-gray-300">{{ __('Associated Education') }}</label>
                                         <select :id="'education_id_' + index" v-model="role.education_id" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors">
-                                            <option :value="null">None</option>
+                                            <option :value="null">{{ __('None') }}</option>
                                             <option v-for="edu in availableEducations" :key="edu.id" :value="edu.id">
                                                 {{ edu.institution }} - {{ edu.degree }}
                                             </option>
@@ -200,13 +200,13 @@ const submit = () => {
 
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label :for="'start_date_' + index" class="block text-sm font-medium text-gray-300">Start Date</label>
+                                            <label :for="'start_date_' + index" class="block text-sm font-medium text-gray-300">{{ __('Start Date') }}</label>
                                             <input :id="'start_date_' + index" v-model="role.start_date" type="date" required class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors [color-scheme:dark]" />
                                             <div v-if="form.errors[`roles.${index}.start_date`]" class="text-red-400 text-xs mt-1">{{ form.errors[`roles.${index}.start_date`] }}</div>
                                         </div>
 
                                         <div>
-                                            <label :for="'end_date_' + index" class="block text-sm font-medium text-gray-300" :class="{ 'opacity-50': role.is_current }">End Date</label>
+                                            <label :for="'end_date_' + index" class="block text-sm font-medium text-gray-300" :class="{ 'opacity-50': role.is_current }">{{ __('End Date') }}</label>
                                             <input :id="'end_date_' + index" v-model="role.end_date" type="date" :disabled="role.is_current" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed [color-scheme:dark]" />
                                             <div v-if="form.errors[`roles.${index}.end_date`]" class="text-red-400 text-xs mt-1">{{ form.errors[`roles.${index}.end_date`] }}</div>
                                         </div>
@@ -214,14 +214,14 @@ const submit = () => {
 
                                     <div class="flex items-center">
                                         <input :id="'is_current_' + index" v-model="role.is_current" @change="() => { if(role.is_current) role.end_date = null }" type="checkbox" class="rounded border-gray-300 text-purple-600 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50" />
-                                        <label :for="'is_current_' + index" class="ml-2 block text-sm font-medium text-gray-300">I currently work here</label>
+                                        <label :for="'is_current_' + index" class="ml-2 block text-sm font-medium text-gray-300">{{ __('I currently work here') }}</label>
                                     </div>
 
                                     <div>
                                         <RichTextEditor 
                                             v-model="role.description" 
-                                            label="Description / Responsibilities" 
-                                            placeholder="Enter role details..."
+                                            :label="__('Description / Responsibilities')" 
+                                            :placeholder="__('Enter role details...')"
                                         />
                                         <div v-if="form.errors[`roles.${index}.description`]" class="text-red-400 text-xs mt-1">{{ form.errors[`roles.${index}.description`] }}</div>
                                     </div>
@@ -231,12 +231,12 @@ const submit = () => {
 
                         <!-- Skills Selection -->
                         <div class="pt-6 border-t border-white/10">
-                            <label class="block text-sm font-medium text-gray-300 mb-3">Associated Skills</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">{{ __('Associated Skills') }}</label>
                             <div v-if="Object.keys(groupedSkills).length === 0" class="text-gray-500 text-sm italic">
-                                No skills created yet. Create skills first in the Skills section.
+                                {{ __('No skills created yet. Create skills first in the Skills section.') }}
                             </div>
                             <div v-for="(skills, category) in groupedSkills" :key="category" class="mb-4">
-                                <p class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">{{ category }}</p>
+                                <p class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">{{ __(category) }}</p>
                                 <div class="flex flex-wrap gap-2">
                                     <button
                                         v-for="skill in skills"
@@ -259,8 +259,8 @@ const submit = () => {
 
                         <div class="flex items-center gap-4 pt-4 border-t border-white/10">
                             <button type="submit" :disabled="form.processing" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-xl font-bold text-white shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50">
-                                <span v-if="form.processing">Creating...</span>
-                                <span v-else>Create Experience</span>
+                                <span v-if="form.processing">{{ __('Creating...') }}</span>
+                                <span v-else>{{ __('Create Experience') }}</span>
                             </button>
                         </div>
                     </form>

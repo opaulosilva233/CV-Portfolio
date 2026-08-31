@@ -84,7 +84,7 @@ const submit = () => {
 </script>
 
 <template>
-    <Head title="Edit Education" />
+    <Head :title="__('Edit Education')" />
 
     <CyberAdminLayout>
         <template #header>
@@ -97,7 +97,7 @@ const submit = () => {
                 </div>
                 <Link :href="route('admin.education.index')" class="text-gray-400 hover:text-white transition-colors text-sm font-medium flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                    Back to List
+                    {{ __('Back to List') }}
                 </Link>
             </div>
         </template>
@@ -109,7 +109,7 @@ const submit = () => {
                         
                         <!-- Institution Logo Upload -->
                         <div class="pb-6 border-b border-white/10">
-                            <label class="block text-sm font-medium text-gray-300 mb-3">Institution Logo</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">{{ __('Institution Logo') }}</label>
                             <div class="flex items-start gap-6">
                                 <!-- Existing image -->
                                 <div v-if="currentImageUrl && !imagePreview" class="relative flex-shrink-0">
@@ -130,8 +130,8 @@ const submit = () => {
                                     <svg class="w-8 h-8 text-gray-500 group-hover:text-purple-400 transition-colors mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">Click to upload logo</span>
-                                    <span class="text-xs text-gray-500 mt-1">PNG, JPG, GIF, WEBP, SVG (max 2MB)</span>
+                                    <span class="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">{{ __('Click to upload logo') }}</span>
+                                    <span class="text-xs text-gray-500 mt-1">{{ __('PNG, JPG, GIF, WEBP, SVG (max 2MB)') }}</span>
                                     <input type="file" accept="image/*" @change="handleImageChange" class="hidden" />
                                 </label>
                             </div>
@@ -140,34 +140,34 @@ const submit = () => {
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label for="institution" class="block text-sm font-medium text-gray-300">Institution / Issuer</label>
+                                <label for="institution" class="block text-sm font-medium text-gray-300">{{ __('Institution / Issuer') }}</label>
                                 <input id="institution" v-model="form.institution" type="text" required class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                 <div v-if="form.errors.institution" class="text-red-400 text-xs mt-1">{{ form.errors.institution }}</div>
                             </div>
                             
                             <div>
-                                <label for="type" class="block text-sm font-medium text-gray-300">Type</label>
+                                <label for="type" class="block text-sm font-medium text-gray-300">{{ __('Type') }}</label>
                                 <select id="type" v-model="form.type" required class="mt-2 block w-full rounded-xl bg-gray-900 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors">
-                                    <option value="education">Education / Degree</option>
-                                    <option value="certificate">Certificate</option>
+                                    <option value="education">{{ __('Education / Degree') }}</option>
+                                    <option value="certificate">{{ __('Certificate') }}</option>
                                 </select>
                                 <div v-if="form.errors.type" class="text-red-400 text-xs mt-1">{{ form.errors.type }}</div>
                             </div>
 
                             <div class="md:col-span-2">
-                                <label for="degree" class="block text-sm font-medium text-gray-300">Degree / Certificate Name</label>
+                                <label for="degree" class="block text-sm font-medium text-gray-300">{{ __('Degree / Certificate Name') }}</label>
                                 <input id="degree" v-model="form.degree" type="text" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                 <div v-if="form.errors.degree" class="text-red-400 text-xs mt-1">{{ form.errors.degree }}</div>
                             </div>
 
                             <div v-if="form.type === 'education'">
-                                <label for="start_date" class="block text-sm font-medium text-gray-300">Start Date</label>
+                                <label for="start_date" class="block text-sm font-medium text-gray-300">{{ __('Start Date') }}</label>
                                 <input id="start_date" v-model="form.start_date" type="date" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors [color-scheme:dark]" />
                                 <div v-if="form.errors.start_date" class="text-red-400 text-xs mt-1">{{ form.errors.start_date }}</div>
                             </div>
 
                             <div>
-                                <label for="end_date" class="block text-sm font-medium text-gray-300" :class="{ 'opacity-50': form.is_current }">End Date</label>
+                                <label for="end_date" class="block text-sm font-medium text-gray-300" :class="{ 'opacity-50': form.is_current }">{{ __('End Date') }}</label>
                                 <input id="end_date" v-model="form.end_date" type="date" :disabled="form.is_current" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed [color-scheme:dark]" />
                                 <div v-if="form.errors.end_date" class="text-red-400 text-xs mt-1">{{ form.errors.end_date }}</div>
                             </div>
@@ -178,7 +178,7 @@ const submit = () => {
                             </div>
 
                             <div class="md:col-span-2">
-                                <label for="url" class="block text-sm font-medium text-gray-300">URL (Certificate Link or Credential URL)</label>
+                                <label for="url" class="block text-sm font-medium text-gray-300">{{ __('URL (Certificate Link or Credential URL)') }}</label>
                                 <input id="url" v-model="form.url" type="url" class="mt-2 block w-full rounded-xl bg-gray-900/50 border border-white/10 shadow-inner text-white focus:border-purple-500 focus:ring-purple-500 transition-colors" />
                                 <div v-if="form.errors.url" class="text-red-400 text-xs mt-1">{{ form.errors.url }}</div>
                             </div>
@@ -186,8 +186,8 @@ const submit = () => {
                             <div class="md:col-span-2">
                                 <RichTextEditor 
                                     v-model="form.description" 
-                                    label="Description" 
-                                    placeholder="Enter education details..."
+                                    :label="__('Description')" 
+                                    :placeholder="__('Enter education details...')"
                                 />
                                 <div v-if="form.errors.description" class="text-red-400 text-xs mt-1">{{ form.errors.description }}</div>
                             </div>
@@ -195,12 +195,12 @@ const submit = () => {
 
                         <!-- Skills Selection -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-3">Associated Skills</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-3">{{ __('Associated Skills') }}</label>
                             <div v-if="Object.keys(groupedSkills).length === 0" class="text-gray-500 text-sm italic">
-                                No skills created yet. Create skills first in the Skills section.
+                                {{ __('No skills created yet. Create skills first in the Skills section.') }}
                             </div>
                             <div v-for="(skills, category) in groupedSkills" :key="category" class="mb-4">
-                                <p class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">{{ category }}</p>
+                                <p class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">{{ __(category) }}</p>
                                 <div class="flex flex-wrap gap-2">
                                     <button
                                         v-for="skill in skills"
@@ -223,8 +223,8 @@ const submit = () => {
 
                         <div class="flex items-center gap-4 pt-4 border-t border-white/10">
                             <button type="submit" :disabled="form.processing" class="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 rounded-xl font-bold text-white shadow-[0_0_15px_rgba(168,85,247,0.4)] transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 disabled:opacity-50">
-                                <span v-if="form.processing">Saving...</span>
-                                <span v-else>Save Changes</span>
+                                <span v-if="form.processing">{{ __('Saving...') }}</span>
+                                <span v-else>{{ __('Save Changes') }}</span>
                             </button>
                              <transition
                                 enter-active-class="transition ease-out duration-300"
@@ -235,7 +235,7 @@ const submit = () => {
                                 leave-to-class="opacity-0 -translate-y-2"
                             >
                                 <p v-if="form.recentlySuccessful" class="text-sm font-medium text-green-400 bg-green-500/10 px-3 py-1 rounded-lg border border-green-500/20">
-                                    Saved successfully.
+                                    {{ __('Saved successfully.') }}
                                 </p>
                             </transition>
                         </div>

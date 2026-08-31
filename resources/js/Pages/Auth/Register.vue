@@ -22,7 +22,7 @@ const submit = () => {
 
 <template>
     <CyberLayout>
-        <Head title="Register" />
+        <Head :title="__('Register')" />
 
         <div class="min-h-screen grid items-center justify-center relative overflow-hidden">
              <!-- 3D Glassmorphism Card Wrapper (Simplified Tilt for Register) -->
@@ -34,17 +34,17 @@ const submit = () => {
                     
                     <div class="text-center mb-8">
                          <h2 class="text-3xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-gray-900 via-purple-800 to-gray-900 dark:from-white dark:via-purple-200 dark:to-white text-center">
-                            NEW USER
+                            {{ __('NEW USER') }}
                         </h2>
                          <p class="text-sm text-gray-500 dark:text-gray-400 text-center font-bold tracking-widest uppercase mt-2 opacity-80">
-                            Initialize Protocol
+                            {{ __('Initialize Protocol') }}
                         </p>
                     </div>
 
                     <form @submit.prevent="submit" class="space-y-5">
                         <!-- Name -->
                         <div class="group">
-                            <InputLabel for="name" value="Name" class="text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]" />
+                            <InputLabel for="name" :value="__('Name')" class="text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]" />
                             <TextInput
                                 id="name"
                                 type="text"
@@ -59,7 +59,7 @@ const submit = () => {
 
                         <!-- Email -->
                         <div class="group">
-                            <InputLabel for="email" value="Email" class="text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]" />
+                            <InputLabel for="email" :value="__('Email Address')" class="text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]" />
                             <TextInput
                                 id="email"
                                 type="email"
@@ -73,7 +73,7 @@ const submit = () => {
 
                         <!-- Password -->
                         <div class="group">
-                             <InputLabel for="password" value="Password" class="text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]" />
+                             <InputLabel for="password" :value="__('Password')" class="text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]" />
                             <TextInput
                                 id="password"
                                 type="password"
@@ -87,7 +87,7 @@ const submit = () => {
 
                         <!-- Confirm Password -->
                         <div class="group">
-                             <InputLabel for="password_confirmation" value="Confirm Password" class="text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]" />
+                             <InputLabel for="password_confirmation" :value="__('Confirm Password')" class="text-[10px] font-black uppercase text-gray-500 dark:text-gray-400 mb-1 ml-1 tracking-[0.2em]" />
                             <TextInput
                                 id="password_confirmation"
                                 type="password"
@@ -104,7 +104,7 @@ const submit = () => {
                                 :href="route('login')"
                                 class="text-sm text-gray-500 dark:text-gray-400 hover:text-purple-600 dark:hover:text-cyan-400 font-bold transition-colors uppercase tracking-wider"
                             >
-                                Already registered?
+                                {{ __('Already registered?') }}
                             </Link>
 
                             <button
@@ -113,7 +113,7 @@ const submit = () => {
                                 :disabled="form.processing"
                             >
                                 <span class="relative z-10 flex items-center justify-center gap-2 group-hover:text-white dark:group-hover:text-white transition-colors duration-300">
-                                    Register
+                                    {{ __('Register') }}
                                 </span>
                                 <div class="absolute inset-0 h-full w-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             </button>
