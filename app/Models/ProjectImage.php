@@ -45,6 +45,23 @@ class ProjectImage extends Model
         ]) . '?v=' . ($this->updated_at ? $this->updated_at->timestamp : time());
     }
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope('withoutBlob', function ($builder) {
+            $builder->select([
+                'id',
+                'project_id',
+                'filename',
+                'mime_type',
+                'description',
+                'is_principal',
+                'sort_order',
+                'created_at',
+                'updated_at',
+            ]);
+        });
+    }
+
     public function project()
     {
         return $this->belongsTo(Project::class);

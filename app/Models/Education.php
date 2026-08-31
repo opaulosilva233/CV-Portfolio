@@ -65,6 +65,26 @@ class Education extends Model
         return $this->morphToMany(Skill::class, 'skillable');
     }
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope('withoutBlob', function ($builder) {
+            $builder->select([
+                'id',
+                'institution',
+                'degree',
+                'start_date',
+                'end_date',
+                'is_current',
+                'type',
+                'url',
+                'description',
+                'image_mime_type',
+                'created_at',
+                'updated_at',
+            ]);
+        });
+    }
+
     public function experienceRoles()
     {
         return $this->hasMany(ExperienceRole::class);

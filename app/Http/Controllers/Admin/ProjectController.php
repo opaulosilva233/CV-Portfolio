@@ -152,7 +152,7 @@ class ProjectController extends Controller
      */
     public function serveImage(Project $project, ?string $filename = null)
     {
-        $query = ProjectImage::where('project_id', $project->id);
+        $query = ProjectImage::withoutGlobalScope('withoutBlob')->where('project_id', $project->id);
 
         if (!$filename || $filename === 'principal' || str_starts_with($filename, 'principal.')) {
             $image = (clone $query)->where('is_principal', true)->first() ?? $query->first();

@@ -175,8 +175,10 @@ class ExperienceController extends Controller
     /**
      * Serve the experience image from database (public route).
      */
-    public function serveImage(Experience $experience)
+    public function serveImage($id)
     {
+        $experience = Experience::withoutGlobalScope('withoutBlob')->findOrFail($id);
+
         if (empty($experience->image_data)) {
             abort(404);
         }

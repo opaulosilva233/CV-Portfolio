@@ -66,6 +66,19 @@ class SiteSetting extends Model
      */
     protected static function booted(): void
     {
+        static::addGlobalScope('withoutBlob', function ($builder) {
+            $builder->select([
+                'id',
+                'key',
+                'value',
+                'type',
+                'group',
+                'image_mime_type',
+                'created_at',
+                'updated_at',
+            ]);
+        });
+
         static::saved(function () {
             self::clearCache();
         });

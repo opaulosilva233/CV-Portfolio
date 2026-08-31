@@ -59,7 +59,7 @@ class SettingController extends Controller
 
     public function serveHeroImage()
     {
-        $setting = SiteSetting::where('key', 'hero_image')->first();
+        $setting = SiteSetting::withoutGlobalScope('withoutBlob')->where('key', 'hero_image')->first();
 
         if (!$setting || empty($setting->image_data)) {
             abort(404);

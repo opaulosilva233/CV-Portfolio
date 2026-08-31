@@ -57,6 +57,21 @@ class Experience extends Model
         return $this->hasMany(ExperienceRole::class)->orderBy('start_date', 'desc');
     }
 
+    protected static function booted(): void
+    {
+        static::addGlobalScope('withoutBlob', function ($builder) {
+            $builder->select([
+                'id',
+                'company',
+                'location',
+                'sort_order',
+                'image_mime_type',
+                'created_at',
+                'updated_at',
+            ]);
+        });
+    }
+
     public function skills()
     {
         return $this->morphToMany(Skill::class, 'skillable');

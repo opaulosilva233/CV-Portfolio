@@ -170,8 +170,10 @@ class EducationController extends Controller
     /**
      * Serve the education image from database (public route).
      */
-    public function serveImage(Education $education)
+    public function serveImage($id)
     {
+        $education = Education::withoutGlobalScope('withoutBlob')->findOrFail($id);
+
         if (empty($education->image_data)) {
             abort(404);
         }
