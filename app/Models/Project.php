@@ -38,7 +38,10 @@ class Project extends Model
 
     public function images()
     {
-        return $this->hasMany(ProjectImage::class)->orderBy('is_principal', 'desc')->orderBy('sort_order', 'asc');
+        return $this->hasMany(ProjectImage::class)
+            ->select(['id', 'project_id', 'filename', 'mime_type', 'description', 'is_principal', 'sort_order', 'created_at', 'updated_at'])
+            ->orderBy('is_principal', 'desc')
+            ->orderBy('sort_order', 'asc');
     }
 
     /**

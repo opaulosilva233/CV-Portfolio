@@ -16,9 +16,10 @@ class ExperienceController extends Controller
     {
         $search = $request->input('search');
 
-        $query = Experience::query()->with(['roles' => function ($q) {
-            $q->orderBy('start_date', 'desc');
-        }, 'skills']);
+        $query = Experience::query()->select(['id', 'company', 'location', 'sort_order', 'image_mime_type', 'created_at', 'updated_at'])
+            ->with(['roles' => function ($q) {
+                $q->orderBy('start_date', 'desc');
+            }, 'skills']);
 
         if ($search) {
             $query->where('company', 'like', "%{$search}%")
@@ -52,6 +53,7 @@ class ExperienceController extends Controller
         $experience->load(['roles' => function ($query) {
             $query->orderBy('start_date', 'desc');
         }, 'skills']);
+        $experience->makeHidden('image_data');
 
         return Inertia::render('Admin/Experiences/Edit', [
             'experience' => $experience,

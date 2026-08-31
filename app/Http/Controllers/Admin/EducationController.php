@@ -18,7 +18,7 @@ class EducationController extends Controller
     {
         $search = $request->input('search');
 
-        $query = Education::query()->with('skills');
+        $query = Education::query()->select(['id', 'institution', 'degree', 'start_date', 'end_date', 'is_current', 'type', 'url', 'description', 'image_mime_type', 'created_at', 'updated_at'])->with('skills');
 
         if ($search) {
             $query->where('institution', 'like', "%{$search}%")
@@ -96,6 +96,7 @@ class EducationController extends Controller
     public function edit(Education $education)
     {
         $education->load('skills');
+        $education->makeHidden('image_data');
 
         return Inertia::render('Admin/Education/Edit', [
             'education' => $education,

@@ -30,17 +30,24 @@ class PortfolioController extends Controller
         });
 
         $experiences = $this->rememberPortfolioData('portfolio_experiences', 3600, function () {
-            return Experience::with(['translations', 'skills', 'roles' => function ($q) {
-                $q->with(['translations', 'education.translations'])->orderBy('start_date', 'desc');
-            }])->orderBy('sort_order')->get()->sortByDesc(function ($exp) {
-                return $exp->roles->max('start_date');
-            })->values();
+            return Experience::select(['id', 'company', 'location', 'sort_order', 'image_mime_type', 'created_at', 'updated_at'])
+                ->with(['translations', 'skills', 'roles' => function ($q) {
+                    $q->with([
+                        'translations',
+                        'education' => function ($eq) {
+                            $eq->select(['id', 'institution', 'degree', 'start_date', 'end_date', 'is_current', 'type', 'url', 'description', 'image_mime_type', 'created_at', 'updated_at'])->with('translations');
+                        }
+                    ])->orderBy('start_date', 'desc');
+                }])->orderBy('sort_order')->get()->sortByDesc(function ($exp) {
+                    return $exp->roles->max('start_date');
+                })->values();
         }, function () {
             return Experience::exists();
         });
 
         $educations = $this->rememberPortfolioData('portfolio_educations', 3600, function () {
-            return \App\Models\Education::with(['translations', 'skills'])->orderBy('start_date', 'desc')->get();
+            return \App\Models\Education::select(['id', 'institution', 'degree', 'start_date', 'end_date', 'is_current', 'type', 'url', 'description', 'image_mime_type', 'created_at', 'updated_at'])
+                ->with(['translations', 'skills'])->orderBy('start_date', 'desc')->get();
         }, function () {
             return \App\Models\Education::exists();
         });

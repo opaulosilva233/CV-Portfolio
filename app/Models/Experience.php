@@ -45,7 +45,7 @@ class Experience extends Model
      */
     public function getImageUrlAttribute(): ?string
     {
-        if (empty($this->image_data)) {
+        if (empty($this->image_mime_type) && empty($this->image_data)) {
             return null;
         }
 

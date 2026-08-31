@@ -25,12 +25,15 @@ class SiteSetting extends Model
     protected $hidden = ['image_data'];
 
     /**
-     * Get all settings from cache or database
+     * Get all settings from cache or database (excluding large binary image_data)
      */
     protected static function getAllCached()
     {
         return Cache::remember('site_settings_models', 3600, function () {
-            return self::with('translations')->get()->keyBy('key');
+            return self::select(['id', 'key', 'value', 'type', 'group', 'image_mime_type', 'created_at', 'updated_at'])
+                ->with('translations')
+                ->get()
+                ->keyBy('key');
         });
     }
 

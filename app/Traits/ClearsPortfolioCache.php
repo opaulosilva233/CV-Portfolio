@@ -31,5 +31,7 @@ trait ClearsPortfolioCache
         Cache::forget('portfolio_educations');
         Cache::forget('portfolio_interests');
         Cache::forget('portfolio_sections');
+        Cache::forget('site_settings');
+        Cache::forget('site_settings_models');
     }
 }

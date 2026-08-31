@@ -13,7 +13,7 @@ class SettingController extends Controller
     public function edit()
     {
         return Inertia::render('Admin/Settings/Edit', [
-            'settings' => SiteSetting::all()->keyBy('key'),
+            'settings' => SiteSetting::select(['id', 'key', 'value', 'type', 'group', 'image_mime_type', 'created_at', 'updated_at'])->get()->keyBy('key'),
         ]);
     }
 
