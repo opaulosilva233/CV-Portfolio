@@ -171,9 +171,17 @@ class TranslationController extends Controller
 
         $translated = $this->translationService->translateText($validated['text'], $sourceLocale, $targetLocale);
 
+        if ($translated === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Translation failed.',
+                'translated_text' => null,
+            ], 422);
+        }
+
         return response()->json([
-            'success' => $translated !== null,
-            'translated_text' => $translated ?? $validated['text'],
+            'success' => true,
+            'translated_text' => $translated,
         ]);
     }
 
@@ -427,7 +435,7 @@ class TranslationController extends Controller
         $existingTranslations = $model->translations ?? collect();
 
         foreach ($fields as $field) {
-            $originalVal = $model->$field ?? '';
+            $originalVal = (method_exists($model, 'getRawOriginal') ? $model->getRawOriginal($field) : null) ?? $model->$field ?? '';
 
             $localeMap = [];
             foreach ($targetLocales as $loc) {

@@ -164,9 +164,8 @@ const translateSelectedFieldsInModal = async () => {
     isSavingModal.value = true;
 
     try {
-        const locales = modalActiveLocale.value === 'all' 
-            ? props.summary.target_locales 
-            : [modalActiveLocale.value];
+        // Always translate to all configured target locales (EN and NL) so all tabs are populated
+        const locales = props.summary.target_locales;
 
         // Translate each selected field on-the-fly
         for (const field of activeItem.value.fields) {
@@ -174,14 +173,18 @@ const translateSelectedFieldsInModal = async () => {
             if (!field.original_value || field.original_value.trim() === '') continue;
 
             for (const loc of locales) {
-                const response = await axios.post(route('admin.translations.translate-text'), {
-                    text: field.original_value,
-                    target_locale: loc,
-                    source_locale: props.summary.source_locale,
-                });
+                try {
+                    const response = await axios.post(route('admin.translations.translate-text'), {
+                        text: field.original_value,
+                        target_locale: loc,
+                        source_locale: props.summary.source_locale,
+                    });
 
-                if (response.data && response.data.translated_text !== undefined) {
-                    editableTranslations.value[`${field.field}_${loc}`] = response.data.translated_text;
+                    if (response.data && response.data.success && response.data.translated_text) {
+                        editableTranslations.value[`${field.field}_${loc}`] = response.data.translated_text;
+                    }
+                } catch (err) {
+                    console.error(`Failed to translate field ${field.field} to ${loc}:`, err);
                 }
             }
         }
@@ -191,16 +194,20 @@ const translateSelectedFieldsInModal = async () => {
             for (const g of activeItem.value.gallery_items) {
                 if (!g.original_value) continue;
                 for (const loc of locales) {
-                    const response = await axios.post(route('admin.translations.translate-text'), {
-                        text: g.original_value,
-                        target_locale: loc,
-                        source_locale: props.summary.source_locale,
-                    });
-                    if (response.data && response.data.translated_text !== undefined) {
-                        if (!editableGalleryTranslations.value[loc]) {
-                            editableGalleryTranslations.value[loc] = {};
+                    try {
+                        const response = await axios.post(route('admin.translations.translate-text'), {
+                            text: g.original_value,
+                            target_locale: loc,
+                            source_locale: props.summary.source_locale,
+                        });
+                        if (response.data && response.data.success && response.data.translated_text) {
+                            if (!editableGalleryTranslations.value[loc]) {
+                                editableGalleryTranslations.value[loc] = {};
+                            }
+                            editableGalleryTranslations.value[loc][g.image_key] = response.data.translated_text;
                         }
-                        editableGalleryTranslations.value[loc][g.image_key] = response.data.translated_text;
+                    } catch (err) {
+                        console.error(`Failed to translate gallery image ${g.image_key} to ${loc}:`, err);
                     }
                 }
             }
@@ -227,7 +234,7 @@ const translateSingleFieldOnDemand = async (field, locale) => {
             source_locale: props.summary.source_locale,
         });
 
-        if (response.data && response.data.translated_text !== undefined) {
+        if (response.data && response.data.success && response.data.translated_text) {
             editableTranslations.value[key] = response.data.translated_text;
         }
     } catch (error) {
@@ -251,7 +258,7 @@ const translateSingleGalleryOnDemand = async (galleryItem, locale) => {
             source_locale: props.summary.source_locale,
         });
 
-        if (response.data && response.data.translated_text !== undefined) {
+        if (response.data && response.data.success && response.data.translated_text) {
             if (!editableGalleryTranslations.value[locale]) {
                 editableGalleryTranslations.value[locale] = {};
             }

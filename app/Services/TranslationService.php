@@ -11,6 +11,7 @@ use App\Models\SiteSetting;
 use App\Models\Skill;
 use App\Models\Translation;
 use Stichoza\GoogleTranslate\GoogleTranslate;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class TranslationService
@@ -67,13 +68,19 @@ class TranslationService
         $results = ['success' => 0, 'errors' => 0];
 
         foreach ($fields as $field) {
-            $originalText = $model->$field;
+            // Get original value directly from raw model attribute to avoid translated accessor
+            $originalText = $model->getRawOriginal($field) ?? $model->$field;
 
             if (empty($originalText)) {
                 continue;
             }
 
             foreach ($locales as $locale) {
+                // Do not translate if target locale is same as source locale
+                if ($locale === $this->sourceLocale) {
+                    continue;
+                }
+
                 // If not forcing, skip if translation already exists and is not empty
                 if (!$force) {
                     $existing = Translation::where('translatable_type', get_class($model))
@@ -90,7 +97,7 @@ class TranslationService
                 try {
                     $translatedText = $this->translateText($originalText, $this->sourceLocale, $locale);
                     
-                    if ($translatedText !== null) {
+                    if ($translatedText !== null && trim($translatedText) !== '') {
                         Translation::updateOrCreate(
                             [
                                 'translatable_type' => get_class($model),
@@ -212,6 +219,8 @@ class TranslationService
             if (empty($description)) continue;
 
             foreach ($this->targetLocales as $locale) {
+                if ($locale === $sourceLocale) continue;
+
                 if (!isset($fullMetadata[$locale])) {
                     $fullMetadata[$locale] = [];
                 }
@@ -236,23 +245,94 @@ class TranslationService
     }
 
     /**
-     * Translate a string using Google Translate.
+     * Translate a string using multiple high-reliability translation engines.
      */
-    public function translateText(string $text, string $source, string $target): ?string
+    public function translateText(string $text, ?string $source = 'pt', string $target = 'en'): ?string
     {
-        try {
-            if (trim($text) === '') {
-                return '';
-            }
-
-            $tr = new GoogleTranslate();
-            $tr->setSource($source);
-            $tr->setTarget($target);
-            
-            return $tr->translate($text);
-        } catch (\Exception $e) {
-            Log::error("Google Translate Error ({$source}->{$target}): " . $e->getMessage());
-            return null;
+        $text = trim($text);
+        if ($text === '') {
+            return '';
         }
+
+        // If target is same as source, no translation needed
+        if ($source && $source === $target) {
+            return $text;
+        }
+
+        // Engine 1: Google Translate GTX Endpoint (Ultra-fast, direct)
+        try {
+            $sl = ($source && $source !== 'auto') ? $source : 'auto';
+            $response = Http::timeout(8)
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                    'Accept' => 'application/json',
+                ])
+                ->get('https://translate.googleapis.com/translate_a/single', [
+                    'client' => 'gtx',
+                    'sl' => $sl,
+                    'tl' => $target,
+                    'dt' => 't',
+                    'q' => $text,
+                ]);
+
+            if ($response->successful()) {
+                $data = $response->json();
+                if (isset($data[0]) && is_array($data[0])) {
+                    $translated = '';
+                    foreach ($data[0] as $segment) {
+                        if (isset($segment[0]) && is_string($segment[0])) {
+                            $translated .= $segment[0];
+                        }
+                    }
+                    if (!empty(trim($translated))) {
+                        return trim($translated);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning("Google GTX Translation failed for ({$source}->{$target}): " . $e->getMessage());
+        }
+
+        // Engine 2: Stichoza GoogleTranslate library
+        try {
+            $tr = new GoogleTranslate();
+            $tr->setSource($source ?: 'pt');
+            $tr->setTarget($target);
+            $tr->setOptions([
+                'headers' => [
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                ],
+                'timeout' => 8,
+            ]);
+            $translated = $tr->translate($text);
+            if (!empty(trim($translated))) {
+                return trim($translated);
+            }
+        } catch (\Exception $e) {
+            Log::warning("Stichoza GoogleTranslate failed for ({$source}->{$target}): " . $e->getMessage());
+        }
+
+        // Engine 3: MyMemory Free Translation API
+        try {
+            $langpair = ($source ?: 'pt') . '|' . $target;
+            $response = Http::timeout(8)
+                ->get('https://api.mymemory.translated.net/get', [
+                    'q' => $text,
+                    'langpair' => $langpair,
+                ]);
+
+            if ($response->successful()) {
+                $json = $response->json();
+                $translated = $json['responseData']['translatedText'] ?? null;
+                if (!empty(trim($translated)) && !str_starts_with(strtoupper($translated), 'MYMEMORY WARNING')) {
+                    return trim($translated);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::warning("MyMemory Translation failed for ({$source}->{$target}): " . $e->getMessage());
+        }
+
+        Log::error("All translation engines failed for text: '{$text}' ({$source}->{$target})");
+        return null;
     }
 }
